@@ -14,6 +14,8 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.util.Color;
@@ -25,12 +27,11 @@ public class Elevator extends SubsystemBase {
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
   @AutoLogOutput
-  public final LoggedMechanism2d mechanism2d =
-      new LoggedMechanism2d(3, 3, new Color8Bit(Color.kBlack));
+  public final LoggedMechanism2d mechanism2d = new LoggedMechanism2d(3, 3, new Color8Bit(Color.kBlack));
 
   private final LoggedMechanismRoot2d mechRoot2d = mechanism2d.getRoot("Elevator Root", 1.5, 0);
-  private final LoggedMechanismLigament2d elevatorMech2d =
-      mechRoot2d.append(new LoggedMechanismLigament2d("Elevator", INITIAL_HEIGHT.in(Meters), 90.0,
+  private final LoggedMechanismLigament2d elevatorMech2d = mechRoot2d
+      .append(new LoggedMechanismLigament2d("Elevator", INITIAL_HEIGHT.in(Meters), 90.0,
           50, new Color8Bit(Color.kBlue)));
 
   public Elevator(ElevatorIO io) {
@@ -49,7 +50,7 @@ public class Elevator extends SubsystemBase {
   }
 
   private Angle inchesToRadians(Distance d) {
-    d.minus(MIN_HEIGHT);
+    d = d.minus(MIN_HEIGHT);
     return Radians.of(d.in(Meters) / DRUM_RADIUS.in(Meters));
   }
 
@@ -92,5 +93,14 @@ public class Elevator extends SubsystemBase {
     Distance height = MAX_EXTENSION.plus(MIN_HEIGHT);
     Angle r = inchesToRadians(height);
     io.setWinchPosition(r);
+  }
+
+  public Pose3d[] getElevatorPoses() {
+    var height = radiansToInches(inputs.winchPosition).minus(MIN_HEIGHT);
+    var stageLift = height.in(Meters) / 3;
+    // cascading lift: first stage is 1/3 current height, second stage is 2/3
+    // current height, and third stage is at lift height
+    return new Pose3d[] { new Pose3d(0, 0, stageLift, Rotation3d.kZero),
+        new Pose3d(0, 0, 2 * stageLift, Rotation3d.kZero), new Pose3d(0, 0, stageLift * 3, Rotation3d.kZero) };
   }
 }

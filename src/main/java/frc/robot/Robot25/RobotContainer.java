@@ -20,6 +20,7 @@ import com.google.flatbuffers.Constants;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -48,6 +49,8 @@ import frc.robot.SimConstants;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -77,6 +80,12 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
   // coast buttion
   private static DigitalInputWrapper coastButton = new DigitalInputWrapper(0, "coastButton", false);
+
+  @AutoLogOutput
+  public final Pose3d[] mechanismPoses = new Pose3d[] { Pose3d.kZero, Pose3d.kZero, Pose3d.kZero };
+
+  @AutoLogOutput
+  public final Pose3d[] zeroedMechanismPoses = new Pose3d[] { Pose3d.kZero, Pose3d.kZero, Pose3d.kZero };
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -251,5 +260,13 @@ public class RobotContainer extends frc.lib.RobotContainer {
   @Override
   public void disabledInit() {
     // drive.stopWithX();
+  }
+
+  @Override
+  public void robotPeriodic() {
+    var elevatorPoses = elevator.getElevatorPoses();
+    mechanismPoses[0] = elevatorPoses[0];
+    mechanismPoses[1] = elevatorPoses[1];
+    mechanismPoses[2] = elevatorPoses[2];
   }
 }
