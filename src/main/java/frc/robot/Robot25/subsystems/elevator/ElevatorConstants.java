@@ -29,9 +29,9 @@ public class ElevatorConstants {
   public static final double GEARING = 5.0;
   public static final Distance MIN_HEIGHT = Inches.of(16.3);
   public static final Distance INITIAL_HEIGHT = Inches.of(16.3);
-  public static final Distance MAX_EXTENSION = Inches.of(75.0);
-  public static final Mass CARRIAGE_MASS = Pounds.of(15);
-  public static final LinearVelocity MAX_VELOCITY = InchesPerSecond.of(180.85);
+  public static final Distance MAX_EXTENSION = Inches.of(75);
+  public static final Mass CARRIAGE_MASS = Pounds.of(19.147);
+  public static final LinearVelocity MAX_VELOCITY = InchesPerSecond.of(178.63);
   public static final AngularAcceleration MAX_ACCELERATION = RadiansPerSecondPerSecond.of(90 / DRUM_RADIUS.in(Inches));
   public static final Current CURRENT_LIMIT = Amps.of(40);
 
@@ -48,14 +48,14 @@ public class ElevatorConstants {
   }
 
   public static final class Sim {
-    public static final double kP = 4.0; // 5
-    public static final double kI = 0.3;
-    public static final double kD = 0.6;
+    public static final double kP = 3.9; // 4
+    public static final double kI = 0.0; // 0.3
+    public static final double kD = 0.06; // 0.6
     public static final double kS = 0.0;
-    public static final double kG = 0.43; // 0.37
-    public static final double kV = 0.10146; // 2.67
-    public static final double kA = 0.002; // * DRUM_RADIUS.in(Meters); // 0.05
-    public static final MomentOfInertia MOTOR_LOAD_MOI = KilogramSquareMeters.of(0.04); // TODO estimate
-    public static final Voltage FRICTION_VOLTAGE = Volts.of(0.5);
+    public static final double kG = 0.548; // 0.54
+    public static final double kV = 0.10146; // 0.10146
+    public static final double kA = 0.002; // 0.002
+    public static final MomentOfInertia MOTOR_LOAD_MOI = KilogramSquareMeters.of(0.01261); // TODO estimate
+    public static final Voltage FRICTION_VOLTAGE = Volts.of(1.1);
   }
 }

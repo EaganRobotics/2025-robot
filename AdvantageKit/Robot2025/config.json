@@ -1,0 +1,106 @@
+{
+  "name": "2025",
+  "sourceUrl": "https://cad.onshape.com/documents/7896b49e96c8855f0c12cc66/w/ddfadf70f70a2e19a3fa31f6/e/8e2ca1d70cd4e0c239c33cb4",
+  "rotations": [
+    {
+      "axis": "x",
+      "degrees": 90
+    },
+    {
+      "axis": "z",
+      "degrees": 90
+    }
+  ],
+  "position": [0, 0, 0],
+  "cameras": [
+    {
+      "name": "Northstar 0",
+      "rotations": [
+        {
+          "axis": "y",
+          "degrees": -28.125
+        },
+        {
+          "axis": "z",
+          "degrees": 30.0
+        }
+      ],
+      "position": [0.225425, 0.2667, 0.20955],
+      "resolution": [1600, 1200],
+      "fov": 75
+    },
+    {
+      "name": "Northstar 1",
+      "rotations": [
+        {
+          "axis": "y",
+          "degrees": -16.875
+        },
+        {
+          "axis": "z",
+          "degrees": -4.709
+        }
+      ],
+      "position": [0.08255, 0.127, 0.16256],
+      "resolution": [1600, 1200],
+      "fov": 45
+    },
+    {
+      "name": "Northstar 2",
+      "rotations": [
+        {
+          "axis": "y",
+          "degrees": -28.125
+        },
+        {
+          "axis": "z",
+          "degrees": -30.0
+        }
+      ],
+      "position": [0.225425, -0.2667, 0.20955],
+      "resolution": [1600, 1200],
+      "fov": 75
+    }
+  ],
+  "components": [
+    {
+      "zeroedRotations": [
+        {
+          "axis": "x",
+          "degrees": 90
+        },
+        {
+          "axis": "z",
+          "degrees": 90
+        }
+      ],
+      "zeroedPosition": [0, 0, 0]
+    },
+    {
+      "zeroedRotations": [
+        {
+          "axis": "x",
+          "degrees": 90
+        },
+        {
+          "axis": "z",
+          "degrees": 90
+        }
+      ],
+      "zeroedPosition": [0, 0, 0]
+    },
+    {
+      "zeroedRotations": [
+        {
+          "axis": "x",
+          "degrees": 90
+        },
+        {
+          "axis": "z",
+          "degrees": 90
+        }
+      ],
+      "zeroedPosition": [0, 0, 0]
+    }
+  ]
+}

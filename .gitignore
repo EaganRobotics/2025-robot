@@ -192,3 +192,7 @@ BuildConstants.java
 # Ignore simgui and network table files created by simulator
 simgui*
 networktables.json
+
+# Ignore changes to editor settings and metadata
+.zed/
+.vscode/
