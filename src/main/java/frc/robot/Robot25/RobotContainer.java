@@ -16,9 +16,7 @@ package frc.robot.Robot25;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerMotorArrangement;
-import com.google.flatbuffers.Constants;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -29,7 +27,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.devices.DigitalInputWrapper;
-import frc.lib.tunables.TunableDouble;
 import frc.robot.Robot;
 import frc.robot.Robot25.commands.DriveCommands;
 import frc.robot.Robot25.subsystems.drive.Drive;
@@ -40,16 +37,13 @@ import frc.robot.Robot25.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.Robot25.subsystems.elevator.Elevator;
 import frc.robot.Robot25.subsystems.elevator.ElevatorIO;
 import frc.robot.Robot25.subsystems.elevator.ElevatorIOSim;
-import frc.robot.Robot25.subsystems.elevator.ElevatorIOTalonFX;
 import frc.robot.Robot25.subsystems.gyro.GyroIO;
-import frc.robot.Robot25.subsystems.gyro.GyroIONavX;
 import frc.robot.Robot25.subsystems.gyro.GyroIOPigeon2;
 import frc.robot.Robot25.subsystems.gyro.GyroIOSim;
 import frc.robot.SimConstants;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -83,9 +77,6 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
   @AutoLogOutput
   public final Pose3d[] mechanismPoses = new Pose3d[] { Pose3d.kZero, Pose3d.kZero, Pose3d.kZero };
-
-  @AutoLogOutput
-  public final Pose3d[] zeroedMechanismPoses = new Pose3d[] { Pose3d.kZero, Pose3d.kZero, Pose3d.kZero };
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
