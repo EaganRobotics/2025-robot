@@ -1,13 +1,13 @@
 {
   "hubs": [
     {
-      "x": -1,
-      "y": 37,
-      "width": 1114,
-      "height": 832,
+      "x": 222,
+      "y": 169,
+      "width": 1000,
+      "height": 700,
       "state": {
         "sidebar": {
-          "width": 326,
+          "width": 250,
           "expanded": [
             "/ReplayOutputs",
             "/ReplayOutputs/Drive",
@@ -29,7 +29,7 @@
           ]
         },
         "tabs": {
-          "selected": 2,
+          "selected": 1,
           "tabs": [
             {
               "type": 0,
@@ -114,9 +114,9 @@
                 "cameraIndex": -2,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  -0.19792763237075173,
+                  -0.1979276323707515,
                   1.5871388523886814,
-                  1.3920348921367196
+                  1.3920348921367194
                 ],
                 "cameraTarget": [
                   -0.18961499502259824,
@@ -124,7 +124,7 @@
                   0.06138892486562306
                 ]
               },
-              "controlsHeight": 416
+              "controlsHeight": 180
             },
             {
               "type": 2,
@@ -177,7 +177,7 @@
               },
               "controllerUUID": "9dp2bpzeeats1k10xzbgvims8xndvi24",
               "renderer": null,
-              "controlsHeight": 200
+              "controlsHeight": 180
             },
             {
               "type": 9,
@@ -237,7 +237,7 @@
               },
               "controllerUUID": "n8cup6tlfl7uzliesun7vcy71lduzika",
               "renderer": null,
-              "controlsHeight": 200
+              "controlsHeight": 180
             },
             {
               "type": 10,
@@ -253,7 +253,7 @@
               ],
               "controllerUUID": "idehch2zpgb3kzeqkl9xxl95h1k9zqoi",
               "renderer": null,
-              "controlsHeight": 200
+              "controlsHeight": 180
             }
           ]
         }
