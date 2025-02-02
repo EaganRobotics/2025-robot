@@ -66,25 +66,25 @@ public class Elevator extends SubsystemBase {
   }
 
   public void L1() {
-    Distance height = Inches.of(18 + 3);
+    Distance height = MIN_HEIGHT.plus(Inches.of(6.5));
     Angle r = inchesToRadians(height);
     io.setWinchPosition(r);
   }
 
   public void L2() {
-    Distance height = Inches.of(31.9 + 3);
+    Distance height = MIN_HEIGHT.plus(Inches.of(23.5));
     Angle r = inchesToRadians(height);
     io.setWinchPosition(r);
   }
 
   public void L3() {
-    Distance height = Inches.of(47.6 + 3);
+    Distance height = MIN_HEIGHT.plus(Inches.of(39.5));
     Angle r = inchesToRadians(height);
     io.setWinchPosition(r);
   }
 
   public void L4() {
-    Distance height = Inches.of(72 + 3);
+    Distance height = MIN_HEIGHT.plus(Inches.of(64));
     Angle r = inchesToRadians(height);
     io.setWinchPosition(r);
   }
@@ -95,12 +95,34 @@ public class Elevator extends SubsystemBase {
     io.setWinchPosition(r);
   }
 
+  /**
+   * Computes the estimated position of each elevator stage (stage 1, stage 2,
+   * carriage + loader) given the current winch position. Useful for rendering the
+   * robot model in simulation.
+   *
+   * A continuous elevator lifts stages in order of least weight. As of 2/1, for
+   * us that would be stage 2, stage 1, then carriage. In order, each stage will
+   * contribute as much height as it can to the lift before the next stage
+   * engages.
+   *
+   * @returns Pose array of each elevator stage in the order: stage 1, stage 2,
+   *          carriage
+   */
   public Pose3d[] getElevatorPoses() {
     var height = radiansToInches(inputs.winchPosition).minus(MIN_HEIGHT);
-    var stageLift = height.in(Meters) / 3;
-    // cascading lift: first stage is 1/3 current height, second stage is 2/3
-    // current height, and third stage is at lift height
-    return new Pose3d[] { new Pose3d(0, 0, stageLift, Rotation3d.kZero),
-        new Pose3d(0, 0, 2 * stageLift, Rotation3d.kZero), new Pose3d(0, 0, stageLift * 3, Rotation3d.kZero) };
+    var heightInches = height.in(Inches);
+    // contributes no height until above 26.25 inches and contributes up to 25.25
+    // inches
+    var stage1Contribution = heightInches < 26.25 ? 0
+        : heightInches < 51.5 ? height.minus(Inches.of(26.25)).in(Meters) : Inches.of(25.25).in(Meters);
+    // contributes up to 26.25 inches starting at height 0
+    var stage2Contribution = heightInches < 26.25 ? height.in(Meters) : Inches.of(26.25).in(Meters);
+    // contributes no height until above 51.5 inches and contributes up to 25.25
+    // inches
+    var stage3Contribution = heightInches < 51.5 ? 0 : height.minus(Inches.of(51.5)).in(Meters);
+
+    return new Pose3d[] { new Pose3d(0, 0, stage1Contribution, Rotation3d.kZero),
+        new Pose3d(0, 0, stage1Contribution + stage2Contribution, Rotation3d.kZero),
+        new Pose3d(0, 0, stage1Contribution + stage2Contribution + stage3Contribution, Rotation3d.kZero) };
   }
 }

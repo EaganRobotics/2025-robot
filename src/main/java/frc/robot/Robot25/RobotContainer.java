@@ -222,7 +222,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
     // Switch to X pattern when X button is pressed
     DriverController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-    // Reset gyro to 0° when START button is pressed
+    // Reset gyro to 0° when START button is pressed
     DriverController.start()
         .onTrue(Commands.runOnce(
             () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
@@ -263,7 +263,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
   }
 
   @Override
-  public void robotPeriodic() {
+  public void simulationPeriodic() {
     var elevatorPoses = elevator.getElevatorPoses();
     mechanismPoses[0] = elevatorPoses[0];
     mechanismPoses[1] = elevatorPoses[1];
