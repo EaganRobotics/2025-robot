@@ -7,13 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Right 1M"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Up 1M"
+            "pathName": "Forward 1M"
           }
         },
         {
@@ -25,13 +19,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Down 1M"
+            "pathName": "Backwards 1M"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Right 1M"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Square Autos",
   "choreoAuto": false
 }

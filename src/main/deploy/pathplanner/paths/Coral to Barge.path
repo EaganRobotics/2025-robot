@@ -3,32 +3,53 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.0,
-        "y": 5.0
+        "x": 5.352,
+        "y": 5.425
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.0,
-        "y": 4.0
+        "x": 7.861648832689095,
+        "y": 4.110359922178988
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.0,
-        "y": 4.0
+        "x": 5.983730544747082,
+        "y": 0.5593871595330745
       },
       "prevControl": {
-        "x": 4.0,
-        "y": 5.0
+        "x": 6.444674124517888,
+        "y": 3.2909046692607005
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1,
+      "rotationDegrees": 0.0
+    },
+    {
+      "waypointRelativePos": 1,
+      "rotationDegrees": 0.0
+    },
+    {
+      "waypointRelativePos": 1,
+      "rotationDegrees": 0.0
+    },
+    {
+      "waypointRelativePos": 1,
+      "rotationDegrees": 0.0
+    },
+    {
+      "waypointRelativePos": 1,
+      "rotationDegrees": 0.0
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -45,10 +66,10 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Score Coral, Score Alage",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -27.07952567801222
   },
   "useDefaultConstraints": true
 }

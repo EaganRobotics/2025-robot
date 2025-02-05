@@ -41,6 +41,8 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class DriveCommands {
   private static final double SLOW_MODE_MULTIPLIER = 0.5;
@@ -57,13 +59,16 @@ public class DriveCommands {
   private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
 
 
-  public static final TunableDouble ANGLE_KP =
-      new TunableDouble("ANGLE_KP", 7.0, "driver").setSpot(0, 0);
-  public static final TunableDouble ANGLE_KI =
-      new TunableDouble("ANGLE_KI", 0.0, "driver").setSpot(1, 0);
-  public static final TunableDouble ANGLE_KD =
-      new TunableDouble("ANGLE_KD", 0.4, "driver").setSpot(2, 0);
+  // public static final TunableDouble ANGLE_KP =
+  // new TunableDouble("ANGLE_KP", 7.0, "driver").setSpot(0, 0);
+  // public static final TunableDouble ANGLE_KI =
+  // new TunableDouble("ANGLE_KI", 0.0, "driver").setSpot(1, 0);
+  // public static final TunableDouble ANGLE_KD =
+  // new TunableDouble("ANGLE_KD", 0.4, "driver").setSpot(2, 0);
 
+  public static final LoggedNetworkNumber ANGLE_KP = new LoggedNetworkNumber("/Tuning/angleKP", 0);
+  public static final LoggedNetworkNumber ANGLE_KI = new LoggedNetworkNumber("/Tuning/angleKI", 0);
+  public static final LoggedNetworkNumber ANGLE_KD = new LoggedNetworkNumber("/Tuning/angleKD", 0);
 
 
   private DriveCommands() {}
@@ -89,12 +94,13 @@ public class DriveCommands {
 
     // Create PID controller
     ProfiledPIDController angleController =
-        new ProfiledPIDController(ANGLE_KP.getValue(), ANGLE_KI.getValue(), ANGLE_KD.getValue(),
+        new ProfiledPIDController(ANGLE_KP.get(), ANGLE_KI.get(), ANGLE_KD.get(),
             new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
     angleController.enableContinuousInput(-Math.PI, Math.PI);
     angleController.setTolerance(ANGLE_TOLERANCE);
 
     return Commands.run(() -> {
+
       // Get linear velocity
       Translation2d linearVelocity =
           getLinearVelocityFromJoysticks(-xSupplier.getAsDouble(), -ySupplier.getAsDouble());
@@ -147,7 +153,7 @@ public class DriveCommands {
 
     // Create PID controller
     ProfiledPIDController angleController =
-        new ProfiledPIDController(ANGLE_KP.getValue(), ANGLE_KI.getValue(), ANGLE_KD.getValue(),
+        new ProfiledPIDController(ANGLE_KP.get(), ANGLE_KI.get(), ANGLE_KD.get(),
             new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
     angleController.enableContinuousInput(-Math.PI, Math.PI);
 

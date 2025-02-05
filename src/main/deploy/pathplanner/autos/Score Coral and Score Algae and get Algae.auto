@@ -7,19 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Move to Alage"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "L4"
+            "pathName": "Barge to Score Coral"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Move to Coral from Alage, Score Coral"
+            "pathName": "Coral to Barge"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Barge to Score Alage"
           }
         }
       ]

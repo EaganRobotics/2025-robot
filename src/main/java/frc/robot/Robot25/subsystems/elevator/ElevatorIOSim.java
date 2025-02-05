@@ -10,12 +10,11 @@ import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Robot25.subsystems.elevator.ElevatorConstants.*;
-import java.util.logging.Logger;
 
 import org.ironmaple.simulation.motorsims.MapleMotorSim;
 import org.ironmaple.simulation.motorsims.SimMotorConfigs;
 import org.ironmaple.simulation.motorsims.SimulatedMotorController;
-
+import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -37,30 +36,16 @@ public class ElevatorIOSim implements ElevatorIO {
   private Voltage winchAppliedVoltage = Volts.of(0);
   private Voltage winchFFVoltage = Volts.of(0);
 
-  private final ProfiledPIDController pidController = new ProfiledPIDController(
-      Sim.kP,
-      Sim.kI,
-      Sim.kD,
-      new TrapezoidProfile.Constraints(MAX_VELOCITY.in(MetersPerSecond) / DRUM_RADIUS.in(Meters),
+  private final ProfiledPIDController pidController = new ProfiledPIDController(Sim.kP, Sim.kI, Sim.kD,
+      new TrapezoidProfile.Constraints(
+          MAX_VELOCITY.in(MetersPerSecond) / DRUM_RADIUS.in(Meters),
           MAX_ACCELERATION.in(RadiansPerSecondPerSecond)));
 
-  private final ElevatorFeedforward feedForwardController = new ElevatorFeedforward(
-      Sim.kS,
-      Sim.kG,
-      Sim.kV,
-      Sim.kA);
+  private final ElevatorFeedforward feedForwardController = new ElevatorFeedforward(Sim.kS, Sim.kG, Sim.kV, Sim.kA);
 
-  private final ElevatorSim elevatorSim = new ElevatorSim(
-      elevatorGearbox,
-      GEARING,
-      CARRIAGE_MASS.in(Kilograms),
+  private final ElevatorSim elevatorSim = new ElevatorSim(elevatorGearbox, GEARING, CARRIAGE_MASS.in(Kilograms),
       DRUM_RADIUS.in(Meters),
-      0,
-      MAX_EXTENSION.in(Meters),
-      true,
-      0,
-      0, // 0.0000075
-      0);
+      0, MAX_EXTENSION.in(Meters), true, 0, 0.000015, 0);
 
   public ElevatorIOSim() {
     elevatorMotor = new MapleMotorSim(
@@ -77,6 +62,7 @@ public class ElevatorIOSim implements ElevatorIO {
       var pidSetpoint = pidController.getSetpoint();
       var feedForwardVolts = feedForwardController.calculate(pidSetpoint.velocity);
       winchAppliedVoltage = Volts.of(feedForwardVolts + pidVolts);
+      Logger.recordOutput("Elevator/Tuning/DesiredVelocity", pidSetpoint.velocity);
     } else {
       pidController.reset(winchPositionRads);
     }
@@ -93,9 +79,6 @@ public class ElevatorIOSim implements ElevatorIO {
     inputs.winchVelocity = RadiansPerSecond.of(elevatorSim.getVelocityMetersPerSecond() / DRUM_RADIUS.in(Meters));
     inputs.winchAppliedVolts = winchAppliedVoltage;
     inputs.winchCurrent = Amps.of(elevatorSim.getCurrentDrawAmps());
-
-    // Update odometry inputs (50Hz because high-frequency odometry in sim doesn't
-    // matter)
   }
 
   @Override

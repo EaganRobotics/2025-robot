@@ -40,4 +40,8 @@ public class Outtake extends SubsystemBase {
       }
     });
   }
+
+  public Command exhaustCoral() {
+    return setOpenLoop(Volts.of(5)).withTimeout(2);
+  }
 }

@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.352,
-        "y": 5.425
+        "x": 5.983730544747082,
+        "y": 0.6106031128404663
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.820257782101168,
-        "y": 5.4846546692607
+        "x": 4.737475680933852,
+        "y": 1.8995379377431902
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.059265564202334,
-        "y": 5.425
+        "x": 1.9803501945525295,
+        "y": 2.181225680933851
       },
       "prevControl": {
-        "x": 6.043482490272373,
-        "y": 5.56147859922179
+        "x": 3.337572957198444,
+        "y": 2.087329766536965
       },
       "nextControl": null,
       "isLocked": false,
@@ -66,10 +66,10 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "Reset Paths",
+  "folder": "Score Coral, Score Alage",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -27.07952567801222
+    "rotation": -0.014509852051401725
   },
   "useDefaultConstraints": true
 }
