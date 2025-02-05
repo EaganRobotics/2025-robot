@@ -11,7 +11,11 @@
       "degrees": 90
     }
   ],
-  "position": [0, 0, 0],
+  "position": [
+    0,
+    0,
+    0
+  ],
   "cameras": [
     {
       "name": "Northstar 0",
@@ -25,8 +29,15 @@
           "degrees": 30.0
         }
       ],
-      "position": [0.225425, 0.2667, 0.20955],
-      "resolution": [1600, 1200],
+      "position": [
+        0.225425,
+        0.2667,
+        0.20955
+      ],
+      "resolution": [
+        1600,
+        1200
+      ],
       "fov": 75
     },
     {
@@ -41,8 +52,15 @@
           "degrees": -4.709
         }
       ],
-      "position": [0.08255, 0.127, 0.16256],
-      "resolution": [1600, 1200],
+      "position": [
+        0.08255,
+        0.127,
+        0.16256
+      ],
+      "resolution": [
+        1600,
+        1200
+      ],
       "fov": 45
     },
     {
@@ -57,8 +75,15 @@
           "degrees": -30.0
         }
       ],
-      "position": [0.225425, -0.2667, 0.20955],
-      "resolution": [1600, 1200],
+      "position": [
+        0.225425,
+        -0.2667,
+        0.20955
+      ],
+      "resolution": [
+        1600,
+        1200
+      ],
       "fov": 75
     }
   ],
@@ -74,7 +99,11 @@
           "degrees": 90
         }
       ],
-      "zeroedPosition": [0, 0, 0]
+      "zeroedPosition": [
+        0,
+        0,
+        0
+      ]
     },
     {
       "zeroedRotations": [
@@ -87,7 +116,11 @@
           "degrees": 90
         }
       ],
-      "zeroedPosition": [0, 0, 0]
+      "zeroedPosition": [
+        0,
+        0,
+        0
+      ]
     },
     {
       "zeroedRotations": [
@@ -100,7 +133,11 @@
           "degrees": 90
         }
       ],
-      "zeroedPosition": [0, 0, 0]
+      "zeroedPosition": [
+        0,
+        0,
+        0
+      ]
     }
   ]
 }
