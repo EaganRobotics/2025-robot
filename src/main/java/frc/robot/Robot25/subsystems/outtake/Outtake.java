@@ -30,7 +30,8 @@ public class Outtake extends SubsystemBase {
   }
 
   public Command autoQueueCoral() {
-    return this.run(() -> {
+    return this.runEnd(() -> {
+      Logger.recordOutput("Outtake/AutoQueuing", true);
       if (inputs.seesCoralAtOutput) {
         io.setOpenLoop(Volts.of(0));
       } else if (inputs.seesCoralAtInput) {
@@ -38,6 +39,9 @@ public class Outtake extends SubsystemBase {
       } else {
         io.setOpenLoop(Volts.of(12));
       }
+    }, () -> {
+      Logger.recordOutput("Outtake/AutoQueuing", false);
+      io.setOpenLoop(Volts.of(0));
     });
   }
 

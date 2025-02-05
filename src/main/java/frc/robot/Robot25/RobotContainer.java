@@ -240,7 +240,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
             xSupplier,
             omegaSupplier,
             slowModeSupplier));
-    outtake.setDefaultCommand(outtake.autoQueueCoral());
+    outtake.setDefaultCommand(outtake.autoQueueCoral().onlyWhile(elevator.elevatorAtMinHeight()));
 
     DriverController.a()
         .toggleOnTrue(
