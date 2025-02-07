@@ -17,6 +17,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -125,7 +126,10 @@ public class Elevator extends SubsystemBase {
       Distance height = Level.minHeight.getHeight();
       Angle r = inchesToRadians(height);
       io.setWinchPosition(r);
-    });
+    }).andThen(Commands.waitUntil(() -> {
+      return Math.abs(inputs.winchPosition.in(Radians)
+          - inchesToRadians(Level.minHeight.getHeight()).in(Radians)) < 0.1;
+    }));
   }
 
   public Command L1() {
@@ -134,7 +138,10 @@ public class Elevator extends SubsystemBase {
       Distance height = Level.L1.getHeight();
       Angle r = inchesToRadians(height);
       io.setWinchPosition(r);
-    });
+    }).andThen(Commands.waitUntil(() -> {
+      return Math.abs(inputs.winchPosition.in(Radians)
+          - inchesToRadians(Level.L1.getHeight()).in(Radians)) < 0.1;
+    }));
   }
 
   public Command L2() {
@@ -143,7 +150,10 @@ public class Elevator extends SubsystemBase {
       Distance height = Level.L2.getHeight();
       Angle r = inchesToRadians(height);
       io.setWinchPosition(r);
-    });
+    }).andThen(Commands.waitUntil(() -> {
+      return Math.abs(inputs.winchPosition.in(Radians)
+          - inchesToRadians(Level.L2.getHeight()).in(Radians)) < 0.1;
+    }));
   }
 
   public Command L3() {
@@ -152,7 +162,10 @@ public class Elevator extends SubsystemBase {
       Distance height = Level.L3.getHeight();
       Angle r = inchesToRadians(height);
       io.setWinchPosition(r);
-    });
+    }).andThen(Commands.waitUntil(() -> {
+      return Math.abs(inputs.winchPosition.in(Radians)
+          - inchesToRadians(Level.L3.getHeight()).in(Radians)) < 0.1;
+    }));
   }
 
   public Command L4() {
@@ -161,7 +174,10 @@ public class Elevator extends SubsystemBase {
       Distance height = Level.L4.getHeight();
       Angle r = inchesToRadians(height);
       io.setWinchPosition(r);
-    });
+    }).andThen(Commands.waitUntil(() -> {
+      return Math.abs(inputs.winchPosition.in(Radians)
+          - inchesToRadians(Level.L4.getHeight()).in(Radians)) < 0.1;
+    }));
   }
 
   public Command maxHeight() {
@@ -170,7 +186,10 @@ public class Elevator extends SubsystemBase {
       Distance height = MAX_EXTENSION.plus(MIN_HEIGHT);
       Angle r = inchesToRadians(height);
       io.setWinchPosition(r);
-    });
+    }).andThen(Commands.waitUntil(() -> {
+      return Math.abs(inputs.winchPosition.in(Radians)
+          - inchesToRadians(Level.L4.getHeight()).in(Radians)) < 0.1;
+    }));
   }
 
   public Command upLevel() {
