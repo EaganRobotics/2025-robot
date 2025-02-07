@@ -194,21 +194,21 @@ public class RobotContainer extends frc.lib.RobotContainer {
         .toggleOnTrue(DriveCommands.keepRotationForward(drive, xSupplier, ySupplier));
 
     // POV snap to angles
-    DriverController.povUp().onTrue(DriveCommands.snapToRotation(drive, Rotation2d.kZero));
-    DriverController.povUpRight()
-        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-45)));
-    DriverController.povRight()
-        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-90)));
-    DriverController.povDownRight()
-        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-135)));
-    DriverController.povDown()
-        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-180)));
-    DriverController.povDownLeft()
-        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(135)));
-    DriverController.povLeft()
-        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(90)));
-    DriverController.povUpLeft()
-        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(45)));
+    // DriverController.povUp().onTrue(DriveCommands.snapToRotation(drive, Rotation2d.kZero));
+    // DriverController.povUpRight()
+    // .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-45)));
+    // DriverController.povRight()
+    // .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-90)));
+    // DriverController.povDownRight()
+    // .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-135)));
+    // DriverController.povDown()
+    // .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-180)));
+    // DriverController.povDownLeft()
+    // .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(135)));
+    // DriverController.povLeft()
+    // .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(90)));
+    // DriverController.povUpLeft()
+    // .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(45)));
 
     // TODO should this be true in TeleOp?
     // Switch to X pattern when X button is pressed
@@ -220,8 +220,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
             () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
             drive).ignoringDisable(true));
 
-    OperatorController.povDown().onTrue(elevator.downLevel());
-    OperatorController.povUp().onTrue(elevator.upLevel());
+    DriverController.povDown().onTrue(elevator.downLevel());
+    DriverController.povUp().onTrue(elevator.upLevel());
     OperatorController.a().onTrue(elevator.L1());
     OperatorController.x().onTrue(elevator.L2());
     OperatorController.b().onTrue(elevator.L3());
