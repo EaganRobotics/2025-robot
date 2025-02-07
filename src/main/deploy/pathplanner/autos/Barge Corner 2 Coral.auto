@@ -11,9 +11,21 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "L4"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Coral to Source"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L1"
           }
         },
         {
@@ -26,6 +38,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "Coral Autos",
+  "folder": null,
   "choreoAuto": false
 }
