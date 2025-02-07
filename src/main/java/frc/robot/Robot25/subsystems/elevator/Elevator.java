@@ -112,12 +112,13 @@ public class Elevator extends SubsystemBase {
   }
 
   private Angle inchesToRadians(Distance d) {
-    return Radians.of(d.minus(MIN_HEIGHT).in(Meters) / DRUM_RADIUS.in(Meters));
+    // d.minus(MIN_HEIGHT); // does nothing
+    return Radians.of(d.in(Meters) / DRUM_RADIUS.in(Meters));
   }
 
   private Distance radiansToInches(Angle a) {
     double d = a.in(Radians) * DRUM_RADIUS.in(Meters);
-    return Meters.of(d).plus(MIN_HEIGHT);
+    return Meters.of(d);
   }
 
   public Command goToLevel(Level level) {
