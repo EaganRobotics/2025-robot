@@ -17,15 +17,15 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "Coral to Source"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "L1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Coral to Source"
           }
         },
         {
@@ -35,9 +35,9 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "named",
           "data": {
-            "commands": []
+            "name": "L2"
           }
         }
       ]
