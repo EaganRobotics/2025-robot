@@ -160,12 +160,29 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command upLevel() {
-    return goToLevel(currentLevel.up());
+    return this.runOnce(() -> {
+      currentLevel = currentLevel.up();
+      Distance height = currentLevel.getHeight();
+      Angle r = inchesToRadians(height);
+      io.setWinchPosition(r);
+    });
   }
 
   public Command downLevel() {
-    return goToLevel(currentLevel.down());
+    return this.runOnce(() -> {
+      currentLevel = currentLevel.down();
+      Distance height = currentLevel.getHeight();
+      Angle r = inchesToRadians(height);
+      io.setWinchPosition(r);
+    });
   }
+  // public Command upLevel() {
+  // return goToLevel(currentLevel.up());
+  // }
+
+  // public Command downLevel() {
+  // return goToLevel(currentLevel.down());
+  // }
 
   /**
    * Computes the estimated position of each elevator stage (stage 1, stage 2, carriage + loader)
