@@ -120,94 +120,49 @@ public class Elevator extends SubsystemBase {
     return Meters.of(d).plus(MIN_HEIGHT);
   }
 
-  public Command minHeight() {
+  public Command goToLevel(Level level) {
     return this.runOnce(() -> {
-      currentLevel = Level.minHeight;
-      Distance height = Level.minHeight.getHeight();
+      currentLevel = level;
+      Distance height = level.getHeight();
       Angle r = inchesToRadians(height);
       io.setWinchPosition(r);
     }).andThen(Commands.waitUntil(() -> {
-      return Math.abs(inputs.winchPosition.in(Radians)
-          - inchesToRadians(Level.minHeight.getHeight()).in(Radians)) < 0.1;
+      return Math.abs(
+          inputs.winchPosition.in(Radians) - inchesToRadians(level.getHeight()).in(Radians)) < 0.1;
     }));
+  }
+
+  public Command minHeight() {
+    return goToLevel(Level.minHeight);
   }
 
   public Command L1() {
-    return this.runOnce(() -> {
-      currentLevel = Level.L1;
-      Distance height = Level.L1.getHeight();
-      Angle r = inchesToRadians(height);
-      io.setWinchPosition(r);
-    }).andThen(Commands.waitUntil(() -> {
-      return Math.abs(inputs.winchPosition.in(Radians)
-          - inchesToRadians(Level.L1.getHeight()).in(Radians)) < 0.1;
-    }));
+    return goToLevel(Level.L1);
   }
 
+
   public Command L2() {
-    return this.runOnce(() -> {
-      currentLevel = Level.L2;
-      Distance height = Level.L2.getHeight();
-      Angle r = inchesToRadians(height);
-      io.setWinchPosition(r);
-    }).andThen(Commands.waitUntil(() -> {
-      return Math.abs(inputs.winchPosition.in(Radians)
-          - inchesToRadians(Level.L2.getHeight()).in(Radians)) < 0.1;
-    }));
+    return goToLevel(Level.L2);
   }
 
   public Command L3() {
-    return this.runOnce(() -> {
-      currentLevel = Level.L3;
-      Distance height = Level.L3.getHeight();
-      Angle r = inchesToRadians(height);
-      io.setWinchPosition(r);
-    }).andThen(Commands.waitUntil(() -> {
-      return Math.abs(inputs.winchPosition.in(Radians)
-          - inchesToRadians(Level.L3.getHeight()).in(Radians)) < 0.1;
-    }));
+    return goToLevel(Level.L3);
   }
 
   public Command L4() {
-    return this.runOnce(() -> {
-      currentLevel = Level.L4;
-      Distance height = Level.L4.getHeight();
-      Angle r = inchesToRadians(height);
-      io.setWinchPosition(r);
-    }).andThen(Commands.waitUntil(() -> {
-      return Math.abs(inputs.winchPosition.in(Radians)
-          - inchesToRadians(Level.L4.getHeight()).in(Radians)) < 0.1;
-    }));
+    return goToLevel(Level.L4);
   }
 
   public Command maxHeight() {
-    return this.runOnce(() -> {
-      currentLevel = Level.L4;
-      Distance height = MAX_EXTENSION.plus(MIN_HEIGHT);
-      Angle r = inchesToRadians(height);
-      io.setWinchPosition(r);
-    }).andThen(Commands.waitUntil(() -> {
-      return Math.abs(inputs.winchPosition.in(Radians)
-          - inchesToRadians(Level.L4.getHeight()).in(Radians)) < 0.1;
-    }));
+    return goToLevel(Level.L4);
   }
 
   public Command upLevel() {
-    return this.runOnce(() -> {
-      currentLevel = currentLevel.up();
-      Distance height = currentLevel.getHeight();
-      Angle r = inchesToRadians(height);
-      io.setWinchPosition(r);
-    });
+    return goToLevel(currentLevel.up());
   }
 
   public Command downLevel() {
-    return this.runOnce(() -> {
-      currentLevel = currentLevel.down();
-      Distance height = currentLevel.getHeight();
-      Angle r = inchesToRadians(height);
-      io.setWinchPosition(r);
-    });
+    return goToLevel(currentLevel.down());
   }
 
   /**
