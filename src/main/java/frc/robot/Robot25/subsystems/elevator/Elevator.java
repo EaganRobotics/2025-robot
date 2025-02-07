@@ -127,14 +127,15 @@ public class Elevator extends SubsystemBase {
       Angle r = inchesToRadians(height);
       io.setWinchPosition(r);
     }).andThen(Commands.waitUntil(() -> {
-      return Math.abs(
-          inputs.winchPosition.in(Radians) - inchesToRadians(level.getHeight()).in(Radians)) < 0.1;
+      return Math.abs((inputs.winchPosition.in(Radians)
+          - inchesToRadians(level.getHeight()).in(Radians))) < 0.1; // up = L1, down = minHeight
     }));
   }
 
   public Command minHeight() {
     return goToLevel(Level.minHeight);
   }
+
 
   public Command L1() {
     return goToLevel(Level.L1);

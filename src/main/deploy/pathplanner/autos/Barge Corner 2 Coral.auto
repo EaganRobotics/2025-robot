@@ -33,6 +33,12 @@
           "data": {
             "pathName": "Source to Reef"
           }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": []
+          }
         }
       ]
     }
