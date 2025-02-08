@@ -13,8 +13,6 @@
 
 package frc.robot.Robot25;
 
-import static edu.wpi.first.units.Units.Volt;
-
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerMotorArrangement;
