@@ -2,14 +2,9 @@ package frc.robot.Robot25.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Radian;
 import static edu.wpi.first.units.Units.Radians;
-import static frc.robot.Robot25.subsystems.elevator.ElevatorConstants.DRUM_RADIUS;
-import static frc.robot.Robot25.subsystems.elevator.ElevatorConstants.INITIAL_HEIGHT;
-import static frc.robot.Robot25.subsystems.elevator.ElevatorConstants.MAX_EXTENSION;
-import static frc.robot.Robot25.subsystems.elevator.ElevatorConstants.MIN_HEIGHT;
+import static frc.robot.Robot25.subsystems.elevator.ElevatorConstants.*;
 
-import com.ctre.phoenix6.wpiutils.ReplayAutoEnable;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.units.measure.Angle;
@@ -92,6 +87,9 @@ public class Elevator extends SubsystemBase {
   public Elevator(ElevatorIO io) {
     this.io = io;
     currentLevel = Level.minHeight;
+    Distance height = currentLevel.getHeight();
+    Angle r = inchesToRadians(height);
+    io.setWinchPosition(r);
   }
 
   @Override
@@ -105,10 +103,6 @@ public class Elevator extends SubsystemBase {
 
     Logger.recordOutput("Elevator/CurrentLevel", currentLevel);
     Logger.recordOutput("Elevator/CurrentLevelHeight", currentLevel.getHeight());
-    Logger.recordOutput("Elevator/Radians", inchesToRadians(currentLevel.getHeight()));
-
-    Logger.recordOutput("Elevator/PTuning",
-        currentLevel.getHeight().minus(radiansToInches(inputs.winchPosition)));
   }
 
   private Angle inchesToRadians(Distance d) {
@@ -129,7 +123,7 @@ public class Elevator extends SubsystemBase {
       io.setWinchPosition(r);
     }).andThen(Commands.waitUntil(() -> {
       return Math.abs((inputs.winchPosition.in(Radians)
-          - inchesToRadians(level.getHeight()).in(Radians))) < 0.1; // up = L1, down = minHeight
+          - inchesToRadians(level.getHeight()).in(Radians))) < 0.1;
     }));
   }
 
