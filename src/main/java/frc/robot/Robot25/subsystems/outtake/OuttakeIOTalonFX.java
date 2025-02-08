@@ -8,17 +8,13 @@ import frc.lib.devices.TalonFXWrapper;
 
 public class OuttakeIOTalonFX implements OuttakeIO {
   TalonFXWrapper outtakeTalonFX;
-  final int motorID = 25;
+  final int motorID = 22;
 
   DigitalInputWrapper inputSensor = new DigitalInputWrapper(1, "inputSensor", false);
   DigitalInputWrapper outputSensor = new DigitalInputWrapper(2, "outputSensor", false);
 
   public OuttakeIOTalonFX() {
-    outtakeTalonFX = new TalonFXWrapper(
-        motorID,
-        "Outtake",
-        true,
-        NeutralModeValue.Brake);
+    outtakeTalonFX = new TalonFXWrapper(motorID, "Outtake", true, NeutralModeValue.Brake);
   }
 
   @Override
