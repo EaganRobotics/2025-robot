@@ -19,8 +19,8 @@ public class ElevatorIOTalonFX implements ElevatorIO{
     double P;
     double I;
     double D;
-    final int rightMotorID = 1;
-    final int leftMotorID = 2;
+    final int rightMotorID = 20;
+    final int leftMotorID = 21;
 
     public ElevatorIOTalonFX() {
         elevatorTalonFX = new TalonFXWrapper(
