@@ -29,7 +29,7 @@ public class ElevatorConstants {
   public static final double GEARING = 5.0;
   public static final Distance MIN_HEIGHT = Inches.of(16.3);
   public static final Distance INITIAL_HEIGHT = Inches.of(16.3);
-  public static final Distance MAX_EXTENSION = Inches.of(75);
+  public static final Distance MAX_EXTENSION = Inches.of(80);
   public static final Mass CARRIAGE_MASS = Pounds.of(19.147);
   public static final LinearVelocity MAX_VELOCITY = InchesPerSecond.of(178.63);
   public static final AngularAcceleration MAX_ACCELERATION =

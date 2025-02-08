@@ -220,8 +220,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
             () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
             drive).ignoringDisable(true));
 
-    OperatorController.povDown().onTrue(elevator.downLevel());
-    OperatorController.povUp().onTrue(elevator.upLevel());
+    DriverController.povDown().onTrue(elevator.downLevel());
+    DriverController.povUp().onTrue(elevator.upLevel());
     OperatorController.a().onTrue(elevator.L1());
     OperatorController.x().onTrue(elevator.L2());
     OperatorController.b().onTrue(elevator.L3());
