@@ -2,6 +2,11 @@
 
 package frc.robot.Robot25;
 
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerMotorArrangement;
@@ -10,6 +15,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -17,6 +23,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.devices.DigitalInputWrapper;
+import frc.lib.devices.TalonFXWrapper;
+import frc.lib.devices.TalonFXWrapper.FollowerConfig;
 import frc.robot.Robot;
 import frc.robot.Robot25.commands.DriveCommands;
 import frc.robot.Robot25.subsystems.drive.Drive;
@@ -27,6 +35,7 @@ import frc.robot.Robot25.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.Robot25.subsystems.elevator.Elevator;
 import frc.robot.Robot25.subsystems.elevator.ElevatorIO;
 import frc.robot.Robot25.subsystems.elevator.ElevatorIOSim;
+import frc.robot.Robot25.subsystems.elevator.ElevatorIOTalonFX;
 import frc.robot.Robot25.subsystems.gyro.GyroIO;
 import frc.robot.Robot25.subsystems.gyro.GyroIOPigeon2;
 import frc.robot.Robot25.subsystems.gyro.GyroIOSim;
@@ -207,8 +216,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
             () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
             drive).ignoringDisable(true));
 
-    DriverController.povDown().onTrue(elevator.downLevel());
-    DriverController.povUp().onTrue(elevator.upLevel());
+    OperatorController.povDown().onTrue(elevator.downLevel());
+    OperatorController.povUp().onTrue(elevator.upLevel());
     OperatorController.a().onTrue(elevator.L1());
     OperatorController.x().onTrue(elevator.L2());
     OperatorController.b().onTrue(elevator.L3());
@@ -220,11 +229,20 @@ public class RobotContainer extends frc.lib.RobotContainer {
   @Override
   public Command getAutonomousCommand() {
     return autoChooser.get();
+
   }
 
-  @Override
   public Command getTestCommand() {
-    return autoChooser.get();
+    var elevatorTalonFX = new TalonFXWrapper(20, "Elevator", false, NeutralModeValue.Brake, 5, 0, 0,
+        0, RotationsPerSecondPerSecond.of(0), RotationsPerSecond.of(0), false, false,
+        Rotations.of(120.0 / 360.0), Rotations.of(0), new FollowerConfig(21, true),
+        Units.Seconds.of(3), Units.Amps.of(75), Units.RotationsPerSecond.of(1));
+
+    return Commands.runEnd(() -> {
+      elevatorTalonFX.set(.1);
+    }, () -> {
+      elevatorTalonFX.set(0);
+    }).withTimeout(5);
   }
 
   @Override

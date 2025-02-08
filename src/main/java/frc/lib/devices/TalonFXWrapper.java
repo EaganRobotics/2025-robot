@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.MusicTone;
 import com.ctre.phoenix6.controls.PositionVoltage;
@@ -161,6 +162,10 @@ public class TalonFXWrapper implements ShuffleBoardTabWrapper {
     Fault.autoUpdating(getName() + " Stalled", EventLoops.everyLoop, this::isStalled);
 
     talon.getConfigurator().apply(talonFXConfigs);
+    if (followerConfig != null) {
+      followerFx = new TalonFX(followerConfig.id);
+      followerFx.setControl(new Follower(id, followerConfig.isInverted));
+    }
 
     if (followerFx != null) {
 

@@ -36,7 +36,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  * project.
  */
 public class Robot extends LoggedRobot {
-  private Command autonomousCommand;
+  private Command testCommand;
   private RobotContainer robotContainer;
 
   public Robot() {
@@ -171,11 +171,11 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void autonomousInit() {
-    autonomousCommand = robotContainer.getAutonomousCommand();
+    testCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
-    if (autonomousCommand != null) {
-      autonomousCommand.schedule();
+    if (testCommand != null) {
+      testCommand.schedule();
     }
 
     robotContainer.autonomousInit();
@@ -194,8 +194,8 @@ public class Robot extends LoggedRobot {
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
-    if (autonomousCommand != null) {
-      autonomousCommand.cancel();
+    if (testCommand != null) {
+      testCommand.cancel();
     }
 
     robotContainer.teleopInit();
@@ -211,7 +211,14 @@ public class Robot extends LoggedRobot {
   @Override
   public void testInit() {
     // Cancels all running commands at the start of test mode.
-    CommandScheduler.getInstance().cancelAll();
+    // CommandScheduler.getInstance().cancelAll();
+    testCommand = robotContainer.getTestCommand();
+
+    // schedule the autonomous command (example)
+    if (testCommand != null) {
+      testCommand.schedule();
+    }
+
     robotContainer.testInit();
   }
 
