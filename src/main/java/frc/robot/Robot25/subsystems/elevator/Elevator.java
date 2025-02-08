@@ -105,10 +105,6 @@ public class Elevator extends SubsystemBase {
 
     Logger.recordOutput("Elevator/CurrentLevel", currentLevel);
     Logger.recordOutput("Elevator/CurrentLevelHeight", currentLevel.getHeight());
-    Logger.recordOutput("Elevator/Radians", inchesToRadians(currentLevel.getHeight()));
-
-    Logger.recordOutput("Elevator/PTuning",
-        currentLevel.getHeight().minus(radiansToInches(inputs.winchPosition)));
   }
 
   private Angle inchesToRadians(Distance d) {
@@ -129,7 +125,7 @@ public class Elevator extends SubsystemBase {
       io.setWinchPosition(r);
     }).andThen(Commands.waitUntil(() -> {
       return Math.abs((inputs.winchPosition.in(Radians)
-          - inchesToRadians(level.getHeight()).in(Radians))) < 0.1; // up = L1, down = minHeight
+          - inchesToRadians(level.getHeight()).in(Radians))) < 0.1;
     }));
   }
 
