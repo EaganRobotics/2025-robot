@@ -105,7 +105,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
             new ModuleIOTalonFX(DriveConstants.BackLeft),
             new ModuleIOTalonFX(DriveConstants.BackRight));
 
-        elevator = new Elevator(new ElevatorIO() {});
+        elevator = new Elevator(new ElevatorIOTalonFX());
         outtake = new Outtake(new OuttakeIOTalonFX());
         break;
       case SIM:
@@ -247,7 +247,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
       elevatorTalonFX.set(.1);
     }, () -> {
       elevatorTalonFX.set(0);
-    }).withTimeout(5);
+    }).withTimeout(10);
   }
 
   @Override
@@ -256,10 +256,18 @@ public class RobotContainer extends frc.lib.RobotContainer {
   }
 
   @Override
-  public void simulationPeriodic() {
+  public void robotPeriodic() {
     var elevatorPoses = elevator.getElevatorPoses();
     mechanismPoses[0] = elevatorPoses[0];
     mechanismPoses[1] = elevatorPoses[1];
     mechanismPoses[2] = elevatorPoses[2];
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    // var elevatorPoses = elevator.getElevatorPoses();
+    // mechanismPoses[0] = elevatorPoses[0];
+    // mechanismPoses[1] = elevatorPoses[1];
+    // mechanismPoses[2] = elevatorPoses[2];
   }
 }

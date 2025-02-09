@@ -25,7 +25,7 @@ import edu.wpi.first.units.measure.Voltage;
  */
 public class ElevatorConstants {
 
-  public static final Distance DRUM_RADIUS = Inches.of(1.5);
+  public static final Distance DRUM_RADIUS = Inches.of(1);
   public static final double GEARING = 5.0;
   public static final Distance MIN_HEIGHT = Inches.of(16.3);
   public static final Distance INITIAL_HEIGHT = Inches.of(16.3);

@@ -14,24 +14,25 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import frc.lib.devices.DigitalInputWrapper;
 import frc.lib.devices.TalonFXWrapper;
 import frc.lib.devices.TalonFXWrapper.FollowerConfig;
+import org.littletonrobotics.junction.Logger;
 
 
 public class ElevatorIOTalonFX implements ElevatorIO {
-  DigitalInputWrapper lowerLimitSwitch = new DigitalInputWrapper(2, "lowerLimit", false);
+  DigitalInputWrapper lowerLimitSwitch = new DigitalInputWrapper(3, "lowerLimit", false);
 
   TalonFXWrapper elevatorTalonFX;
-  double gearRatio;
-  double P;
-  double I;
-  double D;
+  double gearRatio = 5;
+  double P = 1;
+  double I = 0;
+  double D = 0;
   final int rightMotorID = 20;
   final int leftMotorID = 21;
 
   public ElevatorIOTalonFX() {
-    elevatorTalonFX = new TalonFXWrapper(rightMotorID, "Elevator", true, NeutralModeValue.Brake,
+    elevatorTalonFX = new TalonFXWrapper(rightMotorID, "Elevator", false, NeutralModeValue.Brake,
         gearRatio, P, I, D, RotationsPerSecondPerSecond.of(0), RotationsPerSecond.of(0), false,
-        false, Rotations.of(120.0 / 360.0), Rotations.of(0), new FollowerConfig(leftMotorID, true),
-        Units.Seconds.of(3), Units.Amps.of(75), Units.RotationsPerSecond.of(1));
+        false, Rotations.of(0), Rotations.of(0), new FollowerConfig(leftMotorID, true),
+        Units.Seconds.of(3), Units.Amps.of(75), Units.RotationsPerSecond.of(0));
   }
 
   @Override
@@ -41,7 +42,8 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
   @Override
   public void setWinchPosition(Angle angle) {
-    elevatorTalonFX.setPosition(angle.in(Rotations));
+    Logger.recordOutput("elevetorAngle", angle);
+    elevatorTalonFX.setMotionMagicVoltage(angle);
   }
 
   @Override
@@ -52,6 +54,6 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     inputs.winchPosition = elevatorTalonFX.getPosition();
     inputs.winchCurrent = elevatorTalonFX.getTorqueCurrent();
     inputs.winchAppliedVolts = Volts.of(0);
-    System.out.println(lowerLimitSwitch.get());
+    // System.out.println(lowerLimitSwitch.get());
   }
 }

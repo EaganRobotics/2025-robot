@@ -113,12 +113,12 @@ public class Elevator extends SubsystemBase {
 
   private Angle inchesToRadians(Distance d) {
     // d.minus(MIN_HEIGHT); // does nothing
-    return Radians.of(d.in(Meters) / DRUM_RADIUS.in(Meters));
+    return Radians.of(d.minus(MIN_HEIGHT).in(Meters) / DRUM_RADIUS.in(Meters));
   }
 
   private Distance radiansToInches(Angle a) {
     double d = a.in(Radians) * DRUM_RADIUS.in(Meters);
-    return Meters.of(d);
+    return Meters.of(d).plus(MIN_HEIGHT);
   }
 
   public Command goToLevel(Level level) {
@@ -161,13 +161,19 @@ public class Elevator extends SubsystemBase {
   public Command upLevel() {
     return this.runOnce(() -> {
       currentLevel = currentLevel.up();
-    }).andThen(goToLevel(currentLevel));
+      Distance height = currentLevel.getHeight();
+      Angle r = inchesToRadians(height);
+      io.setWinchPosition(r);
+    });
   }
 
   public Command downLevel() {
     return this.runOnce(() -> {
       currentLevel = currentLevel.down();
-    }).andThen(goToLevel(currentLevel));
+      Distance height = currentLevel.getHeight();
+      Angle r = inchesToRadians(height);
+      io.setWinchPosition(r);
+    });
   }
   // public Command upLevel() {
   // return goToLevel(currentLevel.up());
