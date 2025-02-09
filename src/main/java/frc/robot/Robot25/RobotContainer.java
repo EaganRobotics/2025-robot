@@ -66,7 +66,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
   private final LoggedDashboardChooser<Command> autoChooser;
 
   // coast buttion
-  private static DigitalInputWrapper coastButton = new DigitalInputWrapper(0, "coastButton", false);
+  private static DigitalInputWrapper coastButton = new DigitalInputWrapper(3, "coastButton", false);
 
   @AutoLogOutput
   public final Pose3d[] mechanismPoses = new Pose3d[] {Pose3d.kZero, Pose3d.kZero, Pose3d.kZero,};
@@ -124,7 +124,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
     NamedCommands.registerCommand("L2", elevator.L2());
     NamedCommands.registerCommand("L3", elevator.L3());
     NamedCommands.registerCommand("L4", elevator.L4());
-    NamedCommands.registerCommand("Exhaust", outtake.exhaustCoral());
+    NamedCommands.registerCommand("Exhaust", outtake.depositCoral());
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());

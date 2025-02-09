@@ -26,26 +26,22 @@ public class OuttakeIOSim implements OuttakeIO {
   private final MapleMotorSim outtakeMotor;
   private boolean isClosedLoop = false;
   private Voltage outtakeAppliedVoltage = Volts.of(0);
-  private final SimpleMotorFeedforward feedForwardController = new SimpleMotorFeedforward(
-      Sim.kS,
-      Sim.kV,
-      Sim.kA);
+  private final SimpleMotorFeedforward feedForwardController =
+      new SimpleMotorFeedforward(Sim.kS, Sim.kV, Sim.kA);
 
-  private final FlywheelSim outtakeSim = new FlywheelSim(
-      LinearSystemId.createFlywheelSystem(
-          outtakeGearbox,
-          0.1, // To Do: Estimate this value
-          GEARING),
-      outtakeGearbox,
-      0.000015);
+  private final FlywheelSim outtakeSim =
+      new FlywheelSim(LinearSystemId.createFlywheelSystem(outtakeGearbox, 0.1, // To Do: Estimate
+                                                                               // this value
+          GEARING), outtakeGearbox, 0.000015);
 
-  LoggedNetworkBoolean inputSensor = new LoggedNetworkBoolean("/Tuning/inputSensorSim", false);
-  LoggedNetworkBoolean outputSensor = new LoggedNetworkBoolean("/Tuning/outputSensorSim", false);
+  LoggedNetworkBoolean LoadSideSensor = new LoggedNetworkBoolean("/Tuning/LoadSideSensor", false);
+  LoggedNetworkBoolean ScoreSideSensor = new LoggedNetworkBoolean("/Tuning/ScoreSideSensor", false);
 
   public OuttakeIOSim() {
     outtakeMotor = new MapleMotorSim(
         new SimMotorConfigs(outtakeGearbox, GEARING, Sim.MOTOR_LOAD_MOI, Sim.FRICTION_VOLTAGE));
-    outtakeMotorController = outtakeMotor.useSimpleDCMotorController().withCurrentLimit(CURRENT_LIMIT);
+    outtakeMotorController =
+        outtakeMotor.useSimpleDCMotorController().withCurrentLimit(CURRENT_LIMIT);
   }
 
 
@@ -73,7 +69,7 @@ public class OuttakeIOSim implements OuttakeIO {
     inputs.outtakeAppliedVolts = outtakeAppliedVoltage;
     inputs.outtakeCurrent = Amps.of(outtakeSim.getCurrentDrawAmps());
     inputs.outtakeVelocity = AngularVelocity.ofBaseUnits(angularVelocity, RadiansPerSecond);
-    inputs.seesCoralAtInput = inputSensor.get();
-    inputs.seesCoralAtOutput = outputSensor.get();
+    inputs.seesCoralAtInput = LoadSideSensor.get();
+    inputs.seesCoralAtOutput = ScoreSideSensor.get();
   }
 }
