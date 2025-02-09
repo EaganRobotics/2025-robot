@@ -231,8 +231,9 @@ public class RobotContainer extends frc.lib.RobotContainer {
     OperatorController.leftTrigger().onTrue(outtake.depositCoral());
     OperatorController.rightTrigger().onTrue(outtake.reverseCoral());
 
-    DriverController.y();
+    // DriverController.y();
     // .onTrue(DriveCommands.snapToPosition(drive, new Pose2d(5, 5, Rotation2d.fromDegrees(90))));
+    elevator.setDefaultCommand(elevator.openLoop(OperatorController::getLeftY));
 
   }
 

@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
@@ -175,6 +176,13 @@ public class Elevator extends SubsystemBase {
       io.setWinchPosition(r);
     });
   }
+
+  public Command openLoop(DoubleSupplier speed) {
+    return this.run(() -> {
+      io.setWinchOpenLoop(Volts.of(speed.getAsDouble() * 8));
+    });
+  }
+
   // public Command upLevel() {
   // return goToLevel(currentLevel.up());
   // }
