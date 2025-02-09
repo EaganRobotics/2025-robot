@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.devices.DigitalInputWrapper;
@@ -75,7 +76,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
   private final LoggedDashboardChooser<Command> autoChooser;
 
   // coast buttion
-  private static DigitalInputWrapper coastButton = new DigitalInputWrapper(0, "coastButton", false);
+  private static DigitalInputWrapper coastButton = new DigitalInputWrapper(4, "coastButton", false);
 
   @AutoLogOutput
   public final Pose3d[] mechanismPoses = new Pose3d[] {Pose3d.kZero, Pose3d.kZero, Pose3d.kZero,};
@@ -133,7 +134,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
     NamedCommands.registerCommand("L2", elevator.L2());
     NamedCommands.registerCommand("L3", elevator.L3());
     NamedCommands.registerCommand("L4", elevator.L4());
-    NamedCommands.registerCommand("Exhaust", outtake.exhaustCoral());
+    NamedCommands.registerCommand("Exhaust", outtake.depositCoral());
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -189,6 +190,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
     DriverController.a()
         .toggleOnTrue(DriveCommands.keepRotationForward(drive, xSupplier, ySupplier));
 
+    DriverController.y().onTrue(outtake.depositCoral());
+
     // POV snap to angles
     DriverController.povUp().onTrue(DriveCommands.snapToRotation(drive, Rotation2d.kZero));
     DriverController.povUpRight()
@@ -223,7 +226,9 @@ public class RobotContainer extends frc.lib.RobotContainer {
     OperatorController.b().onTrue(elevator.L3());
     OperatorController.y().onTrue(elevator.L4());
 
-    outtake.setDefaultCommand(outtake.autoQueueCoral());
+    DriverController.y();
+        // .onTrue(DriveCommands.snapToPosition(drive, new Pose2d(5, 5, Rotation2d.fromDegrees(90))));
+
   }
 
   @Override
