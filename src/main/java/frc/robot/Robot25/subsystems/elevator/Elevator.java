@@ -111,6 +111,8 @@ public class Elevator extends SubsystemBase {
 
   }
 
+
+
   private Angle inchesToRadians(Distance d) {
     // d.minus(MIN_HEIGHT); // does nothing
     return Radians.of(d.minus(MIN_HEIGHT).in(Meters) / DRUM_RADIUS.in(Meters));
@@ -134,6 +136,16 @@ public class Elevator extends SubsystemBase {
 
   public Command minHeight() {
     return goToLevel(Level.minHeight);
+  }
+
+  public Command oneInchDown() {
+    Angle oneInchDown = inchesToRadians(radiansToInches(inputs.winchPosition).minus(Inches.of(1)));
+    return io.setWinchPosition(oneInchDown);
+  }
+
+  public Command allDown() {
+    Commands.repeatingSequence(oneInchDown()).onlyWhile(lowerLimitHit());
+    return null;
   }
 
 

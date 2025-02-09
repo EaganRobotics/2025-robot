@@ -11,6 +11,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj2.command.Command;
 
 public interface ElevatorIO {
   @AutoLog
@@ -29,6 +30,7 @@ public interface ElevatorIO {
   /** Run the drive side at the specified open loop value. */
   public default void setWinchOpenLoop(Voltage output) {}
 
-  /** Run the drive side at the specified velocity. */
-  public default void setWinchPosition(Angle angle) {}
+  /** Run the drive side at the specified velocity. 
+   * @return */
+  public default Command setWinchPosition(Angle angle) {}
 }
