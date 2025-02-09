@@ -190,15 +190,15 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
 
     // POV snap to angles
-    DriverController.povUp().onTrue(DriveCommands.snapToRotation(drive, Rotation2d.kZero));
+    // DriverController.povUp().onTrue(DriveCommands.snapToRotation(drive, Rotation2d.kZero));
     DriverController.povUpRight()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-45)));
     DriverController.povRight()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-90)));
     DriverController.povDownRight()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-135)));
-    DriverController.povDown()
-        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-180)));
+    // DriverController.povDown()
+    // .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-180)));
     DriverController.povDownLeft()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(135)));
     DriverController.povLeft()
@@ -206,7 +206,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
     DriverController.povUpLeft()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(45)));
 
-
+    DriverController.povDown().onTrue(elevator.downLevel());
+    DriverController.povUp().onTrue(elevator.upLevel());
     DriverController.leftTrigger().onTrue(outtake.depositCoral());
     DriverController.rightTrigger().onTrue(outtake.reverseCoral());
     DriverController.x().onTrue(elevator.minHeight());
