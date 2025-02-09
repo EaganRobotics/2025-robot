@@ -48,4 +48,8 @@ public class Outtake extends SubsystemBase {
   public Command depositCoral() {
     return setOpenLoop(Volts.of(5)).withTimeout(1);
   }
+
+  public Command reverseCoral() {
+    return setOpenLoop(Volts.of(-5)).withTimeout(1);
+  }
 }
