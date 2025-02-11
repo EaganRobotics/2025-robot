@@ -92,4 +92,10 @@ public class ElevatorIOSim implements ElevatorIO {
     pidController.setGoal(angle.in(Radians));
     winchClosedLoop = true;
   }
+
+  @Override
+  public void zeroEncoder() {
+
+    // TODO
+  }
 }

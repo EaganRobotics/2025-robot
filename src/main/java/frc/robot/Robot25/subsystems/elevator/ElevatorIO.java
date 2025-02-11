@@ -11,6 +11,8 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import java.util.function.Function;
 
 public interface ElevatorIO {
   @AutoLog
@@ -24,11 +26,19 @@ public interface ElevatorIO {
   }
 
   /** Updates the set of loggable inputs. */
-  public default void updateInputs(ElevatorIOInputs inputs) {}
+  public default void updateInputs(ElevatorIOInputs inputs) {
+  }
 
   /** Run the drive side at the specified open loop value. */
-  public default void setWinchOpenLoop(Voltage output) {}
+  public default void setWinchOpenLoop(Voltage output) {
+  }
 
   /** Run the drive side at the specified velocity. */
-  public default void setWinchPosition(Angle angle) {}
+  public default void setWinchPosition(Angle angle) {
+  }
+
+  public default void zeroEncoder() {
+
+  }
+
 }

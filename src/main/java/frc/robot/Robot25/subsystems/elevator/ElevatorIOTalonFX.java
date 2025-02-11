@@ -16,7 +16,6 @@ import frc.lib.devices.TalonFXWrapper;
 import frc.lib.devices.TalonFXWrapper.FollowerConfig;
 import org.littletonrobotics.junction.Logger;
 
-
 public class ElevatorIOTalonFX implements ElevatorIO {
   DigitalInputWrapper lowerLimitSwitch = new DigitalInputWrapper(3, "lowerLimit", false);
 
@@ -44,6 +43,11 @@ public class ElevatorIOTalonFX implements ElevatorIO {
   public void setWinchPosition(Angle angle) {
     Logger.recordOutput("elevetorAngle", angle);
     elevatorTalonFX.setMotionMagicVoltage(angle);
+  }
+
+  @Override
+  public void zeroEncoder() {
+    elevatorTalonFX.setPosition(0.0);
   }
 
   @Override
