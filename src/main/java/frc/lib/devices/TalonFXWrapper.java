@@ -257,7 +257,7 @@ public class TalonFXWrapper implements ShuffleBoardTabWrapper {
   }
 
   public void setMotionMagicVoltage(Angle position) {
-    talon.setControl(new PositionVoltage(position.in(Rotations)));
+    talon.setControl(new MotionMagicVoltage(position.in(Rotations)));
     isPositionBeingHeld = false;
   }
 
