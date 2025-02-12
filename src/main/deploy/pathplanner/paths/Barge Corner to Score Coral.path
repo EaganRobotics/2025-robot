@@ -33,10 +33,10 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 3.0,
-    "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0,
+    "maxVelocity": 5.0,
+    "maxAcceleration": 4.0,
+    "maxAngularVelocity": 360.0,
+    "maxAngularAcceleration": 180.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
@@ -45,10 +45,10 @@
     "rotation": -119.82152177970269
   },
   "reversed": false,
-  "folder": "Coral From Start Paths",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -89.06080905426421
+    "rotation": -89.06080905426423
   },
   "useDefaultConstraints": true
 }

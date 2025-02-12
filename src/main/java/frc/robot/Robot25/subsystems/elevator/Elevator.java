@@ -136,7 +136,7 @@ public class Elevator extends SubsystemBase {
       io.setWinchPosition(r);
     })
 
-        .andThen(Commands.waitUntil(isAtGoal().or(lowerLimitHit())));
+        .andThen(Commands.waitUntil(isAtGoal()));
   }
 
   public Command minHeight() {
@@ -239,7 +239,7 @@ public class Elevator extends SubsystemBase {
   public Trigger isAtGoal() {
     return new Trigger(() -> {
       return Math.abs((inputs.winchPosition.in(Radians)
-          - inchesToRadians(currentLevel.getHeight()).in(Radians))) < 0.1;
+          - inchesToRadians(currentLevel.getHeight()).in(Radians))) < 5;
 
     });
   }
