@@ -10,8 +10,9 @@ public class OuttakeIOTalonFX implements OuttakeIO {
   TalonFXWrapper outtakeTalonFX;
   final int motorID = 22;
 
-  DigitalInputWrapper inputSensor = new DigitalInputWrapper(1, "inputSensor", false);
-  DigitalInputWrapper outputSensor = new DigitalInputWrapper(2, "outputSensor", false);
+  // DigitalInputWrapper inputSensor = new DigitalInputWrapper(0, "LoadSideSensor", true);
+  DigitalInputWrapper outputSensor = new DigitalInputWrapper(0, "ScoreSideSensor", true);
+
 
   public OuttakeIOTalonFX() {
     outtakeTalonFX = new TalonFXWrapper(motorID, "Outtake", true, NeutralModeValue.Brake);
@@ -28,7 +29,8 @@ public class OuttakeIOTalonFX implements OuttakeIO {
     inputs.outtakeVelocity = outtakeTalonFX.getVelocity();
     inputs.outtakeCurrent = outtakeTalonFX.getTorqueCurrent();
     inputs.outtakeAppliedVolts = Volts.of(0);
-    inputs.seesCoralAtInput = inputSensor.get();
+    // inputs.seesCoralAtInput = inputSensor.get();
     inputs.seesCoralAtOutput = outputSensor.get();
   }
+
 }

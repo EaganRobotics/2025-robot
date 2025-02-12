@@ -14,8 +14,13 @@
 package frc.robot.Robot25.commands;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
-
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.Waypoint;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -26,6 +31,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -53,6 +59,9 @@ public class DriveCommands {
   private static final double ANGLE_MAX_VELOCITY = 8.0;
   private static final double ANGLE_MAX_ACCELERATION = 20.0;
   private static final double ANGLE_TOLERANCE = Degrees.of(0.05).in(Radians);
+  private static final double POSITION_MAX_VELOCITY = 3.0;
+  private static final double POSITION_MAX_ACCELERATION = 3.0;
+  private static final double POSITION_TOLERANCE = Meters.of(0.0127).in(Meters);
   private static final double FF_START_DELAY = 2.0; // Secs
   private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
   private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
@@ -66,9 +75,19 @@ public class DriveCommands {
   // public static final TunableDouble ANGLE_KD =
   // new TunableDouble("ANGLE_KD", 0.4, "driver").setSpot(2, 0);
 
-  public static final LoggedNetworkNumber ANGLE_KP = new LoggedNetworkNumber("/Tuning/angleKP", 0);
-  public static final LoggedNetworkNumber ANGLE_KI = new LoggedNetworkNumber("/Tuning/angleKI", 0);
-  public static final LoggedNetworkNumber ANGLE_KD = new LoggedNetworkNumber("/Tuning/angleKD", 0);
+  public static final LoggedNetworkNumber ANGLE_KP =
+      new LoggedNetworkNumber("/Tuning/angleKP", 7.0);
+  public static final LoggedNetworkNumber ANGLE_KI =
+      new LoggedNetworkNumber("/Tuning/angleKI", 0.0);
+  public static final LoggedNetworkNumber ANGLE_KD =
+      new LoggedNetworkNumber("/Tuning/angleKD", 0.4);
+
+  public static final LoggedNetworkNumber POSITION_KP =
+      new LoggedNetworkNumber("/Tuning/positionKP", 0.001);
+  public static final LoggedNetworkNumber POSITION_KI =
+      new LoggedNetworkNumber("/Tuning/positionKI", 0);
+  public static final LoggedNetworkNumber POSITION_KD =
+      new LoggedNetworkNumber("/Tuning/positionKD", 0);
 
 
   private DriveCommands() {}
@@ -100,6 +119,9 @@ public class DriveCommands {
     angleController.setTolerance(ANGLE_TOLERANCE);
 
     return Commands.run(() -> {
+      angleController.setP(ANGLE_KP.get());
+      angleController.setI(ANGLE_KI.get());
+      angleController.setD(ANGLE_KD.get());
 
       // Get linear velocity
       Translation2d linearVelocity =
@@ -320,5 +342,65 @@ public class DriveCommands {
     double[] positions = new double[4];
     Rotation2d lastAngle = Rotation2d.kZero;
     double gyroDelta = 0.0;
+  }
+
+  public static Command snapToPosition(Drive drive, Pose2d desiredPosition) {
+
+    // Create PID controller
+    ProfiledPIDController angleController =
+        new ProfiledPIDController(ANGLE_KP.get(), ANGLE_KI.get(), ANGLE_KD.get(),
+            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+    angleController.enableContinuousInput(-Math.PI, Math.PI);
+    angleController.setTolerance(ANGLE_TOLERANCE);
+
+    ProfiledPIDController xController =
+        new ProfiledPIDController(POSITION_KP.get(), POSITION_KI.get(), POSITION_KD.get(),
+            new TrapezoidProfile.Constraints(POSITION_MAX_VELOCITY, POSITION_MAX_ACCELERATION));
+    xController.setTolerance(POSITION_TOLERANCE);
+
+    ProfiledPIDController yController =
+        new ProfiledPIDController(POSITION_KP.get(), POSITION_KI.get(), POSITION_KD.get(),
+            new TrapezoidProfile.Constraints(POSITION_MAX_VELOCITY, POSITION_MAX_ACCELERATION));
+    yController.setTolerance(POSITION_TOLERANCE);
+
+    return Commands.run(() -> {
+      angleController.setP(ANGLE_KP.get());
+      angleController.setI(ANGLE_KI.get());
+      angleController.setD(ANGLE_KD.get());
+
+      xController.setP(POSITION_KP.get());
+      xController.setI(POSITION_KI.get());
+      xController.setD(POSITION_KD.get());
+
+      yController.setP(POSITION_KP.get());
+      yController.setI(POSITION_KI.get());
+      yController.setD(POSITION_KD.get());
+
+      var x = xController.calculate(drive.getPose().getX(), desiredPosition.getX());
+
+      var y = yController.calculate(drive.getPose().getY(), desiredPosition.getY());
+
+      var omega = angleController.calculate(drive.getRotation().getRadians(),
+          desiredPosition.getRotation().getRadians());
+
+      Logger.recordOutput("Snap/omega", omega);
+      Logger.recordOutput("Snap/x/xPos", x);
+      Logger.recordOutput("Snap/x/desiredXPos", desiredPosition.getX());
+      Logger.recordOutput("Snap/x/currentXPos", drive.getPose().getX());
+      Logger.recordOutput("Snap/y/yPos", y);
+      Logger.recordOutput("Snap/y/desiredYPos", desiredPosition.getY());
+      Logger.recordOutput("Snap/y/currentYPos", drive.getPose().getY());
+
+      // Convert to field relative speeds & send command
+      ChassisSpeeds speeds = new ChassisSpeeds(-x, -y, omega);
+      drive.runVelocity(speeds);
+    }, drive)
+
+        // Reset PID controller when command starts
+        .beforeStarting(() -> {
+          angleController.reset(drive.getRotation().getRadians());
+          // xController.reset(drive.getPose().getX());
+          // yController.reset(drive.getPose().getY());
+        });
   }
 }
