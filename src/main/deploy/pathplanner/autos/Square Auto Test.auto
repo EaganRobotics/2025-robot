@@ -9,24 +9,6 @@
           "data": {
             "pathName": "Forward 1M"
           }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Left 1M"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Backwards 1M"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Right 1M"
-          }
         }
       ]
     }

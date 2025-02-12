@@ -197,29 +197,31 @@ public class RobotContainer extends frc.lib.RobotContainer {
         DriveCommands.joystickDrive(drive, ySupplier, xSupplier, omegaSupplier, slowModeSupplier));
     outtake.setDefaultCommand(outtake.autoQueueCoral().onlyWhile(elevator.elevatorAtMinHeight()));
 
-    DriverController.a()
-        .toggleOnTrue(DriveCommands.keepRotationForward(drive, xSupplier, ySupplier));
+    // DriverController.a()
+    // .toggleOnTrue(DriveCommands.keepRotationForward(drive, xSupplier,
+    // ySupplier));
 
     // POV snap to angles
-    DriverController.povUp().onTrue(DriveCommands.snapToRotation(drive, Rotation2d.kZero));
-    DriverController.povUpRight()
-        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-45)));
-    DriverController.povRight()
-        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-90)));
-    DriverController.povDownRight()
-        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-135)));
-    DriverController.povDown()
-        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-180)));
-    DriverController.povDownLeft()
-        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(135)));
-    DriverController.povLeft()
-        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(90)));
-    DriverController.povUpLeft()
-        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(45)));
+    // DriverController.povUp().onTrue(DriveCommands.snapToRotation(drive,
+    // Rotation2d.kZero));
+    // DriverController.povUpRight()
+    // .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-45)));
+    // DriverController.povRight()
+    // .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-90)));
+    // DriverController.povDownRight()
+    // .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-135)));
+    // DriverController.povDown()
+    // .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-180)));
+    // DriverController.povDownLeft()
+    // .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(135)));
+    // DriverController.povLeft()
+    // .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(90)));
+    // DriverController.povUpLeft()
+    // .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(45)));
 
     // TODO should this be true in TeleOp?
     // Switch to X pattern when X button is pressed
-    DriverController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    // DriverController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
     // Reset gyro to 0° when START button is pressed
     DriverController.start()
@@ -227,12 +229,12 @@ public class RobotContainer extends frc.lib.RobotContainer {
             () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
             drive).ignoringDisable(true));
 
-    OperatorController.povDown().onTrue(elevator.downLevel());
-    OperatorController.povUp().onTrue(elevator.upLevel());
-    OperatorController.a().onTrue(elevator.minHeight());
-    OperatorController.x().onTrue(elevator.L2());
-    OperatorController.b().onTrue(elevator.L3());
-    OperatorController.y().onTrue(elevator.L4());
+    DriverController.povDown().onTrue(elevator.downLevel());
+    DriverController.povUp().onTrue(elevator.upLevel());
+    DriverController.a().onTrue(elevator.minHeight());
+    DriverController.x().onTrue(elevator.L2());
+    DriverController.b().onTrue(elevator.L3());
+    DriverController.y().onTrue(elevator.L4());
 
     outtake.setDefaultCommand(outtake.autoQueueCoral());
   }
