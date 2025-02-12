@@ -142,7 +142,7 @@ public class Elevator extends SubsystemBase {
 
   public Command minHeight() {
     return goToLevel(Level.minHeight)
-        .andThen(Commands.runOnce(() -> io.setWinchOpenLoop(Volts.of(-12))))
+        .andThen(Commands.runOnce(() -> io.setWinchOpenLoop(Volts.of(-10))))
         .andThen(Commands.waitUntil(() -> inputs.lowerLimit))
         .andThen(Commands.runOnce(() -> {
           io.zeroEncoder();
