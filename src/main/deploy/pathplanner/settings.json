@@ -3,11 +3,10 @@
   "robotLength": 0.9,
   "holonomicMode": true,
   "pathFolders": [
-    "2 cycle",
-    "New Folder",
-    "Score Cora",
+    "Score Coral",
     "Score Coral and get Algae",
-    "Score Coral, Score Alage"
+    "Score Coral, Score Alage",
+    "3 cycle"
   ],
   "autoFolders": [],
   "defaultMaxVel": 3.0,
