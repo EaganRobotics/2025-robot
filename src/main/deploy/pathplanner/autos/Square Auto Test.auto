@@ -17,6 +17,18 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "L2"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 4.0
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Backwards 1M"
@@ -32,6 +44,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "Square Autos",
+  "folder": null,
   "choreoAuto": false
 }

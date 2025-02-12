@@ -95,14 +95,26 @@ public class Elevator extends SubsystemBase {
 
   };
 
-  private Level currentLevel;
+  private Level currentLevel = Level.minHeight;
 
   public Elevator(ElevatorIO io) {
     this.io = io;
-    currentLevel = Level.minHeight;
-    Distance height = currentLevel.getHeight();
-    Angle r = inchesToRadians(height);
-    io.setWinchPosition(r);
+
+    /*
+     * When the lower limit is hit, set the Elevator's state (where we believe we're
+     * at) to minHeight and set the winch to 0 volts
+     */
+    lowerLimitHit().onTrue(Commands.runOnce(() -> {
+      System.out.println("[Elevator] Lower limit hit, setting state to minHeight and setting motor volts to 0");
+      currentLevel = Level.minHeight;
+      io.setWinchOpenLoop(Volts.of(0));
+    }));
+
+    // currentLevel = Level.minHeight;
+    // Distance height = currentLevel.getHeight();
+    // Angle r = inchesToRadians(height);
+    // io.setWinchPosition(r);
+    goToLevel(Level.minHeight);
   }
 
   @Override
@@ -116,7 +128,6 @@ public class Elevator extends SubsystemBase {
 
     Logger.recordOutput("Elevator/CurrentLevel", currentLevel);
     Logger.recordOutput("Elevator/CurrentLevelHeight", currentLevel.getHeight());
-
   }
 
   private Angle inchesToRadians(Distance d) {
@@ -135,9 +146,7 @@ public class Elevator extends SubsystemBase {
       Distance height = level.getHeight();
       Angle r = inchesToRadians(height);
       io.setWinchPosition(r);
-    })
-
-        .andThen(Commands.waitUntil(isAtGoal().or(lowerLimitHit())));
+    }).andThen(Commands.waitUntil(isAtGoal()));
   }
 
   public Command minHeight() {
