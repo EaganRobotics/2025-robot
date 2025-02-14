@@ -137,6 +137,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
     NamedCommands.registerCommand("L2", elevator.L2());
     NamedCommands.registerCommand("L3", elevator.L3());
     NamedCommands.registerCommand("L4", elevator.L4());
+    NamedCommands.registerCommand("waitUntilIntaked", outtake.autoWaitUntilCoral());
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
