@@ -9,36 +9,6 @@
           "data": {
             "pathName": "Forward 1M"
           }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Left 1M"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "L2"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 4.0
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Backwards 1M"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Right 1M"
-          }
         }
       ]
     }

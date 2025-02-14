@@ -40,10 +40,10 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 3.0,
-    "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0,
+    "maxVelocity": 5.0,
+    "maxAcceleration": 4.0,
+    "maxAngularVelocity": 360.0,
+    "maxAngularAcceleration": 180.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
@@ -55,7 +55,7 @@
   "folder": "Score Coral and get Algae",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -92.80584892673711
+    "rotation": -92.80584892673713
   },
   "useDefaultConstraints": true
 }
