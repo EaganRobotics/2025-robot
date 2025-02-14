@@ -30,11 +30,12 @@ public class Elevator extends SubsystemBase {
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
   @AutoLogOutput
-  public final LoggedMechanism2d mechanism2d = new LoggedMechanism2d(3, 3, new Color8Bit(Color.kBlack));
+  public final LoggedMechanism2d mechanism2d =
+      new LoggedMechanism2d(3, 3, new Color8Bit(Color.kBlack));
 
   private final LoggedMechanismRoot2d mechRoot2d = mechanism2d.getRoot("Elevator Root", 1.5, 0);
-  private final LoggedMechanismLigament2d elevatorMech2d = mechRoot2d
-      .append(new LoggedMechanismLigament2d("Elevator", INITIAL_HEIGHT.in(Meters), 90.0,
+  private final LoggedMechanismLigament2d elevatorMech2d =
+      mechRoot2d.append(new LoggedMechanismLigament2d("Elevator", INITIAL_HEIGHT.in(Meters), 90.0,
           50, new Color8Bit(Color.kBlue)));
   // private WantedState wantedState = WantedState.minHeight;
   // private SystemState systemState = SystemState.zeroingMinhight;
@@ -49,9 +50,8 @@ public class Elevator extends SubsystemBase {
 
   private enum Level {
 
-    minHeight(MIN_HEIGHT), L1(Inches.of(18 + 8)), L2(Inches.of(31.9 + 7)), L3(
-        Inches.of(47.6 + 7)),
-    L4(Inches.of(72 + 7.9));
+    minHeight(MIN_HEIGHT), L1(Inches.of(18 + 14)), L2(Inches.of(31.9 + 7)), L3(
+        Inches.of(47.6 + 7)), L4(Inches.of(72 + 6));
 
     private final Distance height;
 
@@ -101,11 +101,12 @@ public class Elevator extends SubsystemBase {
     this.io = io;
 
     /*
-     * When the lower limit is hit, set the Elevator's state (where we believe we're
-     * at) to minHeight and set the winch to 0 volts
+     * When the lower limit is hit, set the Elevator's state (where we believe we're at) to
+     * minHeight and set the winch to 0 volts
      */
     lowerLimitHit().onTrue(Commands.runOnce(() -> {
-      System.out.println("[Elevator] Lower limit hit, setting state to minHeight and setting motor volts to 0");
+      System.out.println(
+          "[Elevator] Lower limit hit, setting state to minHeight and setting motor volts to 0");
       currentLevel = Level.minHeight;
       io.setWinchOpenLoop(Volts.of(0));
     }));
@@ -152,8 +153,7 @@ public class Elevator extends SubsystemBase {
   public Command minHeight() {
     return goToLevel(Level.minHeight)
         .andThen(Commands.runOnce(() -> io.setWinchOpenLoop(Volts.of(-10))))
-        .andThen(Commands.waitUntil(() -> inputs.lowerLimit))
-        .andThen(Commands.runOnce(() -> {
+        .andThen(Commands.waitUntil(() -> inputs.lowerLimit)).andThen(Commands.runOnce(() -> {
           io.zeroEncoder();
           io.setWinchOpenLoop(Volts.of(0));
         }));
@@ -212,19 +212,14 @@ public class Elevator extends SubsystemBase {
   // }
 
   /**
-   * Computes the estimated position of each elevator stage (stage 1, stage 2,
-   * carriage + loader)
-   * given the current winch position. Useful for rendering the robot model in
-   * simulation.
+   * Computes the estimated position of each elevator stage (stage 1, stage 2, carriage + loader)
+   * given the current winch position. Useful for rendering the robot model in simulation.
    *
-   * A continuous elevator lifts stages in order of least weight. As of 2/1, for
-   * us that would be
-   * stage 2, stage 1, then carriage. In order, each stage will contribute as much
-   * height as it can
+   * A continuous elevator lifts stages in order of least weight. As of 2/1, for us that would be
+   * stage 2, stage 1, then carriage. In order, each stage will contribute as much height as it can
    * to the lift before the next stage engages.
    *
-   * @returns Pose array of each elevator stage in the order: stage 1, stage 2,
-   *          carriage
+   * @returns Pose array of each elevator stage in the order: stage 1, stage 2, carriage
    */
   public Pose3d[] getElevatorPoses() {
     var height = radiansToInches(inputs.winchPosition).minus(MIN_HEIGHT);
@@ -240,9 +235,9 @@ public class Elevator extends SubsystemBase {
     // inches
     var stage3Contribution = heightInches < 51.5 ? 0 : height.minus(Inches.of(51.5)).in(Meters);
 
-    return new Pose3d[] { new Pose3d(0, 0, stage1Contribution, Rotation3d.kZero),
+    return new Pose3d[] {new Pose3d(0, 0, stage1Contribution, Rotation3d.kZero),
         new Pose3d(0, 0, stage1Contribution + stage2Contribution, Rotation3d.kZero), new Pose3d(0,
-            0, stage1Contribution + stage2Contribution + stage3Contribution, Rotation3d.kZero), };
+            0, stage1Contribution + stage2Contribution + stage3Contribution, Rotation3d.kZero),};
   }
 
   public Trigger elevatorAtMinHeight() {

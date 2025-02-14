@@ -19,6 +19,11 @@ public class PWMEncoder {
 
   public Angle getPosition() {
     // return encoder.getAverageValue() * 360 / 4096.0 / Math.pow(2, oversampling);
-    return Degrees.of(encoder.getValue() * 360.0 / 4096.0).plus(offset);
+    return getRawUnoffsettedPosition().plus(offset);
+  }
+
+  public Angle getRawUnoffsettedPosition() {
+    // return encoder.getAverageValue() * 360 / 4096.0 / Math.pow(2, oversampling);
+    return Degrees.of(encoder.getValue() * 360.0 / 4096.0);
   }
 }

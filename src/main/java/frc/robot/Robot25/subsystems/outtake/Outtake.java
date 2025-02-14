@@ -9,7 +9,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Outtake extends SubsystemBase {
   private final OuttakeIO io;
-private final OuttakeIOInputsAutoLogged inputs = new OuttakeIOInputsAutoLogged();
+  private final OuttakeIOInputsAutoLogged inputs = new OuttakeIOInputsAutoLogged();
 
   public Outtake(OuttakeIO io) {
     this.io = io;
