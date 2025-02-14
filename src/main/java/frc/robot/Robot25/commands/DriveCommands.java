@@ -434,4 +434,93 @@ public class DriveCommands {
           yController.reset(drive.getPose().getY());
         }).until(() -> angleController.atGoal() && xController.atGoal() && yController.atGoal());
   }
+
+  public static Command joystickDriveAssist(Drive drive, Pose2d desiredPosition, DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier, DoubleSupplier omegaSupplier, BooleanSupplier slowModeSupplier) {
+
+    // Create PID controller
+    ProfiledPIDController angleController =
+        new ProfiledPIDController(ANGLE_KP.get(), ANGLE_KI.get(), ANGLE_KD.get(),
+            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+    angleController.enableContinuousInput(-Math.PI, Math.PI);
+    angleController.setTolerance(ANGLE_TOLERANCE);
+
+    ProfiledPIDController xController =
+        new ProfiledPIDController(POSITION_KP.get(), POSITION_KI.get(), POSITION_KD.get(),
+            new TrapezoidProfile.Constraints(POSITION_MAX_VELOCITY, POSITION_MAX_ACCELERATION));
+    xController.setTolerance(POSITION_TOLERANCE);
+
+    ProfiledPIDController yController =
+        new ProfiledPIDController(POSITION_KP.get(), POSITION_KI.get(), POSITION_KD.get(),
+            new TrapezoidProfile.Constraints(POSITION_MAX_VELOCITY, POSITION_MAX_ACCELERATION));
+    yController.setTolerance(POSITION_TOLERANCE);
+
+    return Commands.run(() -> {
+
+      angleController.setP(ANGLE_KP.get());
+      angleController.setI(ANGLE_KI.get());
+      angleController.setD(ANGLE_KD.get());
+
+      xController.setP(POSITION_KP.get());
+      xController.setI(POSITION_KI.get());
+      xController.setD(POSITION_KD.get());
+
+      yController.setP(POSITION_KP.get());
+      yController.setI(POSITION_KI.get());
+      yController.setD(POSITION_KD.get());
+
+      final double slowModeMultiplier =
+          (slowModeSupplier.getAsBoolean() ? SLOW_MODE_MULTIPLIER : 1.0);
+
+      // Get linear velocity
+      Translation2d linearVelocity =
+          getLinearVelocityFromJoysticks(-xSupplier.getAsDouble(), -ySupplier.getAsDouble());
+
+      // Apply rotation deadband
+      double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
+
+      final double maxSpeed = drive.getMaxLinearSpeedMetersPerSec() * slowModeMultiplier;
+
+      double x = linearVelocity.getX() * maxSpeed;
+      double y = linearVelocity.getY() * maxSpeed;
+
+      // Square rotation value for more precise control
+      omega = Math.copySign(omega * omega, omega);
+
+      omega *= drive.getMaxAngularSpeedRadPerSec() * slowModeMultiplier;
+
+      if ((Math.abs(omega) > 1E-6) || (Math.abs(x) > 1E-6) || (Math.abs(y) > 1E-6)) {
+        Logger.recordOutput("DriveState", "Driver");
+        
+      } else {
+        Logger.recordOutput("DriveState", "Robot");
+        x = xController.calculate(drive.getPose().getX(), desiredPosition.getX());
+
+        y = yController.calculate(drive.getPose().getY(), desiredPosition.getY());
+
+        omega = angleController.calculate(drive.getRotation().getRadians(),
+            desiredPosition.getRotation().getRadians());
+      }
+
+      Logger.recordOutput("Snap/omega", omega);
+      Logger.recordOutput("Snap/x/xDiff", x);
+      Logger.recordOutput("Snap/x/desiredXPos", desiredPosition.getX());
+      Logger.recordOutput("Snap/x/currentXPos", drive.getPose().getX());
+      Logger.recordOutput("Snap/y/yDiff", y);
+      Logger.recordOutput("Snap/y/desiredYPos", desiredPosition.getY());
+      Logger.recordOutput("Snap/y/currentYPos", drive.getPose().getY());
+
+      // Convert to field relative speeds & send command
+      ChassisSpeeds speeds = new ChassisSpeeds(x, y, omega);
+      drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
+
+    }, drive)
+
+        // Reset PID controller when command starts
+        .beforeStarting(() -> {
+          angleController.reset(drive.getRotation().getRadians());
+          xController.reset(drive.getPose().getX());
+          yController.reset(drive.getPose().getY());
+        });
+  }
 }
