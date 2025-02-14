@@ -14,13 +14,9 @@
 package frc.robot.Robot25.commands;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.GoalEndState;
-import com.pathplanner.lib.path.PathConstraints;
-import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.path.Waypoint;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -31,12 +27,11 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.lib.ShuffleBoardTabWrapper;
-import frc.lib.tunables.TunableDouble;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.Robot25.subsystems.drive.Drive;
 import frc.robot.Robot25.subsystems.drive.DriveConstants;
 import java.text.DecimalFormat;
@@ -47,7 +42,6 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class DriveCommands {
@@ -58,14 +52,49 @@ public class DriveCommands {
   // private static final double ANGLE_KD = 0.4;
   private static final double ANGLE_MAX_VELOCITY = 8.0;
   private static final double ANGLE_MAX_ACCELERATION = 20.0;
-  private static final double ANGLE_TOLERANCE = Degrees.of(0.05).in(Radians);
+  private static final double ANGLE_TOLERANCE = Degrees.of(1).in(Radians);
   private static final double POSITION_MAX_VELOCITY = 3.0;
   private static final double POSITION_MAX_ACCELERATION = 3.0;
-  private static final double POSITION_TOLERANCE = Meters.of(0.0127).in(Meters);
+  private static final double POSITION_TOLERANCE = Inches.of(2).in(Meters);
   private static final double FF_START_DELAY = 2.0; // Secs
   private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
   private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
   private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
+
+  private static final double INCHES_FROM_REEF = 16.75 + 11.757361;
+  private static final double REEF_CENTER_X_INCHES = 176.745545;
+  private static final double REEF_CENTER_Y_INCHES = 158.500907;
+
+  private static final Translation2d REEF_CENTER =
+      new Translation2d(Inches.of(REEF_CENTER_X_INCHES), Inches.of(REEF_CENTER_Y_INCHES));
+  private static final Transform2d REEF_BRANCH_TO_ROBOT =
+      new Transform2d(Inches.of(-INCHES_FROM_REEF), Inches.zero(), Rotation2d.kZero);
+
+  private static final Pose2d[] REEF_POSITIONS = new Pose2d[] {
+      new Pose2d(REEF_CENTER.plus(new Translation2d(Inches.of(-20.738000), Inches.of(6.482000))),
+          Rotation2d.kZero).transformBy(REEF_BRANCH_TO_ROBOT),
+      new Pose2d(REEF_CENTER.plus(new Translation2d(Inches.of(-20.738000), Inches.of(-6.482000))),
+          Rotation2d.kZero).transformBy(REEF_BRANCH_TO_ROBOT),
+      new Pose2d(REEF_CENTER.plus(new Translation2d(Inches.of(-15.982577), Inches.of(-14.718635))),
+          Rotation2d.fromDegrees(60)).transformBy(REEF_BRANCH_TO_ROBOT),
+      new Pose2d(REEF_CENTER.plus(new Translation2d(Inches.of(-4.755423), Inches.of(-21.200635))),
+          Rotation2d.fromDegrees(60)).transformBy(REEF_BRANCH_TO_ROBOT),
+      new Pose2d(REEF_CENTER.plus(new Translation2d(Inches.of(4.755423), Inches.of(-21.200635))),
+          Rotation2d.fromDegrees(120)).transformBy(REEF_BRANCH_TO_ROBOT),
+      new Pose2d(REEF_CENTER.plus(new Translation2d(Inches.of(15.982577), Inches.of(-14.718635))),
+          Rotation2d.fromDegrees(120)).transformBy(REEF_BRANCH_TO_ROBOT),
+      new Pose2d(REEF_CENTER.plus(new Translation2d(Inches.of(20.738000), Inches.of(-6.482000))),
+          Rotation2d.fromDegrees(180)).transformBy(REEF_BRANCH_TO_ROBOT),
+      new Pose2d(REEF_CENTER.plus(new Translation2d(Inches.of(20.738000), Inches.of(6.482000))),
+          Rotation2d.fromDegrees(180)).transformBy(REEF_BRANCH_TO_ROBOT),
+      new Pose2d(REEF_CENTER.plus(new Translation2d(Inches.of(15.982577), Inches.of(14.718635))),
+          Rotation2d.fromDegrees(240)).transformBy(REEF_BRANCH_TO_ROBOT),
+      new Pose2d(REEF_CENTER.plus(new Translation2d(Inches.of(4.755423), Inches.of(21.200635))),
+          Rotation2d.fromDegrees(240)).transformBy(REEF_BRANCH_TO_ROBOT),
+      new Pose2d(REEF_CENTER.plus(new Translation2d(Inches.of(-4.755423), Inches.of(21.200635))),
+          Rotation2d.fromDegrees(300)).transformBy(REEF_BRANCH_TO_ROBOT),
+      new Pose2d(REEF_CENTER.plus(new Translation2d(Inches.of(-15.982577), Inches.of(14.718635))),
+          Rotation2d.fromDegrees(300)).transformBy(REEF_BRANCH_TO_ROBOT),};
 
 
   // public static final TunableDouble ANGLE_KP =
@@ -83,11 +112,11 @@ public class DriveCommands {
       new LoggedNetworkNumber("/Tuning/angleKD", 0.4);
 
   public static final LoggedNetworkNumber POSITION_KP =
-      new LoggedNetworkNumber("/Tuning/positionKP", 0.001);
+      new LoggedNetworkNumber("/Tuning/positionKP", 4);
   public static final LoggedNetworkNumber POSITION_KI =
-      new LoggedNetworkNumber("/Tuning/positionKI", 0);
+      new LoggedNetworkNumber("/Tuning/positionKI", 0); // 1
   public static final LoggedNetworkNumber POSITION_KD =
-      new LoggedNetworkNumber("/Tuning/positionKD", 0);
+      new LoggedNetworkNumber("/Tuning/positionKD", 0); // 1
 
 
   private DriveCommands() {}
@@ -364,6 +393,7 @@ public class DriveCommands {
     yController.setTolerance(POSITION_TOLERANCE);
 
     return Commands.run(() -> {
+
       angleController.setP(ANGLE_KP.get());
       angleController.setI(ANGLE_KI.get());
       angleController.setD(ANGLE_KD.get());
@@ -384,23 +414,24 @@ public class DriveCommands {
           desiredPosition.getRotation().getRadians());
 
       Logger.recordOutput("Snap/omega", omega);
-      Logger.recordOutput("Snap/x/xPos", x);
+      Logger.recordOutput("Snap/x/xDiff", x);
       Logger.recordOutput("Snap/x/desiredXPos", desiredPosition.getX());
       Logger.recordOutput("Snap/x/currentXPos", drive.getPose().getX());
-      Logger.recordOutput("Snap/y/yPos", y);
+      Logger.recordOutput("Snap/y/yDiff", y);
       Logger.recordOutput("Snap/y/desiredYPos", desiredPosition.getY());
       Logger.recordOutput("Snap/y/currentYPos", drive.getPose().getY());
 
       // Convert to field relative speeds & send command
-      ChassisSpeeds speeds = new ChassisSpeeds(-x, -y, omega);
-      drive.runVelocity(speeds);
+      ChassisSpeeds speeds = new ChassisSpeeds(x, y, omega);
+      drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
+
     }, drive)
 
         // Reset PID controller when command starts
         .beforeStarting(() -> {
           angleController.reset(drive.getRotation().getRadians());
-          // xController.reset(drive.getPose().getX());
-          // yController.reset(drive.getPose().getY());
-        });
+          xController.reset(drive.getPose().getX());
+          yController.reset(drive.getPose().getY());
+        }).until(() -> angleController.atGoal() && xController.atGoal() && yController.atGoal());
   }
 }

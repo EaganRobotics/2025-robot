@@ -19,6 +19,7 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -210,10 +211,10 @@ public class RobotContainer extends frc.lib.RobotContainer {
     DriverController.povUp().onTrue(elevator.upLevel());
     DriverController.rightTrigger().onTrue(outtake.depositCoral());
     DriverController.leftTrigger().onTrue(outtake.reverseCoral());
-    DriverController.a().onTrue(elevator.minHeight());
+    // DriverController.a().onTrue(elevator.minHeight());
     DriverController.x().onTrue(elevator.L2());
     DriverController.b().onTrue(elevator.L3());
-    DriverController.y().onTrue(elevator.L4());
+    // DriverController.y().onTrue(elevator.L4());
 
 
 
@@ -232,8 +233,9 @@ public class RobotContainer extends frc.lib.RobotContainer {
     OperatorController.b().onTrue(elevator.L3());
     OperatorController.y().onTrue(elevator.L4());
 
-    // DriverController.y();
-    // .onTrue(DriveCommands.snapToPosition(drive, new Pose2d(5, 5, Rotation2d.fromDegrees(90))));
+    DriverController.y()
+        .onTrue(DriveCommands.snapToPosition(drive, new Pose2d(3, 3, Rotation2d.fromDegrees(90))));
+
     elevator.setDefaultCommand(elevator.openLoop(OperatorController::getLeftY));
 
   }
