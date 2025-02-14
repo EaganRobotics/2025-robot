@@ -25,15 +25,25 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator3d;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
@@ -45,6 +55,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Robot25.subsystems.gyro.GyroIO;
 import frc.robot.Robot25.subsystems.gyro.GyroIOInputsAutoLogged;
+import frc.robot.Robot25.subsystems.vision.Vision.VisionConsumer;
 import frc.robot.Robot25.util.LocalADStarAK;
 import frc.robot.SimConstants;
 import frc.robot.SimConstants.Mode;
@@ -56,45 +67,49 @@ import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class Drive extends SubsystemBase /* implements Vision.VisionConsumer */ {
+public class Drive extends SubsystemBase implements VisionConsumer {
 
   // Configure path planner
-  private static final RobotConfig PP_CONFIG =
-      new RobotConfig(DriveConstants.ROBOT_MASS_KG, DriveConstants.ROBOT_MOI,
-          new ModuleConfig(DriveConstants.FrontLeft.WheelRadius,
-              DriveConstants.kSpeedAt12Volts.in(MetersPerSecond), DriveConstants.WHEEL_COF,
-              DCMotor.getKrakenX60(1).withReduction(DriveConstants.FrontLeft.DriveMotorGearRatio),
-              DriveConstants.FrontLeft.SlipCurrent, 1),
-          getModuleTranslations());
+  private static final RobotConfig PP_CONFIG = new RobotConfig(DriveConstants.ROBOT_MASS_KG, DriveConstants.ROBOT_MOI,
+      new ModuleConfig(DriveConstants.FrontLeft.WheelRadius,
+          DriveConstants.kSpeedAt12Volts.in(MetersPerSecond), DriveConstants.WHEEL_COF,
+          DCMotor.getKrakenX60(1).withReduction(DriveConstants.FrontLeft.DriveMotorGearRatio),
+          DriveConstants.FrontLeft.SlipCurrent, 1),
+      getModuleTranslations());
 
   // Maple Sim config constants
-  public static final DriveTrainSimulationConfig MAPLE_SIM_CONFIG =
-      DriveTrainSimulationConfig.Default().withRobotMass(Kilograms.of(DriveConstants.ROBOT_MASS_KG))
-          .withCustomModuleTranslations(getModuleTranslations()).withGyro(COTS.ofNav2X())
-          .withSwerveModule(new SwerveModuleSimulationConfig(DCMotor.getKrakenX60(1),
-              DCMotor.getFalcon500(1), DriveConstants.FrontLeft.DriveMotorGearRatio,
-              DriveConstants.FrontLeft.SteerMotorGearRatio,
-              Volts.of(DriveConstants.FrontLeft.DriveFrictionVoltage),
-              Volts.of(DriveConstants.FrontLeft.SteerFrictionVoltage),
-              Meters.of(DriveConstants.FrontLeft.WheelRadius),
-              KilogramSquareMeters.of(DriveConstants.FrontLeft.SteerInertia),
-              DriveConstants.WHEEL_COF));
+  public static final DriveTrainSimulationConfig MAPLE_SIM_CONFIG = DriveTrainSimulationConfig.Default()
+      .withRobotMass(Kilograms.of(DriveConstants.ROBOT_MASS_KG))
+      .withCustomModuleTranslations(getModuleTranslations()).withGyro(COTS.ofNav2X())
+      .withSwerveModule(new SwerveModuleSimulationConfig(DCMotor.getKrakenX60(1),
+          DCMotor.getFalcon500(1), DriveConstants.FrontLeft.DriveMotorGearRatio,
+          DriveConstants.FrontLeft.SteerMotorGearRatio,
+          Volts.of(DriveConstants.FrontLeft.DriveFrictionVoltage),
+          Volts.of(DriveConstants.FrontLeft.SteerFrictionVoltage),
+          Meters.of(DriveConstants.FrontLeft.WheelRadius),
+          KilogramSquareMeters.of(DriveConstants.FrontLeft.SteerInertia),
+          DriveConstants.WHEEL_COF));
 
   static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
   private final SysIdRoutine sysId;
-  private final Alert gyroDisconnectedAlert =
-      new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
+  private final Alert gyroDisconnectedAlert = new Alert("Disconnected gyro, using kinematics as fallback.",
+      AlertType.kError);
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
-  private Rotation2d rawGyroRotation = new Rotation2d();
+  private Rotation3d rawGyroRotation3d = Rotation3d.kZero;
+  private Rotation2d rawGyroRotation = Rotation2d.kZero;
   private SwerveModulePosition[] lastModulePositions = // For delta tracking
-      new SwerveModulePosition[] {new SwerveModulePosition(), new SwerveModulePosition(),
-          new SwerveModulePosition(), new SwerveModulePosition()};
-  private SwerveDrivePoseEstimator poseEstimator =
-      new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, Pose2d.kZero);
+      new SwerveModulePosition[] { new SwerveModulePosition(), new SwerveModulePosition(),
+          new SwerveModulePosition(), new SwerveModulePosition() };
+  private SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(kinematics, rawGyroRotation,
+      lastModulePositions, SimConstants.SIM_INITIAL_FIELD_POSE);
+  private SwerveDrivePoseEstimator3d poseEstimator3d = new SwerveDrivePoseEstimator3d(kinematics, rawGyroRotation3d,
+      lastModulePositions, new Pose3d(SimConstants.SIM_INITIAL_FIELD_POSE),
+      MatBuilder.fill(Nat.N4(), Nat.N1(), 0.1, 0.1, 0.1, 0.1),
+      MatBuilder.fill(Nat.N4(), Nat.N1(), 0.9, 0.9, 0.9, 0.9));
 
   private boolean coastModeOn = false;
   private boolean snapToRotationEnabled = false;
@@ -176,14 +191,17 @@ public class Drive extends SubsystemBase /* implements Vision.VisionConsumer */ 
       if (gyroInputs.connected) {
         // Use the real gyro angle
         rawGyroRotation = gyroInputs.odometryYawPositions[i];
+        rawGyroRotation3d = gyroInputs.odometryRotation3d[i];
       } else {
         // Estimate the angle delta from the kinematics and module deltas
         Twist2d twist = kinematics.toTwist2d(moduleDeltas);
         rawGyroRotation = rawGyroRotation.plus(new Rotation2d(twist.dtheta));
+        rawGyroRotation3d = new Rotation3d(rawGyroRotation);
       }
 
       // Apply update
       poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
+      poseEstimator3d.updateWithTime(sampleTimestamps[i], rawGyroRotation3d, modulePositions);
     }
 
     // Update gyro alert
@@ -227,8 +245,10 @@ public class Drive extends SubsystemBase /* implements Vision.VisionConsumer */ 
   }
 
   /**
-   * Stops the drive and turns the modules to an X arrangement to resist movement. The modules will
-   * return to their normal orientations the next time a nonzero velocity is requested.
+   * Stops the drive and turns the modules to an X arrangement to resist movement.
+   * The modules will
+   * return to their normal orientations the next time a nonzero velocity is
+   * requested.
    */
   public void stopWithX() {
     Rotation2d[] headings = new Rotation2d[4];
@@ -267,7 +287,10 @@ public class Drive extends SubsystemBase /* implements Vision.VisionConsumer */ 
     return run(() -> runCharacterization(0.0)).withTimeout(1.0).andThen(sysId.dynamic(direction));
   }
 
-  /** Returns the module states (turn angles and drive velocities) for all of the modules. */
+  /**
+   * Returns the module states (turn angles and drive velocities) for all of the
+   * modules.
+   */
   @AutoLogOutput(key = "SwerveStates/Measured")
   private SwerveModuleState[] getModuleStates() {
     SwerveModuleState[] states = new SwerveModuleState[4];
@@ -277,7 +300,10 @@ public class Drive extends SubsystemBase /* implements Vision.VisionConsumer */ 
     return states;
   }
 
-  /** Returns the module positions (turn angles and drive positions) for all of the modules. */
+  /**
+   * Returns the module positions (turn angles and drive positions) for all of the
+   * modules.
+   */
   private SwerveModulePosition[] getModulePositions() {
     SwerveModulePosition[] states = new SwerveModulePosition[4];
     for (int i = 0; i < 4; i++) {
@@ -301,7 +327,10 @@ public class Drive extends SubsystemBase /* implements Vision.VisionConsumer */ 
     return values;
   }
 
-  /** Returns the average velocity of the modules in rotations/sec (Phoenix native units). */
+  /**
+   * Returns the average velocity of the modules in rotations/sec (Phoenix native
+   * units).
+   */
   public double getFFCharacterizationVelocity() {
     double output = 0.0;
     for (int i = 0; i < 4; i++) {
@@ -316,6 +345,12 @@ public class Drive extends SubsystemBase /* implements Vision.VisionConsumer */ 
     return poseEstimator.getEstimatedPosition();
   }
 
+  /** Returns the current odometry pose in 3d. */
+  @AutoLogOutput(key = "Odometry/Robot3d")
+  public Pose3d getPose3d() {
+    return poseEstimator3d.getEstimatedPosition();
+  }
+
   /** Returns the current odometry rotation. */
   public Rotation2d getRotation() {
     return getPose().getRotation();
@@ -324,17 +359,24 @@ public class Drive extends SubsystemBase /* implements Vision.VisionConsumer */ 
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
+    poseEstimator3d.resetPosition(new Rotation3d(rawGyroRotation), getModulePositions(), new Pose3d(pose));
   }
 
-  // /** Adds a new timestamped vision measurement. */
-  // @Override
-  // public void accept(
-  // Pose2d visionRobotPoseMeters,
-  // double timestampSeconds,
-  // Matrix<N3, N1> visionMeasurementStdDevs) {
-  // poseEstimator.addVisionMeasurement(
-  // visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
-  // }
+  /** Adds a new timestamped vision measurement. */
+  @Override
+  public void accept(
+      Pose2d visionRobotPoseMeters,
+      double timestampSeconds,
+      Matrix<N3, N1> visionMeasurementStdDevs) {
+    poseEstimator.addVisionMeasurement(
+        visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
+    var linear = visionMeasurementStdDevs.get(0, 0);
+    var angular = visionMeasurementStdDevs.get(2, 0);
+    System.out.println("Accepting vision measurement");
+    // TODO modify to accept 3d pose?
+    poseEstimator3d.addVisionMeasurement(new Pose3d(visionRobotPoseMeters), timestampSeconds,
+        VecBuilder.fill(linear, linear, linear, angular));
+  }
 
   /** Returns the maximum linear speed in meters per sec. */
   public double getMaxLinearSpeedMetersPerSec() {
@@ -352,7 +394,7 @@ public class Drive extends SubsystemBase /* implements Vision.VisionConsumer */ 
         new Translation2d(DriveConstants.FrontLeft.LocationX, DriveConstants.FrontLeft.LocationY),
         new Translation2d(DriveConstants.FrontRight.LocationX, DriveConstants.FrontRight.LocationY),
         new Translation2d(DriveConstants.BackLeft.LocationX, DriveConstants.BackLeft.LocationY),
-        new Translation2d(DriveConstants.BackRight.LocationX, DriveConstants.BackRight.LocationY)};
+        new Translation2d(DriveConstants.BackRight.LocationX, DriveConstants.BackRight.LocationY) };
   }
 
   public void toggleCoast() {

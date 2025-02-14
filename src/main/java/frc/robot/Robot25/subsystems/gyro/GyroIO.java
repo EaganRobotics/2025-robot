@@ -14,12 +14,16 @@
 package frc.robot.Robot25.subsystems.gyro;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+
 import org.littletonrobotics.junction.AutoLog;
 
 public interface GyroIO {
   @AutoLog
   public static class GyroIOInputs {
     public boolean connected = false;
+
+    public Rotation3d gyroRotation = Rotation3d.kZero;
 
     public Rotation2d yawPosition = new Rotation2d();
     public double yawVelocityRadPerSec = 0.0;
@@ -32,6 +36,7 @@ public interface GyroIO {
 
     public double[] odometryYawTimestamps = new double[] {};
     public Rotation2d[] odometryYawPositions = new Rotation2d[] {};
+    public Rotation3d[] odometryRotation3d = new Rotation3d[] {};
   }
 
   public default void updateInputs(GyroIOInputs inputs) {
