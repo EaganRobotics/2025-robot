@@ -205,14 +205,14 @@ public class RobotContainer extends frc.lib.RobotContainer {
     DriverController.povUpLeft()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(45)));
 
-    // DriverController.povDown().onTrue(elevator.downLevel());
-    // DriverController.povUp().onTrue(elevator.upLevel());
-    // DriverController.rightTrigger().onTrue(outtake.depositCoral());
-    // DriverController.leftTrigger().onTrue(outtake.reverseCoral());
-    // DriverController.a().onTrue(elevator.minHeight());
-    // DriverController.x().onTrue(elevator.L2());
-    // DriverController.b().onTrue(elevator.L3());
-    // DriverController.y().onTrue(elevator.L4());
+    DriverController.povDown().onTrue(elevator.downLevel());
+    DriverController.povUp().onTrue(elevator.upLevel());
+    DriverController.rightTrigger().onTrue(outtake.depositCoral());
+    DriverController.leftTrigger().onTrue(outtake.reverseCoral());
+    DriverController.a().onTrue(elevator.minHeight());
+    DriverController.x().onTrue(elevator.L2());
+    DriverController.b().onTrue(elevator.L3());
+    DriverController.y().onTrue(elevator.L4());
 
     // Reset gyro to 0° when START button is pressed
     DriverController.start()
