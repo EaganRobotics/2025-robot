@@ -53,7 +53,7 @@ public class Elevator extends SubsystemBase {
 
     minHeight(MIN_HEIGHT), L1(Inches.of(18 + 14)), L2(Inches.of(31.9 + 7)), L3(
         Inches.of(47.6 + 7)),
-    L4(Inches.of(72 + 8));
+    L4(Inches.of(72 + 7));
 
     private final Distance height;
 
@@ -155,7 +155,7 @@ public class Elevator extends SubsystemBase {
 
   public Command minHeight() {
     return goToLevel(Level.minHeight)
-        .andThen(Commands.runOnce(() -> io.setWinchOpenLoop(Volts.of(-10))))
+        .andThen(Commands.runOnce(() -> io.setWinchOpenLoop(Volts.of(-9))))
         .andThen(Commands.waitUntil(() -> inputs.lowerLimit)).andThen(Commands.runOnce(() -> {
           io.zeroEncoder();
           io.setWinchOpenLoop(Volts.of(0));
