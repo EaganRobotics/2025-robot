@@ -51,9 +51,9 @@ public class Elevator extends SubsystemBase {
 
   private enum Level {
 
-    minHeight(MIN_HEIGHT), L1(Inches.of(18 + 14)), L2(Inches.of(31.9 + 7)), L3(
-        Inches.of(47.6 + 7)),
-    L4(Inches.of(72 + 7));
+    minHeight(MIN_HEIGHT), L1(Inches.of(72 + 3)), L2(Inches.of(72 + 4)), L3(
+        Inches.of(72 + 5)),
+    L4(Inches.of(72 + 6));
 
     private final Distance height;
 
