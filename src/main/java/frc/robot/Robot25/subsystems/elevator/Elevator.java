@@ -1,5 +1,6 @@
 package frc.robot.Robot25.subsystems.elevator;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
@@ -51,8 +52,8 @@ public class Elevator extends SubsystemBase {
 
   private enum Level {
 
-    minHeight(MIN_HEIGHT), L1(Inches.of(72 + 3)), L2(Inches.of(72 + 4)), L3(
-        Inches.of(72 + 5)),
+    minHeight(MIN_HEIGHT), L1(Inches.of(18 + 14)), L2(Inches.of(31.9 + 7)), L3(
+        Inches.of(47.6 + 7)),
     L4(Inches.of(72 + 6));
 
     private final Distance height;
@@ -259,7 +260,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public Trigger lowerLimitHit() {
-    return new Trigger(() -> inputs.lowerLimit);
+    return new Trigger(() -> inputs.lowerLimit || inputs.winchCurrent.lt(Amps.of(-50)));
   }
 
   public Trigger isAtGoal() {
