@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Barge Corner to Score Coral"
+            "pathName": "rbtc1"
           }
         },
         {
@@ -23,21 +23,33 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "rbtc2"
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "minHeight"
           }
         },
         {
-          "type": "path",
+          "type": "wait",
           "data": {
-            "pathName": "Coral to Source"
+            "waitTime": 1.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Source to Reef"
+            "pathName": "rbtc3"
           }
         },
         {

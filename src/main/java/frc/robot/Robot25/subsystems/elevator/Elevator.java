@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Robot25.subsystems.outtake.Outtake;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -27,6 +28,7 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 public class Elevator extends SubsystemBase {
 
   private final ElevatorIO io;
+
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
   @AutoLogOutput
@@ -49,9 +51,9 @@ public class Elevator extends SubsystemBase {
 
   private enum Level {
 
-    minHeight(MIN_HEIGHT), L1(Inches.of(18 + 8)), L2(Inches.of(31.9 + 7)), L3(
+    minHeight(MIN_HEIGHT), L1(Inches.of(18 + 14)), L2(Inches.of(31.9 + 7)), L3(
         Inches.of(47.6 + 7)),
-    L4(Inches.of(72 + 7.9));
+    L4(Inches.of(72 + 7));
 
     private final Distance height;
 
@@ -102,10 +104,12 @@ public class Elevator extends SubsystemBase {
 
     /*
      * When the lower limit is hit, set the Elevator's state (where we believe we're
-     * at) to minHeight and set the winch to 0 volts
+     * at) to
+     * minHeight and set the winch to 0 volts
      */
     lowerLimitHit().onTrue(Commands.runOnce(() -> {
-      System.out.println("[Elevator] Lower limit hit, setting state to minHeight and setting motor volts to 0");
+      System.out.println(
+          "[Elevator] Lower limit hit, setting state to minHeight and setting motor volts to 0");
       currentLevel = Level.minHeight;
       io.setWinchOpenLoop(Volts.of(0));
     }));
@@ -151,13 +155,18 @@ public class Elevator extends SubsystemBase {
 
   public Command minHeight() {
     return goToLevel(Level.minHeight)
-        .andThen(Commands.runOnce(() -> io.setWinchOpenLoop(Volts.of(-10))))
-        .andThen(Commands.waitUntil(() -> inputs.lowerLimit))
-        .andThen(Commands.runOnce(() -> {
+        .andThen(Commands.runOnce(() -> io.setWinchOpenLoop(Volts.of(-9))))
+        .andThen(Commands.waitUntil(() -> inputs.lowerLimit)).andThen(Commands.runOnce(() -> {
           io.zeroEncoder();
           io.setWinchOpenLoop(Volts.of(0));
         }));
   }
+
+  // public Command miniHeight() {
+  // return goToLevel(Level.minHeight)
+  // .andThen(Commands.runOnce(() -> io.setWinchOpenLoop(Volts.of(-10))));
+
+  // }
 
   public Command L1() {
     return goToLevel(Level.L1);
@@ -256,7 +265,7 @@ public class Elevator extends SubsystemBase {
   public Trigger isAtGoal() {
     return new Trigger(() -> {
       return Math.abs((inputs.winchPosition.in(Radians)
-          - inchesToRadians(currentLevel.getHeight()).in(Radians))) < 0.1;
+          - inchesToRadians(currentLevel.getHeight()).in(Radians))) < 5;
 
     });
   }

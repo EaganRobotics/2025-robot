@@ -66,8 +66,8 @@ public class DriveConstants {
   }
 
   // PathPlanner and Maple Sim config constants
-  public static final double ROBOT_MASS_KG = 16.21;
-  public static final double ROBOT_MOI = 3.805;
+  public static final double ROBOT_MASS_KG = 53.524;
+  public static final double ROBOT_MOI = 5.290;
   public static final double WHEEL_COF = 1.542;
 
   // The closed-loop output type to use for the steer motors;
@@ -154,7 +154,7 @@ public class DriveConstants {
   private static final int kFrontRightDriveMotorId = 14;
   private static final int kFrontRightSteerMotorId = 13;
   private static final int kFrontRightEncoderId = 2;
-  private static final Angle kFrontRightEncoderOffset = Radians.of(-3.738);
+  private static final Angle kFrontRightEncoderOffset = Radians.of(-4.098);
   private static final boolean kFrontRightSteerMotorInverted = true;
   private static final boolean kFrontRightEncoderInverted = false;
   private static final Distance kFrontRightXPos = Inches.of(10.375);

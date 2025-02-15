@@ -7,37 +7,55 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Forward 1M"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Left 1M"
+            "pathName": "Barge Corner to Score Coral"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "L2"
+            "name": "L4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Exhaust"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "MinHeight"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Coral to Source"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 4.0
+            "waitTime": 0.5
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Backwards 1M"
+            "pathName": "Source to Reef"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Right 1M"
+            "name": "L4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Exhaust"
           }
         }
       ]

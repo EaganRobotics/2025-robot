@@ -70,11 +70,10 @@ import org.littletonrobotics.junction.Logger;
 public class Drive extends SubsystemBase implements VisionConsumer {
 
   // Configure path planner
-  private static final RobotConfig PP_CONFIG = new RobotConfig(DriveConstants.ROBOT_MASS_KG, DriveConstants.ROBOT_MOI,
-      new ModuleConfig(DriveConstants.FrontLeft.WheelRadius,
-          DriveConstants.kSpeedAt12Volts.in(MetersPerSecond), DriveConstants.WHEEL_COF,
-          DCMotor.getKrakenX60(1).withReduction(DriveConstants.FrontLeft.DriveMotorGearRatio),
-          DriveConstants.FrontLeft.SlipCurrent, 1),
+  private static final RobotConfig PP_CONFIG = new RobotConfig(DriveConstants.ROBOT_MASS_KG,
+      DriveConstants.ROBOT_MOI,
+      new ModuleConfig(0.047, 4, DriveConstants.WHEEL_COF,
+          DCMotor.getKrakenX60(1).withReduction(6.122), DriveConstants.FrontLeft.SlipCurrent, 1),
       getModuleTranslations());
 
   // Maple Sim config constants

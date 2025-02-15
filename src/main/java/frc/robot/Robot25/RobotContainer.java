@@ -159,6 +159,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
         break;
     }
 
+    NamedCommands.registerCommand("MinHeight", elevator.minHeight());
+
     NamedCommands.registerCommand("L1", elevator.L1());
     NamedCommands.registerCommand("L2", elevator.L2());
     NamedCommands.registerCommand("L3", elevator.L3());
@@ -235,14 +237,14 @@ public class RobotContainer extends frc.lib.RobotContainer {
     DriverController.povUpLeft()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(45)));
 
-    DriverController.povDown().onTrue(elevator.downLevel());
-    DriverController.povUp().onTrue(elevator.upLevel());
-    DriverController.rightTrigger().onTrue(outtake.depositCoral());
-    DriverController.leftTrigger().onTrue(outtake.reverseCoral());
-    DriverController.a().onTrue(elevator.minHeight());
-    DriverController.x().onTrue(elevator.L2());
-    DriverController.b().onTrue(elevator.L3());
-    DriverController.y().onTrue(elevator.L4());
+    // DriverController.povDown().onTrue(elevator.downLevel());
+    // DriverController.povUp().onTrue(elevator.upLevel());
+    // DriverController.rightTrigger().onTrue(outtake.depositCoral());
+    // DriverController.leftTrigger().onTrue(outtake.reverseCoral());
+    // DriverController.a().onTrue(elevator.minHeight());
+    // DriverController.x().onTrue(elevator.L2());
+    // DriverController.b().onTrue(elevator.L3());
+    // DriverController.y().onTrue(elevator.L4());
 
     // Reset gyro to 0° when START button is pressed
     DriverController.start()
@@ -254,6 +256,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
     OperatorController.povUp().onTrue(elevator.upLevel());
     OperatorController.rightTrigger().onTrue(outtake.depositCoral());
     OperatorController.leftTrigger().onTrue(outtake.reverseCoral());
+    OperatorController.rightBumper().onTrue(elevator.L1());
     OperatorController.a().onTrue(elevator.minHeight());
     OperatorController.x().onTrue(elevator.L2());
     OperatorController.b().onTrue(elevator.L3());
@@ -262,7 +265,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
     // DriverController.y();
     // .onTrue(DriveCommands.snapToPosition(drive, new Pose2d(5, 5,
     // Rotation2d.fromDegrees(90))));
-    elevator.setDefaultCommand(elevator.openLoop(OperatorController::getLeftY));
+    // elevator.setDefaultCommand(elevator.openLoop(OperatorController::getLeftY));
 
   }
 
