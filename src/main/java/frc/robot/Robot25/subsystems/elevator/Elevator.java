@@ -132,6 +132,8 @@ public class Elevator extends SubsystemBase {
 
     Logger.recordOutput("Elevator/CurrentLevel", currentLevel);
     Logger.recordOutput("Elevator/CurrentLevelHeight", currentLevel.getHeight());
+
+
   }
 
   private Angle inchesToRadians(Distance d) {
@@ -253,10 +255,12 @@ public class Elevator extends SubsystemBase {
     return new Trigger(() -> currentLevel == Level.minHeight);
   }
 
+  @AutoLogOutput
   public Trigger lowerLimitHit() {
     return new Trigger(() -> inputs.lowerLimit || inputs.winchCurrent.lt(Amps.of(-50)));
   }
 
+  @AutoLogOutput
   public Trigger isAtGoal() {
     return new Trigger(() -> {
       return Math.abs((inputs.winchPosition.in(Radians)
