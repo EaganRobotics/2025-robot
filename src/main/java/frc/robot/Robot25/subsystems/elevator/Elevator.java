@@ -156,7 +156,7 @@ public class Elevator extends SubsystemBase {
   public Command minHeight() {
     return goToLevel(Level.minHeight)
         // .andThen(Commands.runOnce(() -> io.setWinchOpenLoop(Volts.of(-9))))
-        .andThen(Commands.waitUntil(() -> inputs.lowerLimit)).andThen(Commands.runOnce(() -> {
+        .andThen(Commands.waitUntil(lowerLimitHit())).andThen(Commands.runOnce(() -> {
           io.zeroEncoder();
           io.setWinchOpenLoop(Volts.of(0));
         }));
@@ -254,7 +254,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public Trigger lowerLimitHit() {
-    return new Trigger(() -> inputs.lowerLimit || inputs.winchCurrent.lt(Amps.of(-50)));
+    return new Trigger(() -> inputs.lowerLimit || inputs.winchCurrent.lt(Amps.of(-65)));
   }
 
   public Trigger isAtGoal() {
