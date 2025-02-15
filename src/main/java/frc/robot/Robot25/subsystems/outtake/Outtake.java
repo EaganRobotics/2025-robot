@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
@@ -26,7 +27,17 @@ public class Outtake extends SubsystemBase {
       io.setOpenLoop(output);
     }, () -> {
       io.setOpenLoop(Volts.of(0));
-    });
+    }
+
+    );
+  }
+
+  public Command setOpenLop(Voltage output) {
+    return this.startEnd(() -> {
+      io.setOpenLoop(output);
+    }, () -> {
+      io.setOpenLoop(Volts.of(0));
+    }).withTimeout(2);
   }
 
   public Command autoQueueCoral() {
@@ -48,6 +59,14 @@ public class Outtake extends SubsystemBase {
   public Command depositCoral() {
     return setOpenLoop(Volts.of(5)).withTimeout(1);
   }
+
+  public Command depositCoralAuto() {
+    return setOpenLoop(Volts.of(5)).withTimeout(2);
+  }
+
+  // public Command specialDepositCoral() {
+  // return setOpenLop(Volts.of(5));
+  // }
 
   public Command reverseCoral() {
     return setOpenLoop(Volts.of(-5)).withTimeout(1);

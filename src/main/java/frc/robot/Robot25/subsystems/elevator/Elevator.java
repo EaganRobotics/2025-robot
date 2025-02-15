@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Robot25.subsystems.outtake.Outtake;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -27,6 +28,7 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 public class Elevator extends SubsystemBase {
 
   private final ElevatorIO io;
+
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
   @AutoLogOutput
@@ -158,6 +160,12 @@ public class Elevator extends SubsystemBase {
           io.setWinchOpenLoop(Volts.of(0));
         }));
   }
+
+  // public Command miniHeight() {
+  // return goToLevel(Level.minHeight)
+  // .andThen(Commands.runOnce(() -> io.setWinchOpenLoop(Volts.of(-10))));
+
+  // }
 
   public Command L1() {
     return goToLevel(Level.L1);
