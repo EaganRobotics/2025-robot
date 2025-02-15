@@ -254,7 +254,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public Trigger lowerLimitHit() {
-    return new Trigger(() -> inputs.lowerLimit || inputs.winchCurrent.lt(Amps.of(-65)));
+    return new Trigger(() -> inputs.lowerLimit || inputs.winchCurrent.lt(Amps.of(-50)));
   }
 
   public Trigger isAtGoal() {
