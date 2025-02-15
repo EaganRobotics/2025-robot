@@ -112,7 +112,6 @@ public class Elevator extends SubsystemBase {
           "[Elevator] Lower limit hit, setting state to minHeight and setting motor volts to 0");
       currentLevel = Level.minHeight;
       io.setWinchOpenLoop(Volts.of(0));
-      io.zeroEncoder();
     }));
 
     // currentLevel = Level.minHeight;
@@ -155,8 +154,9 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command minHeight() {
-    return goToLevel(Level.minHeight).andThen(Commands.waitUntil(lowerLimitHit()))
-        .andThen(Commands.runOnce(() -> {
+    return goToLevel(Level.minHeight)
+        .andThen(Commands.runOnce(() -> io.setWinchOpenLoop(Volts.of(-9))))
+        .andThen(Commands.waitUntil(() -> inputs.lowerLimit)).andThen(Commands.runOnce(() -> {
           io.zeroEncoder();
           io.setWinchOpenLoop(Volts.of(0));
         }));
@@ -254,7 +254,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public Trigger lowerLimitHit() {
-    return new Trigger(() -> inputs.lowerLimit || inputs.winchCurrent.lt(Amps.of(-65)));
+    return new Trigger(() -> inputs.lowerLimit || inputs.winchCurrent.lt(Amps.of(-50)));
   }
 
   public Trigger isAtGoal() {
