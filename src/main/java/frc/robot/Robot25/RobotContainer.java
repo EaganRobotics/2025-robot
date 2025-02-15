@@ -139,7 +139,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
         });
         break;
     }
-
+    NamedCommands.registerCommand("minHeight", elevator.minHeight());
     NamedCommands.registerCommand("L1", elevator.L1());
     NamedCommands.registerCommand("L2", elevator.L2());
     NamedCommands.registerCommand("L3", elevator.L3());
@@ -201,15 +201,21 @@ public class RobotContainer extends frc.lib.RobotContainer {
     // POV snap to angles
 
     // DriverControllerCommmands
-    DriverController.povUp().onTrue(DriveCommands.snapToRotation(drive,
-        Rotation2d.kZero));
-    DriverController.povUpRight().onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-45)));
-    DriverController.povRight().onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-90)));
-    DriverController.povDownRight().onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-135)));
-    DriverController.povDown().onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-180)));
-    DriverController.povDownLeft().onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(135)));
-    DriverController.povLeft().onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(90)));
-    DriverController.povUpLeft().onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(45)));
+    DriverController.povUp().onTrue(DriveCommands.snapToRotation(drive, Rotation2d.kZero));
+    DriverController.povUpRight()
+        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-45)));
+    DriverController.povRight()
+        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-90)));
+    DriverController.povDownRight()
+        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-135)));
+    DriverController.povDown()
+        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-180)));
+    DriverController.povDownLeft()
+        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(135)));
+    DriverController.povLeft()
+        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(90)));
+    DriverController.povUpLeft()
+        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(45)));
 
     DriverController.rightTrigger().onTrue(outtake.depositCoral());
     DriverController.leftTrigger().onTrue(outtake.reverseCoral());

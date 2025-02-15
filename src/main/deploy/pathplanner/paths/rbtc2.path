@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.0,
-        "y": 6.0
+        "x": 5.317301324503311,
+        "y": 3.000765728476821
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.0,
-        "y": 6.0
+        "x": 5.636920529801325,
+        "y": 0.5237168874172178
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.7046206225680938,
-        "y": 5.390758754863813
+        "x": 1.6344163907284766,
+        "y": 0.6326779801324495
       },
       "prevControl": {
-        "x": 3.542436770428016,
-        "y": 6.07363813229572
+        "x": 2.6731788079470196,
+        "y": 1.351821192052979
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,14 +31,7 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "L2",
-      "waypointRelativePos": 1.0,
-      "endWaypointRelativePos": null,
-      "command": null
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 5.0,
     "maxAcceleration": 4.0,
@@ -49,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -150.67952412241917
+    "rotation": 53.47114463301477
   },
   "reversed": false,
-  "folder": "Score Coral and get Algae",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -92.80584892673713
+    "rotation": 123.17851165939274
   },
   "useDefaultConstraints": true
 }
