@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 5.142491883116882,
-        "y": 5.549228896103895
+        "x": 5.0057386363636365,
+        "y": 5.251505681818182
       },
       "prevControl": {
-        "x": 5.156737012987013,
-        "y": 6.418181818181818
+        "x": 5.019983766233767,
+        "y": 6.120458603896105
       },
       "nextControl": null,
       "isLocked": false,
@@ -34,9 +34,9 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,
-    "maxAcceleration": 3.0,
-    "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0,
+    "maxAcceleration": 2.0,
+    "maxAngularVelocity": 360.0,
+    "maxAngularAcceleration": 180.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
@@ -45,10 +45,10 @@
     "rotation": -118.53998518795994
   },
   "reversed": false,
-  "folder": "Coral Score From Source",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -54.090276920822404
+    "rotation": -54.09027692082241
   },
   "useDefaultConstraints": true
 }
