@@ -129,12 +129,12 @@ public class RobotContainer extends frc.lib.RobotContainer {
         outtake = new Outtake(new OuttakeIO() {});
         break;
     }
-    NamedCommands.registerCommand("minHeight", elevator.minHeight());
+
     NamedCommands.registerCommand("L1", elevator.L1());
     NamedCommands.registerCommand("L2", elevator.L2());
     NamedCommands.registerCommand("L3", elevator.L3());
     NamedCommands.registerCommand("L4", elevator.L4());
-    NamedCommands.registerCommand("Exhaust", outtake.depositCoralAuto());
+    NamedCommands.registerCommand("Exhaust", outtake.depositCoral());
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -174,8 +174,6 @@ public class RobotContainer extends frc.lib.RobotContainer {
       System.out.println("COAST TOGGLED");
     }));
 
-
-
     // Xbox controller is mapped incorrectly on Mac OS
     DoubleSupplier xSupplier = () -> DriverController.getLeftX();
     DoubleSupplier ySupplier = () -> DriverController.getLeftY();
@@ -187,20 +185,19 @@ public class RobotContainer extends frc.lib.RobotContainer {
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(drive, ySupplier, xSupplier, omegaSupplier, slowModeSupplier));
-    outtake.setDefaultCommand(outtake.autoQueueCoral());
+    outtake.setDefaultCommand(outtake.autoQueueCoral().onlyWhile(elevator.elevatorAtMinHeight()));
 
     // POV snap to angles
-
-    // DriverControllerCommmands
-    DriverController.povUp().onTrue(DriveCommands.snapToRotation(drive, Rotation2d.kZero));
+    // DriverController.povUp().onTrue(DriveCommands.snapToRotation(drive,
+    // Rotation2d.kZero));
     DriverController.povUpRight()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-45)));
     DriverController.povRight()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-90)));
     DriverController.povDownRight()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-135)));
-    DriverController.povDown()
-        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-180)));
+    // DriverController.povDown()
+    // .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-180)));
     DriverController.povDownLeft()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(135)));
     DriverController.povLeft()
@@ -208,9 +205,14 @@ public class RobotContainer extends frc.lib.RobotContainer {
     DriverController.povUpLeft()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(45)));
 
+    DriverController.povDown().onTrue(elevator.downLevel());
+    DriverController.povUp().onTrue(elevator.upLevel());
     DriverController.rightTrigger().onTrue(outtake.depositCoral());
     DriverController.leftTrigger().onTrue(outtake.reverseCoral());
     DriverController.a().onTrue(elevator.minHeight());
+    DriverController.x().onTrue(elevator.L2());
+    DriverController.b().onTrue(elevator.L3());
+    DriverController.y().onTrue(elevator.L4());
 
     // Reset gyro to 0° when START button is pressed
     DriverController.start()
@@ -218,11 +220,11 @@ public class RobotContainer extends frc.lib.RobotContainer {
             () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
             drive).ignoringDisable(true));
 
-    // OperatorControllerCommmands
     OperatorController.povDown().onTrue(elevator.downLevel());
     OperatorController.povUp().onTrue(elevator.upLevel());
     OperatorController.rightTrigger().onTrue(outtake.depositCoral());
     OperatorController.leftTrigger().onTrue(outtake.reverseCoral());
+    OperatorController.rightBumper().onTrue(elevator.L1());
     OperatorController.a().onTrue(elevator.minHeight());
     OperatorController.x().onTrue(elevator.L2());
     OperatorController.b().onTrue(elevator.L3());
@@ -265,7 +267,6 @@ public class RobotContainer extends frc.lib.RobotContainer {
     mechanismPoses[0] = elevatorPoses[0];
     mechanismPoses[1] = elevatorPoses[1];
     mechanismPoses[2] = elevatorPoses[2];
-    // command.run(outtake.autoQueueCoral());
   }
 
   @Override
