@@ -198,7 +198,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(drive, ySupplier, xSupplier, omegaSupplier, slowModeSupplier));
-    outtake.setDefaultCommand(outtake.autoQueueCoral().onlyWhile(elevator.elevatorAtMinHeight()));
+    outtake.setDefaultCommand(
+        outtake.autoQueueCoral(OperatorController.leftBumper()).onlyWhile(elevator.elevatorAtMinHeight()));
 
     // POV snap to angles
     // DriverController.povUp().onTrue(DriveCommands.snapToRotation(drive,
