@@ -1,5 +1,6 @@
 package frc.robot.Robot25.subsystems.elevator;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
@@ -259,7 +260,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public Trigger lowerLimitHit() {
-    return new Trigger(() -> inputs.lowerLimit);
+    return new Trigger(() -> inputs.lowerLimit || inputs.winchCurrent.lt(Amps.of(-50)));
   }
 
   public Trigger isAtGoal() {
