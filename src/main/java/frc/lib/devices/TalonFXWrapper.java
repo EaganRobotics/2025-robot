@@ -64,9 +64,9 @@ public class TalonFXWrapper implements ShuffleBoardTabWrapper {
     talonFXConfigs.Audio.BeepOnConfig = false;
     talonFXConfigs.Audio.AllowMusicDurDisable = true;
 
-    talonFXConfigs.CurrentLimits.StatorCurrentLimit = 60;
+    talonFXConfigs.CurrentLimits.StatorCurrentLimit = 30;
     talonFXConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
-    talonFXConfigs.CurrentLimits.SupplyCurrentLimit = 60;
+    talonFXConfigs.CurrentLimits.SupplyCurrentLimit = 30;
     talonFXConfigs.CurrentLimits.SupplyCurrentLimitEnable = true;
 
     talonFXConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable = forwardSoftLimitEnable;

@@ -37,6 +37,7 @@ import frc.robot.Robot25.subsystems.elevator.Elevator;
 import frc.robot.Robot25.subsystems.elevator.ElevatorIO;
 import frc.robot.Robot25.subsystems.elevator.ElevatorIOSim;
 import frc.robot.Robot25.subsystems.elevator.ElevatorIOTalonFX;
+import frc.robot.Robot25.subsystems.elevator.ElevatorIOTalonFXNew;
 import frc.robot.Robot25.subsystems.gyro.GyroIO;
 import frc.robot.Robot25.subsystems.gyro.GyroIOPigeon2;
 import frc.robot.Robot25.subsystems.gyro.GyroIOSim;
@@ -105,7 +106,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
             new ModuleIOTalonFX(DriveConstants.BackLeft),
             new ModuleIOTalonFX(DriveConstants.BackRight));
 
-        elevator = new Elevator(new ElevatorIOTalonFX());
+        elevator = new Elevator(new ElevatorIOTalonFXNew());
         outtake = new Outtake(new OuttakeIOTalonFX());
         break;
       case SIM:
