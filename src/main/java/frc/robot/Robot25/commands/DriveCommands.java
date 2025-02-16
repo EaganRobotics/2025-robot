@@ -109,7 +109,7 @@ public class DriveCommands {
    * Field relative drive command using two joysticks (controlling linear and angular velocities).
    */
   public static Command joystickDrive(Drive drive, DoubleSupplier xSupplier,
-      DoubleSupplier ySupplier, DoubleSupplier omegaSupplier, BooleanSupplier slowModeSupplier) {
+      DoubleSupplier ySupplier, DoubleSupplier omegaSupplier) {
 
     // Create PID controller
     ProfiledPIDController angleController =
@@ -133,14 +133,14 @@ public class DriveCommands {
       // Square rotation value for more precise control
       omega = Math.copySign(omega * omega, omega);
 
-      final double slowModeMultiplier =
-          (slowModeSupplier.getAsBoolean() ? SLOW_MODE_MULTIPLIER : 1.0);
+      // final double slowModeMultiplier =
+      //     (slowModeSupplier.getAsBoolean() ? SLOW_MODE_MULTIPLIER : 1.0);
 
       // No rotation
       if (Math.abs(omega) > 1E-6) {
         Logger.recordOutput("Rotation", "joystick");
         drive.setSnapToRotation(false);
-        omega *= drive.getMaxAngularSpeedRadPerSec() * slowModeMultiplier;
+        omega *= drive.getMaxAngularSpeedRadPerSec();
       } else if (drive.getSnapToRotation()) {
         omega = angleController.calculate(drive.getRotation().getRadians(),
             drive.getDesiredRotation().getRadians());
@@ -153,7 +153,7 @@ public class DriveCommands {
         omega = 0.0;
       }
 
-      final double maxSpeed = drive.getMaxLinearSpeedMetersPerSec() * slowModeMultiplier;
+      final double maxSpeed = drive.getMaxLinearSpeedMetersPerSec();
 
       // Convert to field relative speeds & send command
       ChassisSpeeds speeds = new ChassisSpeeds(linearVelocity.getX() * maxSpeed,

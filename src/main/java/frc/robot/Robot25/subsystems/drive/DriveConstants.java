@@ -66,7 +66,7 @@ public class DriveConstants {
   }
 
   // PathPlanner and Maple Sim config constants
-  public static final double ROBOT_MASS_KG = 53.524;
+  public static final double ROBOT_MASS_KG = 54.431;
   public static final double ROBOT_MOI = 5.290;
   public static final double WHEEL_COF = 1.542;
 
