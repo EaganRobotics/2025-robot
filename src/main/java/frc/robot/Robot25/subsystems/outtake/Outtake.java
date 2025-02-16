@@ -58,7 +58,7 @@ public class Outtake extends SubsystemBase {
   }
 
   public Command depositCoral() {
-    return setOpenLoop(Volts.of(5)).withTimeout(1);
+    return setOpenLoop(Volts.of(7)).withTimeout(1);
   }
 
   public Command depositCoralAuto() {
