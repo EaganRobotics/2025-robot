@@ -60,8 +60,7 @@ public class Drive extends SubsystemBase /* implements Vision.VisionConsumer */ 
 
   // Configure path planner
   private static final RobotConfig PP_CONFIG = new RobotConfig(DriveConstants.ROBOT_MASS_KG,
-      DriveConstants.ROBOT_MOI,
-      new ModuleConfig(0.046, 4, DriveConstants.WHEEL_COF,
+      DriveConstants.ROBOT_MOI, new ModuleConfig(0.046, 4, 1.524,
           DCMotor.getKrakenX60(1).withReduction(6.122), DriveConstants.FrontLeft.SlipCurrent, 1),
       getModuleTranslations());
 
