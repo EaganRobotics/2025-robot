@@ -232,6 +232,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
     DriverController.x().onTrue(elevator.L2());
     DriverController.b().onTrue(elevator.L3());
     DriverController.y().onTrue(elevator.L4());
+    // elevator.setDefaultCommand(elevator.openLoop(OperatorController::getLeftY));
 
     // DriverController.y();
     // .onTrue(DriveCommands.snapToPosition(drive, new Pose2d(5, 5,
