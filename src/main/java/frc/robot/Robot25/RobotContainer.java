@@ -243,6 +243,9 @@ public class RobotContainer extends frc.lib.RobotContainer {
     OperatorController.b().onTrue(elevator.L3());
     OperatorController.y().onTrue(elevator.L4());
 
+    OperatorController.axisMagnitudeGreaterThan(1, 0.1)
+        .whileTrue(elevator.openLoop(OperatorController::getLeftY));
+
     // elevator.setDefaultCommand(elevator.openLoop(OperatorController::getLeftY));
 
     // DriverController.y();

@@ -209,8 +209,10 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command openLoop(DoubleSupplier speed) {
-    return this.run(() -> {
+    return this.runEnd(() -> {
       io.setWinchOpenLoop(Volts.of(speed.getAsDouble() * 8));
+    }, () -> {
+      io.setWinchPosition(inputs.winchPosition);
     });
   }
 
