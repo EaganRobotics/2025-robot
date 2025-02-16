@@ -132,6 +132,8 @@ public class Elevator extends SubsystemBase {
 
     Logger.recordOutput("Elevator/CurrentLevel", currentLevel);
     Logger.recordOutput("Elevator/CurrentLevelHeight", currentLevel.getHeight());
+    Logger.recordOutput("Elevator/isAtGoal", isAtGoal());
+    Logger.recordOutput("Elevator/lowerLimitHIt", lowerLimitHit());
   }
 
   private Angle inchesToRadians(Distance d) {
