@@ -1,9 +1,10 @@
 {
-  "robotWidth": 0.673,
-  "robotLength": 0.673,
+  "robotWidth": 0.838,
+  "robotLength": 0.838,
   "holonomicMode": true,
   "pathFolders": [
     "Score Coral",
+    "Score Coral and get Algae",
     "Score Coral, Score Alage"
   ],
   "autoFolders": [],
@@ -12,10 +13,10 @@
   "defaultMaxAngVel": 360.0,
   "defaultMaxAngAccel": 180.0,
   "defaultNominalVoltage": 12.0,
-  "robotMass": 53.524,
-  "robotMOI": 5.29,
+  "robotMass": 54.431,
+  "robotMOI": 5.98,
   "robotTrackwidth": 0.546,
-  "driveWheelRadius": 0.047,
+  "driveWheelRadius": 0.046,
   "driveGearing": 6.122,
   "maxDriveSpeed": 5.22,
   "driveMotorType": "krakenX60",

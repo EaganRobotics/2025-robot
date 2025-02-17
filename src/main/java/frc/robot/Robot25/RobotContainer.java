@@ -40,6 +40,7 @@ import frc.robot.Robot25.subsystems.elevator.Elevator;
 import frc.robot.Robot25.subsystems.elevator.ElevatorIO;
 import frc.robot.Robot25.subsystems.elevator.ElevatorIOSim;
 import frc.robot.Robot25.subsystems.elevator.ElevatorIOTalonFX;
+import frc.robot.Robot25.subsystems.elevator.ElevatorIOTalonFXNew;
 import frc.robot.Robot25.subsystems.gyro.GyroIO;
 import frc.robot.Robot25.subsystems.gyro.GyroIOPigeon2;
 import frc.robot.Robot25.subsystems.gyro.GyroIOSim;
@@ -113,7 +114,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
             new ModuleIOTalonFX(DriveConstants.BackLeft),
             new ModuleIOTalonFX(DriveConstants.BackRight));
 
-        elevator = new Elevator(new ElevatorIOTalonFX());
+        elevator = new Elevator(new ElevatorIOTalonFXNew());
         outtake = new Outtake(new OuttakeIOTalonFX());
 
         vision =
@@ -203,9 +204,10 @@ public class RobotContainer extends frc.lib.RobotContainer {
             : DriverController.getRightX() > 0.0;
 
     // Default command, normal field-relative drive
-    drive.setDefaultCommand(
-        DriveCommands.joystickDrive(drive, ySupplier, xSupplier, omegaSupplier, slowModeSupplier));
-    outtake.setDefaultCommand(outtake.autoQueueCoral().onlyWhile(elevator.elevatorAtMinHeight()));
+    drive
+        .setDefaultCommand(DriveCommands.joystickDrive(drive, ySupplier, xSupplier, omegaSupplier));
+    outtake.setDefaultCommand(outtake.autoQueueCoral(OperatorController.leftBumper())
+        .onlyWhile(elevator.elevatorAtMinHeight()));
 
     // POV snap to angles
     // DriverController.povUp().onTrue(DriveCommands.snapToRotation(drive,
@@ -240,6 +242,16 @@ public class RobotContainer extends frc.lib.RobotContainer {
             () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
             drive).ignoringDisable(true));
 
+    // OperatorController.povDown().onTrue(elevator.downLevel());
+    // OperatorController.povUp().onTrue(elevator.upLevel());
+    // DriverController.rightTrigger().onTrue(outtake.depositCoral());
+    // DriverController.leftTrigger().onTrue(outtake.reverseCoral());
+    // OperatorController.rightBumper().onTrue(elevator.L1());
+    // DriverController.a().onTrue(elevator.minHeight());
+    // DriverController.x().onTrue(elevator.L2());
+    // DriverController.b().onTrue(elevator.L3());
+    // DriverController.y().onTrue(elevator.L4());
+
     OperatorController.povDown().onTrue(elevator.downLevel());
     OperatorController.povUp().onTrue(elevator.upLevel());
     OperatorController.rightTrigger().onTrue(outtake.depositCoral());
@@ -249,6 +261,11 @@ public class RobotContainer extends frc.lib.RobotContainer {
     OperatorController.x().onTrue(elevator.L2());
     OperatorController.b().onTrue(elevator.L3());
     OperatorController.y().onTrue(elevator.L4());
+
+    OperatorController.axisMagnitudeGreaterThan(1, 0.1)
+        .whileTrue(elevator.openLoop(OperatorController::getLeftY));
+
+    // elevator.setDefaultCommand(elevator.openLoop(OperatorController::getLeftY));
 
     // DriverController.y();
     // .onTrue(DriveCommands.snapToPosition(drive, new Pose2d(5, 5,

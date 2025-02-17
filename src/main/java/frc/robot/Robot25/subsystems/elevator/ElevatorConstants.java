@@ -37,7 +37,7 @@ public class ElevatorConstants {
   public static final Current CURRENT_LIMIT = Amps.of(40);
 
   public static final class Real {
-    public static final double kP = 0;
+    public static final double kP = 2;
     public static final double kI = 0;
     public static final double kD = 0;
     public static final double kS = 0;

@@ -21,7 +21,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
   TalonFXWrapper elevatorTalonFX;
   double gearRatio = 5;
-  double P = 2.2;
+  double P = 2;
   double I = 0;
   double D = 0;
   final int rightMotorID = 20;
@@ -29,7 +29,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
   public ElevatorIOTalonFX() {
     elevatorTalonFX = new TalonFXWrapper(rightMotorID, "Elevator", false, NeutralModeValue.Brake,
-        gearRatio, P, I, D, RotationsPerSecondPerSecond.of(300), RotationsPerSecond.of(250), false,
+        gearRatio, P, I, D, RotationsPerSecondPerSecond.of(150), RotationsPerSecond.of(150), false,
         false, Rotations.of(0), Rotations.of(0), new FollowerConfig(leftMotorID, true),
         Units.Seconds.of(3), Units.Amps.of(75), Units.RotationsPerSecond.of(0));
   }

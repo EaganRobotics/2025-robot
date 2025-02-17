@@ -40,7 +40,6 @@ public class DriveConstants {
     // TODO Both sets of gains need to be tuned to your individual robot; practice
     // tuning in simulation
 
-
     /* Steer gains */
     public static final double STEER_KS = 0.1;
     public static final double STEER_KV = 1.91;
@@ -66,8 +65,8 @@ public class DriveConstants {
   }
 
   // PathPlanner and Maple Sim config constants
-  public static final double ROBOT_MASS_KG = 53.524;
-  public static final double ROBOT_MOI = 5.290;
+  public static final double ROBOT_MASS_KG = 16.21;
+  public static final double ROBOT_MOI = 3.805;
   public static final double WHEEL_COF = 1.542;
 
   // The closed-loop output type to use for the steer motors;
@@ -99,7 +98,7 @@ public class DriveConstants {
   // documentation.
   private static final TalonFXConfiguration driveInitialConfigs =
       new TalonFXConfiguration().withCurrentLimits(new CurrentLimitsConfigs()
-          .withStatorCurrentLimit(Amps.of(90)).withStatorCurrentLimitEnable(true));
+          .withStatorCurrentLimit(Amps.of(60)).withStatorCurrentLimitEnable(true));
   private static final TalonFXConfiguration steerInitialConfigs =
       new TalonFXConfiguration().withCurrentLimits(new CurrentLimitsConfigs()
           // Swerve azimuth does not require much torque output, so we can
@@ -112,8 +111,6 @@ public class DriveConstants {
 
   // Configs for the Pigeon 2; leave this null to skip applying Pigeon 2 configs
   private static final Pigeon2Configuration pigeonConfigs = new Pigeon2Configuration();
-
-
 
   private static final int kPigeonId = 1;
 
@@ -154,7 +151,7 @@ public class DriveConstants {
   private static final int kFrontRightDriveMotorId = 14;
   private static final int kFrontRightSteerMotorId = 13;
   private static final int kFrontRightEncoderId = 2;
-  private static final Angle kFrontRightEncoderOffset = Radians.of(-4.098);
+  private static final Angle kFrontRightEncoderOffset = Radians.of(-4.598);
   private static final boolean kFrontRightSteerMotorInverted = true;
   private static final boolean kFrontRightEncoderInverted = false;
   private static final Distance kFrontRightXPos = Inches.of(10.375);
