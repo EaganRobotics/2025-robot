@@ -116,9 +116,10 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
         elevator = new Elevator(new ElevatorIOTalonFXNew());
         outtake = new Outtake(new OuttakeIOTalonFX());
+        vision = new Vision(drive, new VisionIO() {});
 
-        vision =
-            new Vision(drive, new VisionIOLimelight("bob", () -> drive.getPose().getRotation()));
+        // vision =
+        // new Vision(drive, new VisionIOLimelight("bob", () -> drive.getPose().getRotation()));
         break;
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
