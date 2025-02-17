@@ -110,6 +110,7 @@ public class ElevatorIOTalonFXNew implements ElevatorIO {
   @Override
   public void zeroEncoder() {
     lead.setPosition(0);
+
   }
 
   @Override

@@ -107,13 +107,15 @@ public class Elevator extends SubsystemBase {
      * When the lower limit is hit, set the Elevator's state (where we believe we're at) to
      * minHeight and set the winch to 0 volts
      */
-    lowerLimitHit().onTrue(Commands.runOnce(() -> {
+    lowerLimitHit.onTrue(Commands.runOnce(() -> {
       System.out.println(
           "[Elevator] Lower limit hit, setting state to minHeight and setting motor volts to 0");
       currentLevel = Level.minHeight;
       io.setWinchOpenLoop(Volts.of(0));
       io.zeroEncoder();
-    }));
+
+    }).ignoringDisable(true));
+
 
     // currentLevel = Level.minHeight;
     // Distance height = currentLevel.getHeight();
@@ -134,7 +136,7 @@ public class Elevator extends SubsystemBase {
     Logger.recordOutput("Elevator/CurrentLevel", currentLevel);
     Logger.recordOutput("Elevator/CurrentLevelHeight", currentLevel.getHeight());
     Logger.recordOutput("Elevator/isAtGoal", isAtGoal());
-    Logger.recordOutput("Elevator/lowerLimitHIt", lowerLimitHit());
+    Logger.recordOutput("Elevator/lowerLimitHIt", lowerLimitHit);
   }
 
   private Angle inchesToRadians(Distance d) {
@@ -164,7 +166,7 @@ public class Elevator extends SubsystemBase {
       io.setWinchPosition(r);
     })
         // .andThen(Commands.runOnce(() -> io.setWinchOpenLoop(Volts.of(-9))))
-        .andThen(Commands.waitUntil(lowerLimitHit())).andThen(Commands.runOnce(() -> {
+        .andThen(Commands.waitUntil(lowerLimitHit)).andThen(Commands.runOnce(() -> {
           io.zeroEncoder();
           io.setWinchOpenLoop(Volts.of(0));
         }));
@@ -216,7 +218,7 @@ public class Elevator extends SubsystemBase {
 
   public Command openLoop(DoubleSupplier speed) {
     return this.runEnd(() -> {
-      io.setWinchOpenLoop(Volts.of(speed.getAsDouble() * -8));
+      io.setWinchOpenLoop(Volts.of(speed.getAsDouble() * -4));
     }, () -> {
       io.setWinchPosition(inputs.winchPosition);
     });
@@ -263,9 +265,9 @@ public class Elevator extends SubsystemBase {
     return new Trigger(() -> currentLevel == Level.minHeight);
   }
 
-  public Trigger lowerLimitHit() {
-    return new Trigger(() -> inputs.lowerLimit);
-  }
+  public final Trigger lowerLimitHit =
+      new Trigger(() -> inputs.lowerLimit || Math.abs(inputs.winchCurrent.in(Amps)) > 80);
+
 
   // todo CHECK VALID TOLERANCE
 
