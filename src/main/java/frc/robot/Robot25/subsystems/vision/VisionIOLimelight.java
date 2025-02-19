@@ -149,6 +149,6 @@ public class VisionIOLimelight implements VisionIO {
         new Rotation3d(
             Units.degreesToRadians(rawLLArray[3]),
             Units.degreesToRadians(rawLLArray[4]),
-            Units.degreesToRadians(rawLLArray[5])));
+Units.degreesToRadians(rawLLArray[5])));
   }
 }

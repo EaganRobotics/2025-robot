@@ -15,6 +15,7 @@ public enum RobotInstance {
   Robot25("00-80-2F-36-FD-D6"),
   KrackenSwerve("00-80-2F-17-F8-19"),
   Simulator("Simulator");
+  // BoxyBot("00-80-2F-36-FD-D6");
 
   private String address;
   private static RobotInstance current = getMacAddress();

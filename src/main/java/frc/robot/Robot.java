@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.lib.RobotContainer;
 import frc.lib.RobotInstance;
 import frc.lib.replay.WPILogReadMACAddress;
+// import frc.robot.boxybot.BoxysRobotContainer;
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -121,6 +122,7 @@ public class Robot extends LoggedRobot {
       case Robot24 -> new frc.robot.Robot24.RobotContainer();
       case Robot25 -> new frc.robot.Robot25.RobotContainer();
       case Simulator -> SimConstants.SIM_ROBOT_SUPPLIER.get();
+      // case BoxyBot -> new frc.robot.boxybot.BoxysRobotContainer();
       default -> throw new RuntimeException("Unsupported robot instance: " + instance.toString());
     };
   }
