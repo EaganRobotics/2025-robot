@@ -435,8 +435,9 @@ public class DriveCommands {
         }).until(() -> angleController.atGoal() && xController.atGoal() && yController.atGoal());
   }
 
-  public static Command joystickDriveAssist(Drive drive, Pose2d desiredPosition, DoubleSupplier xSupplier,
-      DoubleSupplier ySupplier, DoubleSupplier omegaSupplier, BooleanSupplier slowModeSupplier) {
+  public static Command joystickDriveAssist(Drive drive, Pose2d desiredPosition,
+      DoubleSupplier xSupplier, DoubleSupplier ySupplier, DoubleSupplier omegaSupplier,
+      BooleanSupplier slowModeSupplier) {
 
     // Create PID controller
     ProfiledPIDController angleController =
@@ -491,23 +492,29 @@ public class DriveCommands {
 
       if ((Math.abs(omega) > 1E-6) || (Math.abs(x) > 1E-6) || (Math.abs(y) > 1E-6)) {
         Logger.recordOutput("DriveState", "Driver");
-        
+
       } else {
-        Logger.recordOutput("DriveState", "Robot");
-        x = xController.calculate(drive.getPose().getX(), desiredPosition.getX());
+        for (int i = 0; i < REEF_POSITIONS.length; i++) {
+          if (Math.abs(drive.getPose().getX() - REEF_POSITIONS[i].getX()) < 0.5
+              && Math.abs(drive.getPose().getY() - REEF_POSITIONS[i].getY()) < 0.5) {
+            Logger.recordOutput("DriveState", "Robot");
+            Logger.recordOutput("Snap/x/desiredXPos", REEF_POSITIONS[i].getX());
+            Logger.recordOutput("Snap/y/desiredYPos", REEF_POSITIONS[i].getY());
 
-        y = yController.calculate(drive.getPose().getY(), desiredPosition.getY());
+            x = xController.calculate(drive.getPose().getX(), REEF_POSITIONS[i].getX());
 
-        omega = angleController.calculate(drive.getRotation().getRadians(),
-            desiredPosition.getRotation().getRadians());
+            y = yController.calculate(drive.getPose().getY(), REEF_POSITIONS[i].getY());
+
+            omega = angleController.calculate(drive.getRotation().getRadians(),
+                REEF_POSITIONS[i].getRotation().getRadians());
+          }
+        }
       }
 
       Logger.recordOutput("Snap/omega", omega);
       Logger.recordOutput("Snap/x/xDiff", x);
-      Logger.recordOutput("Snap/x/desiredXPos", desiredPosition.getX());
       Logger.recordOutput("Snap/x/currentXPos", drive.getPose().getX());
       Logger.recordOutput("Snap/y/yDiff", y);
-      Logger.recordOutput("Snap/y/desiredYPos", desiredPosition.getY());
       Logger.recordOutput("Snap/y/currentYPos", drive.getPose().getY());
 
       // Convert to field relative speeds & send command

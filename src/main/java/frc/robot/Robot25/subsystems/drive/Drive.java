@@ -93,8 +93,8 @@ public class Drive extends SubsystemBase /* implements Vision.VisionConsumer */ 
   private SwerveModulePosition[] lastModulePositions = // For delta tracking
       new SwerveModulePosition[] {new SwerveModulePosition(), new SwerveModulePosition(),
           new SwerveModulePosition(), new SwerveModulePosition()};
-  private SwerveDrivePoseEstimator poseEstimator =
-      new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, Pose2d.kZero);
+  private SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(kinematics,
+      rawGyroRotation, lastModulePositions, new Pose2d(3, 3, new Rotation2d()));
 
   private boolean coastModeOn = false;
   private boolean snapToRotationEnabled = false;
