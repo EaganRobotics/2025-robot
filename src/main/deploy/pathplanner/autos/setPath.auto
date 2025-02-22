@@ -17,6 +17,24 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "L2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Exhaust"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "MinHeight"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "set 3"
