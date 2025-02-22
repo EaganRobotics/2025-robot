@@ -11,8 +11,8 @@ public class OuttakeIOTalonFX implements OuttakeIO {
   TalonFXWrapper outtakeRollerFX;
   final int motorID = 22;
   final int rollerID = 23;
-  final int outtakeWheelDiameter = 3;
-  final int outtakeRollerDiameter = 2;
+  final int outtakeWheelDiameter = 5;
+  final int outtakeRollerDiameter = 4;
 
   // DigitalInputWrapper inputSensor = new DigitalInputWrapper(0, "LoadSideSensor", true);
   DigitalInputWrapper outputSensor = new DigitalInputWrapper(0, "ScoreSideSensor", true);
