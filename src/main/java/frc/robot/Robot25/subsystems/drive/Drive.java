@@ -25,16 +25,10 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator3d;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -43,7 +37,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
@@ -71,8 +64,7 @@ public class Drive extends SubsystemBase implements VisionConsumer {
 
   // Configure path planner
   private static final RobotConfig PP_CONFIG = new RobotConfig(DriveConstants.ROBOT_MASS_KG,
-      DriveConstants.ROBOT_MOI,
-      new ModuleConfig(0.047, 4, DriveConstants.WHEEL_COF,
+      DriveConstants.ROBOT_MOI, new ModuleConfig(0.046, 4, 1.524,
           DCMotor.getKrakenX60(1).withReduction(6.122), DriveConstants.FrontLeft.SlipCurrent, 1),
       getModuleTranslations());
 
@@ -98,17 +90,12 @@ public class Drive extends SubsystemBase implements VisionConsumer {
       AlertType.kError);
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
-  private Rotation3d rawGyroRotation3d = Rotation3d.kZero;
-  private Rotation2d rawGyroRotation = Rotation2d.kZero;
+  private Rotation2d rawGyroRotation = new Rotation2d();
   private SwerveModulePosition[] lastModulePositions = // For delta tracking
       new SwerveModulePosition[] { new SwerveModulePosition(), new SwerveModulePosition(),
           new SwerveModulePosition(), new SwerveModulePosition() };
   private SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(kinematics, rawGyroRotation,
-      lastModulePositions, SimConstants.SIM_INITIAL_FIELD_POSE);
-  private SwerveDrivePoseEstimator3d poseEstimator3d = new SwerveDrivePoseEstimator3d(kinematics, rawGyroRotation3d,
-      lastModulePositions, new Pose3d(SimConstants.SIM_INITIAL_FIELD_POSE),
-      MatBuilder.fill(Nat.N4(), Nat.N1(), 0.1, 0.1, 0.1, 0.1),
-      MatBuilder.fill(Nat.N4(), Nat.N1(), 0.9, 0.9, 0.9, 0.9));
+      lastModulePositions, Pose2d.kZero);
 
   private boolean coastModeOn = false;
   private boolean snapToRotationEnabled = false;
@@ -190,17 +177,14 @@ public class Drive extends SubsystemBase implements VisionConsumer {
       if (gyroInputs.connected) {
         // Use the real gyro angle
         rawGyroRotation = gyroInputs.odometryYawPositions[i];
-        rawGyroRotation3d = gyroInputs.odometryRotation3d[i];
       } else {
         // Estimate the angle delta from the kinematics and module deltas
         Twist2d twist = kinematics.toTwist2d(moduleDeltas);
         rawGyroRotation = rawGyroRotation.plus(new Rotation2d(twist.dtheta));
-        rawGyroRotation3d = new Rotation3d(rawGyroRotation);
       }
 
       // Apply update
       poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
-      poseEstimator3d.updateWithTime(sampleTimestamps[i], rawGyroRotation3d, modulePositions);
     }
 
     // Update gyro alert
@@ -344,12 +328,6 @@ public class Drive extends SubsystemBase implements VisionConsumer {
     return poseEstimator.getEstimatedPosition();
   }
 
-  /** Returns the current odometry pose in 3d. */
-  @AutoLogOutput(key = "Odometry/Robot3d")
-  public Pose3d getPose3d() {
-    return poseEstimator3d.getEstimatedPosition();
-  }
-
   /** Returns the current odometry rotation. */
   public Rotation2d getRotation() {
     return getPose().getRotation();
@@ -358,7 +336,6 @@ public class Drive extends SubsystemBase implements VisionConsumer {
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
-    poseEstimator3d.resetPosition(new Rotation3d(rawGyroRotation), getModulePositions(), new Pose3d(pose));
   }
 
   /** Adds a new timestamped vision measurement. */
@@ -369,12 +346,6 @@ public class Drive extends SubsystemBase implements VisionConsumer {
       Matrix<N3, N1> visionMeasurementStdDevs) {
     poseEstimator.addVisionMeasurement(
         visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
-    var linear = visionMeasurementStdDevs.get(0, 0);
-    var angular = visionMeasurementStdDevs.get(2, 0);
-    System.out.println("Accepting vision measurement");
-    // TODO modify to accept 3d pose?
-    poseEstimator3d.addVisionMeasurement(new Pose3d(visionRobotPoseMeters), timestampSeconds,
-        VecBuilder.fill(linear, linear, linear, angular));
   }
 
   /** Returns the maximum linear speed in meters per sec. */
