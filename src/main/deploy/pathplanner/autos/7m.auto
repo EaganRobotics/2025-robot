@@ -7,7 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Forward 1M"
+            "pathName": "7m tst"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L1"
           }
         }
       ]

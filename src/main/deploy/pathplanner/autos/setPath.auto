@@ -7,7 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Forward 1M"
+            "pathName": "set 1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "set 2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "set 3"
           }
         }
       ]
