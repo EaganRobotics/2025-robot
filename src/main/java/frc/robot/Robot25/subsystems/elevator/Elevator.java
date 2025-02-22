@@ -272,7 +272,6 @@ public class Elevator extends SubsystemBase {
 
 
   // todo CHECK VALID TOLERANCE
-
   public Trigger isAtGoal() {
     return new Trigger(() -> {
       return Math.abs((inputs.winchPosition.in(Radians)
