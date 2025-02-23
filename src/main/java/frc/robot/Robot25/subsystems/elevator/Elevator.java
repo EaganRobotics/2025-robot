@@ -174,11 +174,30 @@ public class Elevator extends SubsystemBase {
         }));
   }
 
+  public Command miniHeight() {
+    return this.runOnce(() -> {
+      currentLevel = Level.minHeight;
+      Distance height = Level.minHeight.getHeight();
+      Angle r = inchesToRadians(height);
+      io.setWinchPosition(r);
+
+    }).andThen(Commands.waitUntil(isAtGoal()))
+        // .andThen(Commands.runOnce(() -> io.setWinchOpenLoop(Volts.of(-9))))
+        .andThen(Commands.waitUntil(lowerLimitHit)).andThen(Commands.runOnce(() -> {
+          io.zeroEncoder();
+          io.setWinchOpenLoop(Volts.of(0));
+        }));
+  }
+
   // public Command miniHeight() {
   // return goToLevel(Level.minHeight)
   // .andThen(Commands.runOnce(() -> io.setWinchOpenLoop(Volts.of(-10))));
 
   // }
+
+  public Command L0() {
+    return goToLevel(Level.minHeight);
+  }
 
   public Command L1() {
     return goToLevel(Level.L1);

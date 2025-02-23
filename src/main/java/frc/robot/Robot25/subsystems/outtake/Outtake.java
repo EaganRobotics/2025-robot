@@ -57,6 +57,22 @@ public class Outtake extends SubsystemBase {
     });
   }
 
+  public Command autoQueueCoral2() {
+    return this.runEnd(() -> {
+      Logger.recordOutput("Outtake/AutoQueuing", true);
+      if (inputs.seesCoralAtOutput) {
+        io.setRollerOpenLoop(Volts.of(0));
+        // } else if (inputs.seesCoralAtInput) {
+        // io.setOpenLoop(Volts.of(6));
+      } else {
+        io.setRollerOpenLoop(Volts.of(5));
+      }
+    }, () -> {
+      Logger.recordOutput("Outtake/AutoQueuing", false);
+      io.setRollerOpenLoop(Volts.of(0));
+    }).withTimeout(3.5);
+  }
+
   public Command depositCoral() {
     return setOpenLoop(Volts.of(7)).withTimeout(1);
   }

@@ -29,15 +29,40 @@
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "MinHeight"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "L0"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "set 3"
+                }
+              }
+            ]
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "set 3"
+            "pathName": "set 4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Exhaust"
           }
         }
       ]

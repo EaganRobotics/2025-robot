@@ -150,13 +150,14 @@ public class RobotContainer extends frc.lib.RobotContainer {
         break;
     }
 
-    NamedCommands.registerCommand("MinHeight", elevator.minHeight());
+    NamedCommands.registerCommand("L0", elevator.L0().andThen(outtake.autoQueueCoral2()));
 
     NamedCommands.registerCommand("L1", elevator.L1());
     NamedCommands.registerCommand("L2", elevator.L2());
     NamedCommands.registerCommand("L3", elevator.L3());
     NamedCommands.registerCommand("L4", elevator.L4());
     NamedCommands.registerCommand("Exhaust", outtake.depositCoral());
+    // NamedCommands.registerCommand();
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
