@@ -70,7 +70,7 @@ public class Outtake extends SubsystemBase {
     }, () -> {
       Logger.recordOutput("Outtake/AutoQueuing", false);
       io.setRollerOpenLoop(Volts.of(0));
-    }).withTimeout(3.5);
+    }).withTimeout(2.5);
   }
 
   public Command depositCoral() {

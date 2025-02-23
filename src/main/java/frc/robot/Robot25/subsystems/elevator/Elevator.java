@@ -55,8 +55,8 @@ public class Elevator extends SubsystemBase {
 
     // original value during W0 = L4 = 72 + 6
 
-    minHeight(MIN_HEIGHT), L1(Inches.of(18 + 14)), L2(Inches.of(31.9 + 7)), L3(
-        Inches.of(47.6 + 7)), L4(Inches.of(72 + 6));
+    minHeight(MIN_HEIGHT), L11(Inches.of(16.4 + 4.4)), L1(Inches.of(18 + 14)), L2(
+        Inches.of(31.9 + 7)), L3(Inches.of(47.6 + 7)), L4(Inches.of(72 + 6.5));
 
     private final Distance height;
 
@@ -196,7 +196,11 @@ public class Elevator extends SubsystemBase {
   // }
 
   public Command L0() {
-    return goToLevel(Level.minHeight);
+    return goToLevel(Level.L11);
+  }
+
+  public Command L11() {
+    return goToLevel(Level.L11);
   }
 
   public Command L1() {
@@ -283,7 +287,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public Trigger elevatorAtMinHeight() {
-    return new Trigger(() -> currentLevel == Level.minHeight);
+    return new Trigger(() -> currentLevel == Level.L11);
   }
 
   public final Trigger lowerLimitHit =
