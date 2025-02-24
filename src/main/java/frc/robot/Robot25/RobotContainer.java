@@ -194,9 +194,11 @@ public class RobotContainer extends frc.lib.RobotContainer {
     // : DriverController.getRightX() > 0.0;
 
     // Default command, normal field-relative drive
-    drive.setDefaultCommand(DriveCommands.joystickDriveAssist(drive,
+    // drive.setDefaultCommand(DriveCommands.joystickDriveAssist(drive,
+    // new Pose2d(3, 3, Rotation2d.fromDegrees(90)), ySupplier, xSupplier, omegaSupplier));
+
+    DriverController.leftTrigger().whileTrue(DriveCommands.joystickDriveAssist(drive,
         new Pose2d(3, 3, Rotation2d.fromDegrees(90)), ySupplier, xSupplier, omegaSupplier));
-    outtake.setDefaultCommand(outtake.autoQueueCoral().onlyWhile(elevator.elevatorAtMinHeight()));
     drive
         .setDefaultCommand(DriveCommands.joystickDrive(drive, ySupplier, xSupplier, omegaSupplier));
     outtake.setDefaultCommand(outtake.autoQueueCoral().onlyWhile(elevator.elevatorAtMinHeight()));
@@ -236,13 +238,13 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
     // OperatorController.povDown().onTrue(elevator.downLevel());
     // OperatorController.povUp().onTrue(elevator.upLevel());
-    DriverController.rightTrigger().onTrue(outtake.depositCoral());
-    DriverController.leftTrigger().onTrue(outtake.reverseCoral());
-    OperatorController.rightBumper().onTrue(elevator.L1());
-    DriverController.a().onTrue(elevator.minHeight());
-    DriverController.x().onTrue(elevator.L2());
-    DriverController.b().onTrue(elevator.L3());
-    DriverController.y().onTrue(elevator.L4());
+    // DriverController.rightTrigger().onTrue(outtake.depositCoral());
+    // DriverController.leftTrigger().onTrue(outtake.reverseCoral());
+    // OperatorController.rightBumper().onTrue(elevator.L1());
+    // DriverController.a().onTrue(elevator.minHeight());
+    // DriverController.x().onTrue(elevator.L2());
+    // DriverController.b().onTrue(elevator.L3());
+    // DriverController.y().onTrue(elevator.L4());
     // elevator.setDefaultCommand(elevator.openLoop(OperatorController::getLeftY));
 
     DriverController.y()
