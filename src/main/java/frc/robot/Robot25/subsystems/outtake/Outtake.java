@@ -41,10 +41,10 @@ public class Outtake extends SubsystemBase {
     }).withTimeout(2);
   }
 
-  public Command autoQueueCoral(BooleanSupplier override) {
+  public Command autoQueueCoral() {
     return this.runEnd(() -> {
       Logger.recordOutput("Outtake/AutoQueuing", true);
-      if (inputs.seesCoralAtOutput || override.getAsBoolean()) {
+      if (inputs.seesCoralAtOutput) {
         io.setOpenLoop(Volts.of(0));
         // } else if (inputs.seesCoralAtInput) {
         // io.setOpenLoop(Volts.of(6));

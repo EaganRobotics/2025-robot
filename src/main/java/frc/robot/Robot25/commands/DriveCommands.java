@@ -163,7 +163,7 @@ public class DriveCommands {
       omega = Math.copySign(omega * omega, omega);
 
       // final double slowModeMultiplier =
-      //     (slowModeSupplier.getAsBoolean() ? SLOW_MODE_MULTIPLIER : 1.0);
+      // (slowModeSupplier.getAsBoolean() ? SLOW_MODE_MULTIPLIER : 1.0);
 
       // No rotation
       if (Math.abs(omega) > 1E-6) {
@@ -436,8 +436,7 @@ public class DriveCommands {
   }
 
   public static Command joystickDriveAssist(Drive drive, Pose2d desiredPosition,
-      DoubleSupplier xSupplier, DoubleSupplier ySupplier, DoubleSupplier omegaSupplier,
-      BooleanSupplier slowModeSupplier) {
+      DoubleSupplier xSupplier, DoubleSupplier ySupplier, DoubleSupplier omegaSupplier) {
 
     // Create PID controller
     ProfiledPIDController angleController =
@@ -470,8 +469,8 @@ public class DriveCommands {
       yController.setI(POSITION_KI.get());
       yController.setD(POSITION_KD.get());
 
-      final double slowModeMultiplier =
-          (slowModeSupplier.getAsBoolean() ? SLOW_MODE_MULTIPLIER : 1.0);
+      // final double slowModeMultiplier =
+      // (slowModeSupplier.getAsBoolean() ? SLOW_MODE_MULTIPLIER : 1.0);
 
       // Get linear velocity
       Translation2d linearVelocity =
@@ -480,7 +479,7 @@ public class DriveCommands {
       // Apply rotation deadband
       double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
 
-      final double maxSpeed = drive.getMaxLinearSpeedMetersPerSec() * slowModeMultiplier;
+      final double maxSpeed = drive.getMaxLinearSpeedMetersPerSec();
 
       double x = linearVelocity.getX() * maxSpeed;
       double y = linearVelocity.getY() * maxSpeed;
@@ -488,8 +487,7 @@ public class DriveCommands {
       // Square rotation value for more precise control
       omega = Math.copySign(omega * omega, omega);
 
-      omega *= drive.getMaxAngularSpeedRadPerSec() * slowModeMultiplier;
-
+      omega *= drive.getMaxAngularSpeedRadPerSec();
       if ((Math.abs(omega) > 1E-6) || (Math.abs(x) > 1E-6) || (Math.abs(y) > 1E-6)) {
         Logger.recordOutput("DriveState", "Driver");
 
