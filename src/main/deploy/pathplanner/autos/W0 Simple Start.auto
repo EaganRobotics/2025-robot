@@ -7,19 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Barge to Score Coral"
+            "pathName": "Barge Corner to Score Coral"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Coral to Barge"
+            "name": "L2"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Barge to Score Alage"
+            "name": "Exhaust"
           }
         }
       ]

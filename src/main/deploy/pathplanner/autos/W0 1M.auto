@@ -7,13 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Forward 1M"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Left 1M"
+            "pathName": "Copy of Forward 1M"
           }
         }
       ]

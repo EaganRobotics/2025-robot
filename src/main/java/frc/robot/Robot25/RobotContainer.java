@@ -5,7 +5,6 @@ package frc.robot.Robot25;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
-import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
@@ -21,7 +20,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.devices.DigitalInputWrapper;
@@ -45,8 +43,11 @@ import frc.robot.Robot25.subsystems.outtake.Outtake;
 import frc.robot.Robot25.subsystems.outtake.OuttakeIO;
 import frc.robot.Robot25.subsystems.outtake.OuttakeIOSim;
 import frc.robot.Robot25.subsystems.outtake.OuttakeIOTalonFX;
+import frc.robot.Robot25.subsystems.vision.Vision;
+import frc.robot.Robot25.subsystems.vision.VisionIO;
+import frc.robot.Robot25.subsystems.vision.VisionIOLimelight;
+import frc.robot.Robot25.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.SimConstants;
-import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -64,6 +65,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
   private final Drive drive;
   private final Elevator elevator;
   private final Outtake outtake;
+  private final Vision vision;
 
   // Drive simulation
   private static final SwerveDriveSimulation driveSimulation =
@@ -108,6 +110,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
         elevator = new Elevator(new ElevatorIOTalonFX());
         outtake = new Outtake(new OuttakeIOTalonFX());
+        vision = new Vision(drive,
+            new VisionIOLimelight("limelight-one", () -> drive.getPose().getRotation()));
         break;
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
@@ -119,6 +123,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
         elevator = new Elevator(new ElevatorIOSim());
         outtake = new Outtake(new OuttakeIOSim());
+        // TODO use photon vision in SIM with actual camera positions
+        vision = new Vision(drive, new VisionIO() {});
         break;
       default:
         // Replayed robot, disable IO implementations
@@ -128,8 +134,12 @@ public class RobotContainer extends frc.lib.RobotContainer {
         elevator = new Elevator(new ElevatorIO() {});
 
         outtake = new Outtake(new OuttakeIO() {});
+
+        vision = new Vision(drive, new VisionIO() {});
         break;
     }
+
+    NamedCommands.registerCommand("MinHeight", elevator.minHeight());
 
     NamedCommands.registerCommand("L1", elevator.L1());
     NamedCommands.registerCommand("L2", elevator.L2());
@@ -179,18 +189,21 @@ public class RobotContainer extends frc.lib.RobotContainer {
     DoubleSupplier xSupplier = () -> DriverController.getLeftX();
     DoubleSupplier ySupplier = () -> DriverController.getLeftY();
     DoubleSupplier omegaSupplier = () -> -DriverController.getRightX();
-    BooleanSupplier slowModeSupplier =
-        () -> !SimConstants.IS_MAC ? DriverController.getRightTriggerAxis() > 0.5
-            : DriverController.getRightX() > 0.0;
+    // BooleanSupplier slowModeSupplier =
+    // () -> !SimConstants.IS_MAC ? DriverController.getRightTriggerAxis() > 0.5
+    // : DriverController.getRightX() > 0.0;
 
     // Default command, normal field-relative drive
-    drive.setDefaultCommand(
-        DriveCommands.joystickDriveAssist(drive, new Pose2d(3, 3, Rotation2d.fromDegrees(90)),
-            ySupplier, xSupplier, omegaSupplier, slowModeSupplier));
+    drive.setDefaultCommand(DriveCommands.joystickDriveAssist(drive,
+        new Pose2d(3, 3, Rotation2d.fromDegrees(90)), ySupplier, xSupplier, omegaSupplier));
+    outtake.setDefaultCommand(outtake.autoQueueCoral().onlyWhile(elevator.elevatorAtMinHeight()));
+    drive
+        .setDefaultCommand(DriveCommands.joystickDrive(drive, ySupplier, xSupplier, omegaSupplier));
     outtake.setDefaultCommand(outtake.autoQueueCoral().onlyWhile(elevator.elevatorAtMinHeight()));
 
     // POV snap to angles
-    // DriverController.povUp().onTrue(DriveCommands.snapToRotation(drive, Rotation2d.kZero));
+    // DriverController.povUp().onTrue(DriveCommands.snapToRotation(drive,
+    // Rotation2d.kZero));
     DriverController.povUpRight()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-45)));
     DriverController.povRight()
@@ -206,16 +219,14 @@ public class RobotContainer extends frc.lib.RobotContainer {
     DriverController.povUpLeft()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(45)));
 
-    DriverController.povDown().onTrue(elevator.downLevel());
-    DriverController.povUp().onTrue(elevator.upLevel());
-    DriverController.rightTrigger().onTrue(outtake.depositCoral());
-    DriverController.leftTrigger().onTrue(outtake.reverseCoral());
+    // DriverController.povDown().onTrue(elevator.downLevel());
+    // DriverController.povUp().onTrue(elevator.upLevel());
+    // DriverController.rightTrigger().onTrue(outtake.depositCoral());
+    // DriverController.leftTrigger().onTrue(outtake.reverseCoral());
     // DriverController.a().onTrue(elevator.minHeight());
-    DriverController.x().onTrue(elevator.L2());
-    DriverController.b().onTrue(elevator.L3());
+    // DriverController.x().onTrue(elevator.L2());
+    // DriverController.b().onTrue(elevator.L3());
     // DriverController.y().onTrue(elevator.L4());
-
-
 
     // Reset gyro to 0° when START button is pressed
     DriverController.start()
@@ -223,14 +234,16 @@ public class RobotContainer extends frc.lib.RobotContainer {
             () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
             drive).ignoringDisable(true));
 
-    OperatorController.povDown().onTrue(elevator.downLevel());
-    OperatorController.povUp().onTrue(elevator.upLevel());
-    OperatorController.rightTrigger().onTrue(outtake.depositCoral());
-    OperatorController.leftTrigger().onTrue(outtake.reverseCoral());
-    OperatorController.a().onTrue(elevator.minHeight());
-    OperatorController.x().onTrue(elevator.L2());
-    OperatorController.b().onTrue(elevator.L3());
-    OperatorController.y().onTrue(elevator.L4());
+    // OperatorController.povDown().onTrue(elevator.downLevel());
+    // OperatorController.povUp().onTrue(elevator.upLevel());
+    DriverController.rightTrigger().onTrue(outtake.depositCoral());
+    DriverController.leftTrigger().onTrue(outtake.reverseCoral());
+    OperatorController.rightBumper().onTrue(elevator.L1());
+    DriverController.a().onTrue(elevator.minHeight());
+    DriverController.x().onTrue(elevator.L2());
+    DriverController.b().onTrue(elevator.L3());
+    DriverController.y().onTrue(elevator.L4());
+    // elevator.setDefaultCommand(elevator.openLoop(OperatorController::getLeftY));
 
     DriverController.y()
         .onTrue(DriveCommands.snapToPosition(drive, new Pose2d(3, 3, Rotation2d.fromDegrees(90))));
