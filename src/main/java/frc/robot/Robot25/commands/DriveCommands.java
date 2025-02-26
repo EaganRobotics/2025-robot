@@ -38,6 +38,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -250,6 +251,26 @@ public class DriveCommands {
       }
     });
   }
+
+  public static Command Snapper(Drive drive) {
+
+    return Commands.defer(() -> {
+      Pose2d desiredPose = Pose2d.kZero;
+      double mindistance = Double.POSITIVE_INFINITY;
+      for (Pose2d pose : REEF_POSITIONS) {
+        double distance = drive.getPose().getTranslation().getDistance(pose.getTranslation());
+        if (distance < mindistance) {
+          mindistance = distance;
+          desiredPose = pose;
+        }
+      }
+      Logger.recordOutput("SnapperPose", desiredPose);
+      return snapToPosition(drive, desiredPose);
+    }, Set.of(drive));
+
+  };
+
+
 
   /**
    * Measures the velocity feedforward constants for the drive motors.

@@ -248,11 +248,17 @@ public class RobotContainer extends frc.lib.RobotContainer {
     // elevator.setDefaultCommand(elevator.openLoop(OperatorController::getLeftY));
 
     DriverController.y()
-        .onTrue(DriveCommands.snapToPosition(drive, new Pose2d(3, 3, Rotation2d.fromDegrees(90))));
+        // .onTrue(DriveCommands.snapToPosition(drive, new Pose2d(3, 3,
+        // Rotation2d.fromDegrees(90))));
+        .whileTrue(DriveCommands.Snapper(drive));
 
     elevator.setDefaultCommand(elevator.openLoop(OperatorController::getLeftY));
 
+
+
   }
+
+
 
   @Override
   public Command getAutonomousCommand() {
