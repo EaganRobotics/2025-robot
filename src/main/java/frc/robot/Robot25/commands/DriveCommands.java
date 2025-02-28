@@ -487,7 +487,7 @@ public class DriveCommands {
   }
 
   public static Command joystickDriveAssist(Drive drive, DoubleSupplier xSupplier,
-      DoubleSupplier ySupplier, DoubleSupplier omegaSupplier) {
+      DoubleSupplier ySupplier, DoubleSupplier omegaSupplier, BooleanSupplier snapSupplier) {
 
     // Create PID controller
     ProfiledPIDController angleController =
@@ -520,6 +520,8 @@ public class DriveCommands {
       yController.setI(POSITION_KI.get());
       yController.setD(POSITION_KD.get());
 
+      Logger.recordOutput("ReefPositions", DriveCommands.REEF_POSITIONS);
+
       // final double slowModeMultiplier =
       // (slowModeSupplier.getAsBoolean() ? SLOW_MODE_MULTIPLIER : 1.0);
 
@@ -542,7 +544,7 @@ public class DriveCommands {
       if ((Math.abs(omega) > 1E-6) || (Math.abs(x) > 1E-6) || (Math.abs(y) > 1E-6)) {
         Logger.recordOutput("DriveState", "Driver");
         Logger.recordOutput("Snap/desiredPos", new Pose2d(-50, -50, Rotation2d.kZero));
-      } else {
+      } else if (!snapSupplier.getAsBoolean()) {
         Optional<Pose2d> closestOptionalPose = getClosestPosition(drive, SNAPPY_RADIUS);
 
         if (closestOptionalPose.isPresent()) {
