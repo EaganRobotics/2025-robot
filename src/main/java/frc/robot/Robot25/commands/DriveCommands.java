@@ -71,6 +71,18 @@ public class DriveCommands {
   private static final double REEF_CENTER_X_INCHES = 176.745545;
   private static final double REEF_CENTER_Y_INCHES = 158.500907;
 
+  private static final double Left_Loading_Station_X = 43.3071;
+  private static final double Left_Loading_Station_Y = 275.591;
+
+  private static final double Right_Loading_Station_X = 43.3071;
+  private static final double Right_Loading_Station_Y = 29.52756;
+
+  private static final Translation2d Left_Loading_Station =
+      new Translation2d(Inches.of(Left_Loading_Station_X), Inches.of(Left_Loading_Station_Y));
+
+  private static final Translation2d Right_Loading_Station =
+      new Translation2d(Inches.of(Right_Loading_Station_X), Inches.of(Right_Loading_Station_Y));
+
   private static final Translation2d REEF_CENTER =
       new Translation2d(Inches.of(REEF_CENTER_X_INCHES), Inches.of(REEF_CENTER_Y_INCHES));
   private static final Transform2d REEF_BRANCH_TO_ROBOT =
@@ -100,10 +112,15 @@ public class DriveCommands {
       new Pose2d(REEF_CENTER.plus(new Translation2d(Inches.of(-4.755423), Inches.of(21.200635))),
           Rotation2d.fromDegrees(300)).transformBy(REEF_BRANCH_TO_ROBOT),
       new Pose2d(REEF_CENTER.plus(new Translation2d(Inches.of(-15.982577), Inches.of(14.718635))),
-          Rotation2d.fromDegrees(300)).transformBy(REEF_BRANCH_TO_ROBOT),};
+          Rotation2d.fromDegrees(300)).transformBy(REEF_BRANCH_TO_ROBOT),
+
+      new Pose2d(Left_Loading_Station.plus(new Translation2d(Inches.of(0), Inches.of(0))),
+          Rotation2d.fromDegrees(-50 + 180 + 180)).transformBy(REEF_BRANCH_TO_ROBOT),
+      new Pose2d(Right_Loading_Station.plus(new Translation2d(Inches.of(0), Inches.of(0))),
+          Rotation2d.fromDegrees(130 + 90 + 180)).transformBy(REEF_BRANCH_TO_ROBOT),};
 
 
-  // public static final TunableDouble ANGLE_KP =
+  // public static final TunableDouble ANGLE_KP =/
   // new TunableDouble("ANGLE_KP", 7.0, "driver").setSpot(0, 0);
   // public static final TunableDouble ANGLE_KI =
   // new TunableDouble("ANGLE_KI", 0.0, "driver").setSpot(1, 0);
