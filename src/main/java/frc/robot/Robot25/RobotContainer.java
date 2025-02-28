@@ -120,6 +120,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
             new ModuleIOSim(driveSimulation.getModules()[1]),
             new ModuleIOSim(driveSimulation.getModules()[2]),
             new ModuleIOSim(driveSimulation.getModules()[3]));
+        drive.setPose(SimConstants.SIM_INITIAL_FIELD_POSE);
 
         elevator = new Elevator(new ElevatorIOSim());
         outtake = new Outtake(new OuttakeIOSim());
@@ -194,13 +195,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
     // : DriverController.getRightX() > 0.0;
 
     // Default command, normal field-relative drive
-    // drive.setDefaultCommand(DriveCommands.joystickDriveAssist(drive,
-    // new Pose2d(3, 3, Rotation2d.fromDegrees(90)), ySupplier, xSupplier, omegaSupplier));
-
-    DriverController.leftTrigger().whileTrue(DriveCommands.joystickDriveAssist(drive,
-        new Pose2d(3, 3, Rotation2d.fromDegrees(90)), ySupplier, xSupplier, omegaSupplier));
-    drive
-        .setDefaultCommand(DriveCommands.joystickDrive(drive, ySupplier, xSupplier, omegaSupplier));
+    drive.setDefaultCommand(
+        DriveCommands.joystickDriveAssist(drive, ySupplier, xSupplier, omegaSupplier));
     outtake.setDefaultCommand(outtake.autoQueueCoral().onlyWhile(elevator.elevatorAtMinHeight()));
 
     // POV snap to angles

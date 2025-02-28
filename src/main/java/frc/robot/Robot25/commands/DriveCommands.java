@@ -27,6 +27,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -38,6 +39,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -56,11 +58,14 @@ public class DriveCommands {
   private static final double ANGLE_TOLERANCE = Degrees.of(1).in(Radians);
   private static final double POSITION_MAX_VELOCITY = 3.0;
   private static final double POSITION_MAX_ACCELERATION = 3.0;
-  private static final double POSITION_TOLERANCE = Inches.of(2).in(Meters);
+  private static final double POSITION_TOLERANCE = Inches.of(1).in(Meters);
   private static final double FF_START_DELAY = 2.0; // Secs
   private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
   private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
   private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
+
+  /// Auto snap to position distance
+  private static final Distance SNAPPY_RADIUS = Inches.of(12);
 
   private static final double INCHES_FROM_REEF = 16.75 + 11.757361;
   private static final double REEF_CENTER_X_INCHES = 176.745545;
@@ -255,19 +260,26 @@ public class DriveCommands {
   public static Command Snapper(Drive drive) {
 
     return Commands.defer(() -> {
-      Pose2d desiredPose = Pose2d.kZero;
-      double mindistance = Double.POSITIVE_INFINITY;
-      for (Pose2d pose : REEF_POSITIONS) {
-        double distance = drive.getPose().getTranslation().getDistance(pose.getTranslation());
-        if (distance < mindistance) {
-          mindistance = distance;
-          desiredPose = pose;
-        }
-      }
+      Pose2d desiredPose = getClosestPosition(drive, Meters.of(1000)).orElse(Pose2d.kZero);
       Logger.recordOutput("SnapperPose", desiredPose);
       return snapToPosition(drive, desiredPose);
     }, Set.of(drive));
 
+  }
+
+  private static Optional<Pose2d> getClosestPosition(Drive drive, Distance radius) {
+    Optional<Pose2d> desiredPose = Optional.empty();
+    Distance minDistance = Meters.of(1000000);
+    for (Pose2d pose : REEF_POSITIONS) {
+      double distance = drive.getPose().getTranslation().getDistance(pose.getTranslation());
+      Distance distanceMeasure = Meters.of(distance);
+      if (distanceMeasure.lte(radius) && distanceMeasure.lte(minDistance)) {
+        minDistance = distanceMeasure;
+        desiredPose = Optional.of(pose);
+      }
+    }
+
+    return desiredPose;
   };
 
 
@@ -441,6 +453,7 @@ public class DriveCommands {
       Logger.recordOutput("Snap/y/yDiff", y);
       Logger.recordOutput("Snap/y/desiredYPos", desiredPosition.getY());
       Logger.recordOutput("Snap/y/currentYPos", drive.getPose().getY());
+      Logger.recordOutput("Snap/desiredPos", desiredPosition);
 
       // Convert to field relative speeds & send command
       ChassisSpeeds speeds = new ChassisSpeeds(x, y, omega);
@@ -456,8 +469,8 @@ public class DriveCommands {
         }).until(() -> angleController.atGoal() && xController.atGoal() && yController.atGoal());
   }
 
-  public static Command joystickDriveAssist(Drive drive, Pose2d desiredPosition,
-      DoubleSupplier xSupplier, DoubleSupplier ySupplier, DoubleSupplier omegaSupplier) {
+  public static Command joystickDriveAssist(Drive drive, DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier, DoubleSupplier omegaSupplier) {
 
     // Create PID controller
     ProfiledPIDController angleController =
@@ -511,22 +524,23 @@ public class DriveCommands {
       omega *= drive.getMaxAngularSpeedRadPerSec();
       if ((Math.abs(omega) > 1E-6) || (Math.abs(x) > 1E-6) || (Math.abs(y) > 1E-6)) {
         Logger.recordOutput("DriveState", "Driver");
-
+        Logger.recordOutput("Snap/desiredPos", new Pose2d(-50, -50, Rotation2d.kZero));
       } else {
-        for (int i = 0; i < REEF_POSITIONS.length; i++) {
-          if (Math.abs(drive.getPose().getX() - REEF_POSITIONS[i].getX()) < 0.5
-              && Math.abs(drive.getPose().getY() - REEF_POSITIONS[i].getY()) < 0.5) {
-            Logger.recordOutput("DriveState", "Robot");
-            Logger.recordOutput("Snap/x/desiredXPos", REEF_POSITIONS[i].getX());
-            Logger.recordOutput("Snap/y/desiredYPos", REEF_POSITIONS[i].getY());
+        Optional<Pose2d> closestOptionalPose = getClosestPosition(drive, SNAPPY_RADIUS);
 
-            x = xController.calculate(drive.getPose().getX(), REEF_POSITIONS[i].getX());
+        if (closestOptionalPose.isPresent()) {
+          Pose2d closestPose = closestOptionalPose.orElse(Pose2d.kZero);
+          Logger.recordOutput("DriveState", "Robot");
+          Logger.recordOutput("Snap/desiredPos", closestPose);
 
-            y = yController.calculate(drive.getPose().getY(), REEF_POSITIONS[i].getY());
+          x = xController.calculate(drive.getPose().getX(), closestPose.getX());
 
-            omega = angleController.calculate(drive.getRotation().getRadians(),
-                REEF_POSITIONS[i].getRotation().getRadians());
-          }
+          y = yController.calculate(drive.getPose().getY(), closestPose.getY());
+
+          omega = angleController.calculate(drive.getRotation().getRadians(),
+              closestPose.getRotation().getRadians());
+
+
         }
       }
 
@@ -543,7 +557,9 @@ public class DriveCommands {
     }, drive)
 
         // Reset PID controller when command starts
-        .beforeStarting(() -> {
+        .beforeStarting(() ->
+
+        {
           angleController.reset(drive.getRotation().getRadians());
           xController.reset(drive.getPose().getX());
           yController.reset(drive.getPose().getY());
