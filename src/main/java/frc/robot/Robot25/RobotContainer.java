@@ -2,11 +2,9 @@
 
 package frc.robot.Robot25;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
-import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
@@ -16,14 +14,12 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.devices.DigitalInputWrapper;
@@ -40,7 +36,6 @@ import frc.robot.Robot25.subsystems.elevator.Elevator;
 import frc.robot.Robot25.subsystems.elevator.ElevatorIO;
 import frc.robot.Robot25.subsystems.elevator.ElevatorIOSim;
 import frc.robot.Robot25.subsystems.elevator.ElevatorIOTalonFX;
-import frc.robot.Robot25.subsystems.elevator.ElevatorIOTalonFXNew;
 import frc.robot.Robot25.subsystems.gyro.GyroIO;
 import frc.robot.Robot25.subsystems.gyro.GyroIOPigeon2;
 import frc.robot.Robot25.subsystems.gyro.GyroIOSim;
@@ -53,7 +48,6 @@ import frc.robot.Robot25.subsystems.vision.VisionIO;
 import frc.robot.Robot25.subsystems.vision.VisionIOLimelight;
 import frc.robot.Robot25.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.SimConstants;
-import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -114,12 +108,10 @@ public class RobotContainer extends frc.lib.RobotContainer {
             new ModuleIOTalonFX(DriveConstants.BackLeft),
             new ModuleIOTalonFX(DriveConstants.BackRight));
 
-        elevator = new Elevator(new ElevatorIOTalonFXNew());
+        elevator = new Elevator(new ElevatorIOTalonFX());
         outtake = new Outtake(new OuttakeIOTalonFX());
-        vision = new Vision(drive, new VisionIO() {});
-
-        // vision =
-        // new Vision(drive, new VisionIOLimelight("bob", () -> drive.getPose().getRotation()));
+        vision = new Vision(drive,
+            new VisionIOLimelight("limelight-one", () -> drive.getPose().getRotation()));
         break;
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
@@ -128,14 +120,12 @@ public class RobotContainer extends frc.lib.RobotContainer {
             new ModuleIOSim(driveSimulation.getModules()[1]),
             new ModuleIOSim(driveSimulation.getModules()[2]),
             new ModuleIOSim(driveSimulation.getModules()[3]));
+        drive.setPose(SimConstants.SIM_INITIAL_FIELD_POSE);
 
         elevator = new Elevator(new ElevatorIOSim());
         outtake = new Outtake(new OuttakeIOSim());
-        vision = new Vision(drive,
-            new VisionIOPhotonVisionSim("Northstar 0",
-                new Transform3d(0.225425, 0.2667, 0.20955,
-                    new Rotation3d(Degrees.zero(), Degrees.of(-28.125), Degrees.of(30.0))),
-                () -> drive.getPose()));
+        // TODO use photon vision in SIM with actual camera positions
+        vision = new Vision(drive, new VisionIO() {});
         break;
       default:
         // Replayed robot, disable IO implementations
@@ -200,15 +190,14 @@ public class RobotContainer extends frc.lib.RobotContainer {
     DoubleSupplier xSupplier = () -> DriverController.getLeftX();
     DoubleSupplier ySupplier = () -> DriverController.getLeftY();
     DoubleSupplier omegaSupplier = () -> -DriverController.getRightX();
-    BooleanSupplier slowModeSupplier =
-        () -> !SimConstants.IS_MAC ? DriverController.getRightTriggerAxis() > 0.5
-            : DriverController.getRightX() > 0.0;
+    // BooleanSupplier slowModeSupplier =
+    // () -> !SimConstants.IS_MAC ? DriverController.getRightTriggerAxis() > 0.5
+    // : DriverController.getRightX() > 0.0;
 
     // Default command, normal field-relative drive
-    drive
-        .setDefaultCommand(DriveCommands.joystickDrive(drive, ySupplier, xSupplier, omegaSupplier));
-    outtake.setDefaultCommand(outtake.autoQueueCoral(OperatorController.leftBumper())
-        .onlyWhile(elevator.elevatorAtMinHeight()));
+    drive.setDefaultCommand(
+        DriveCommands.joystickDriveAssist(drive, ySupplier, xSupplier, omegaSupplier));
+    outtake.setDefaultCommand(outtake.autoQueueCoral().onlyWhile(elevator.elevatorAtMinHeight()));
 
     // POV snap to angles
     // DriverController.povUp().onTrue(DriveCommands.snapToRotation(drive,
@@ -252,28 +241,20 @@ public class RobotContainer extends frc.lib.RobotContainer {
     // DriverController.x().onTrue(elevator.L2());
     // DriverController.b().onTrue(elevator.L3());
     // DriverController.y().onTrue(elevator.L4());
-
-    OperatorController.povDown().onTrue(elevator.downLevel());
-    OperatorController.povUp().onTrue(elevator.upLevel());
-    OperatorController.rightTrigger().onTrue(outtake.depositCoral());
-    OperatorController.leftTrigger().onTrue(outtake.reverseCoral());
-    OperatorController.rightBumper().onTrue(elevator.L1());
-    OperatorController.a().onTrue(elevator.minHeight());
-    OperatorController.x().onTrue(elevator.L2());
-    OperatorController.b().onTrue(elevator.L3());
-    OperatorController.y().onTrue(elevator.L4());
-
-    OperatorController.axisMagnitudeGreaterThan(1, 0.1)
-        .whileTrue(elevator.openLoop(OperatorController::getLeftY));
-
     // elevator.setDefaultCommand(elevator.openLoop(OperatorController::getLeftY));
 
-    // DriverController.y();
-    // .onTrue(DriveCommands.snapToPosition(drive, new Pose2d(5, 5,
-    // Rotation2d.fromDegrees(90))));
-    // elevator.setDefaultCommand(elevator.openLoop(OperatorController::getLeftY));
+    DriverController.y()
+        // .onTrue(DriveCommands.snapToPosition(drive, new Pose2d(3, 3,
+        // Rotation2d.fromDegrees(90))));
+        .whileTrue(DriveCommands.Snapper(drive));
+
+    elevator.setDefaultCommand(elevator.openLoop(OperatorController::getLeftY));
+
+
 
   }
+
+
 
   @Override
   public Command getAutonomousCommand() {
