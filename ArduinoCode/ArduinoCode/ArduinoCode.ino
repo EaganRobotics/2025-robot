@@ -5,65 +5,117 @@
 // number of leds on the strip
 // FastLED.show(); (ill just keep this here)
 
-typedef struct ColorData
-{
-  byte red = 0;
-  byte green = 0;
-  byte blue = 0;
-} ColorData;
-
-ColorData getColor(void);
-
 CRGB leds[NUM_LEDS];
 byte value = -1;
 const unsigned long interval = 150; // 1 second interval in milliseconds
-const unsigned int msgStart = 0x30;
-const unsigned int wordBytes = 4;
 unsigned long previousMillis = 0;
 bool toggleState = false; // Track which command is active
-
 
 void setup()
 {
   Serial.begin(9600);
   FastLED.addLeds<WS2812, LED_PIN, GRB>(leds, NUM_LEDS);
-  pinMode(12, OUTPUT);
 }
 
-ColorData getColor(void)
+void Red()
 {
-  unsigned int inWord[wordBytes];
-  ColorData commandedColor;
+  fill_solid(leds, NUM_LEDS, CRGB(255, 0, 0));
+  FastLED.show();
+}
 
-  for (unsigned int n = 0; n < wordBytes; n++)
-  {
-    inWord[n] = Serial.read();
-  }
-
-  if (inWord[0] == msgStart)
-  {
-    commandedColor.red = inWord[1];
-    commandedColor.green = inWord[2];
-    commandedColor.blue = inWord[3];
-  }
-
-  return commandedColor;
+void Blue()
+{
+  fill_solid(leds, NUM_LEDS, CRGB(0, 0, 255));
+  FastLED.show();
 }
 
 void loop()
 {
-  static ColorData currentColor;
-  static int LEDStat = HIGH;
+  // If the byte is 0x12 (i.e. 18 in decimal)
+  unsigned long currentMillis = millis();
 
-  // if a word is in the serial buffer
-  if (Serial.available() == 4)
+  if (Serial.available())
   {
-    // decode color data from serial
-    currentColor = getColor();
-    LEDStat = ~LEDStat;
+    // Read a byte from the input buffer
+    value = Serial.read();
   }
 
-  digitalWrite(13, LEDStat);
-  fill_solid(leds, NUM_LEDS, CRGB(currentColor.red, currentColor.green, currentColor.blue));
-  FastLED.show();
+  switch (value)
+  {
+  case 0x12:
+  {
+    fill_solid(leds, NUM_LEDS, CRGB(0, 0, 0));
+    FastLED.show();
+  }
+  break;
+  case 0x13:
+  {
+
+    fill_solid(leds, NUM_LEDS, CRGB(255, 0, 0));
+    FastLED.show();
+  }
+  break;
+  case 0x14:
+  {
+    fill_solid(leds, NUM_LEDS, CRGB(255, 140, 0));
+    FastLED.show();
+  }
+  break;
+  case 0x15:
+  {
+    fill_solid(leds, NUM_LEDS, CRGB(255, 255, 0));
+    FastLED.show();
+  }
+  break;
+  case 0x16:
+  {
+    fill_solid(leds, NUM_LEDS, CRGB(0, 128, 0));
+    FastLED.show();
+  }
+  break;
+  case 0x17:
+  {
+    fill_solid(leds, NUM_LEDS, CRGB(0, 0, 255));
+    FastLED.show();
+  }
+  break;
+  case 0x18:
+  {
+    fill_solid(leds, NUM_LEDS, CRGB(255, 192, 203));
+    FastLED.show();
+  }
+  break;
+  case 0x19:
+  {
+    fill_solid(leds, NUM_LEDS, CRGB(108, 92, 231));
+    FastLED.show();
+  }
+  break;
+  case 0x20:
+  {
+    if (currentMillis - previousMillis >= interval)
+    {
+      previousMillis = currentMillis;
+      toggleState = !toggleState;
+
+      if (toggleState)
+      {
+        Blue();
+      }
+      else
+      {
+        Red();
+      }
+    }
+  }
+  break;
+  case 0x30:
+  {
+    byte R = Serial.read();
+    byte G = Serial.read();
+    byte B = Serial.read();
+    fill_solid(leds, NUM_LEDS, CRGB(R, G, B));
+    FastLED.show();
+  }
+  }
 }
