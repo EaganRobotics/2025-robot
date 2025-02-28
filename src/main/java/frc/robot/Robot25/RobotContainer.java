@@ -18,7 +18,6 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -46,7 +45,6 @@ import frc.robot.Robot25.subsystems.outtake.OuttakeIOTalonFX;
 import frc.robot.Robot25.subsystems.vision.Vision;
 import frc.robot.Robot25.subsystems.vision.VisionIO;
 import frc.robot.Robot25.subsystems.vision.VisionIOLimelight;
-import frc.robot.Robot25.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.SimConstants;
 import java.util.function.DoubleSupplier;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -65,6 +63,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
   private final Drive drive;
   private final Elevator elevator;
   private final Outtake outtake;
+  @SuppressWarnings("unused")
   private final Vision vision;
 
   // Drive simulation
