@@ -1,0 +1,8 @@
+# Mentors are the default code owners of the repo
+*                  @EaganRobotics/mentors
+
+# Examples: active if uncommented
+# The most restrictive matching pattern to a changeset is used to determine the code owners for PR reviews
+# /docs/                               # gives PR approval access to the docs folder to all repo writers
+# /protected/      @TimHendricksen     # gives PR approval access to the protected folder only to Tim
+# *.java           @scuyul             # gives PR approval access to all Java files only to Griffin (don't do this)
