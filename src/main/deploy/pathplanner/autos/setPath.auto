@@ -11,49 +11,6 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "set 2"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "L4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Exhaust"
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "L0"
-                }
-              },
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "set 3"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "set 4"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "L4"

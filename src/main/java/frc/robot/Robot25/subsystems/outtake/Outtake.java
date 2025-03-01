@@ -33,6 +33,16 @@ public class Outtake extends SubsystemBase {
     );
   }
 
+  public Command setRopenLoop(Voltage output) {
+    return this.startEnd(() -> {
+      io.setRollerOpenLoop(output);
+    }, () -> {
+      io.setRollerOpenLoop(Volts.of(0));
+    }
+
+    );
+  }
+
   public Command setOpenLop(Voltage output) {
     return this.startEnd(() -> {
       io.setOpenLoop(output);
@@ -90,6 +100,6 @@ public class Outtake extends SubsystemBase {
   // }
 
   public Command reverseCoral() {
-    return setOpenLoop(Volts.of(-5)).withTimeout(1);
+    return setRopenLoop(Volts.of(-5)).withTimeout(1);
   }
 }
