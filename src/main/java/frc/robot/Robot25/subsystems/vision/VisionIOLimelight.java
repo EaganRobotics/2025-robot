@@ -67,8 +67,7 @@ public class VisionIOLimelight implements VisionIO {
 
   }
 
- 
-  
+
 
   @Override
   public void updateInputs(VisionIOInputs inputs) {

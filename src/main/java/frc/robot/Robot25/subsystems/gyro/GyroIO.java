@@ -39,6 +39,5 @@ public interface GyroIO {
     public Rotation3d[] odometryRotation3d = new Rotation3d[] {};
   }
 
-  public default void updateInputs(GyroIOInputs inputs) {
-  }
+  public default void updateInputs(GyroIOInputs inputs) {}
 }

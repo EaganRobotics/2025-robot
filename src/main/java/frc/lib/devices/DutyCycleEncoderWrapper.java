@@ -10,12 +10,10 @@ public class DutyCycleEncoderWrapper {
 
   public DutyCycleEncoderWrapper(int channel) {
     duty = new DutyCycleEncoder(channel);
-    Fault.autoUpdating(
-        "DutyCycleEncoder Disconnected",
-        () -> {
-          var value = !duty.isConnected();
-          return value;
-        });
+    Fault.autoUpdating("DutyCycleEncoder Disconnected", () -> {
+      var value = !duty.isConnected();
+      return value;
+    });
   }
 
   public Rotation2d getAngle() {

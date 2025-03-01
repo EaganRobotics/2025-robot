@@ -43,14 +43,14 @@ public class TunableBoolean {
     this(name, defaultValue, tunable, "Tunables");
   }
 
-  public TunableBoolean(
-      String name, boolean defaultValue, boolean tunable, String tab, Consumer<Boolean> onChange) {
+  public TunableBoolean(String name, boolean defaultValue, boolean tunable, String tab,
+      Consumer<Boolean> onChange) {
     this(name, defaultValue, tunable, tab);
     addChangeListener(onChange);
   }
 
-  public TunableBoolean(
-      String name, boolean defaultValue, boolean tunable, Consumer<Boolean> onChange) {
+  public TunableBoolean(String name, boolean defaultValue, boolean tunable,
+      Consumer<Boolean> onChange) {
     this(name, defaultValue, tunable);
     addChangeListener(onChange);
   }
@@ -67,27 +67,25 @@ public class TunableBoolean {
    * @return Value as a double
    */
   public boolean getValue() {
-    if (shuffleboard != null) return shuffleboard.getBoolean(defaultValue);
+    if (shuffleboard != null)
+      return shuffleboard.getBoolean(defaultValue);
     return defaultValue;
   }
 
   public void addChangeListener(Consumer<Boolean> onChange) {
     onChange.accept(getValue());
-    CommandScheduler.getInstance()
-        .getDefaultButtonLoop()
-        .bind(
-            new Runnable() {
-              private boolean oldValue = getValue();
+    CommandScheduler.getInstance().getDefaultButtonLoop().bind(new Runnable() {
+      private boolean oldValue = getValue();
 
-              @Override
-              public void run() {
-                boolean newValue = getValue();
+      @Override
+      public void run() {
+        boolean newValue = getValue();
 
-                if (oldValue != newValue) {
-                  onChange.accept(newValue);
-                  oldValue = newValue;
-                }
-              }
-            });
+        if (oldValue != newValue) {
+          onChange.accept(newValue);
+          oldValue = newValue;
+        }
+      }
+    });
   }
 }

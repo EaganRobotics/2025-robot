@@ -11,12 +11,8 @@ public class LazyCommandXboxWrapper {
 
   CommandXBoxWrapper xbox;
 
-  public LazyCommandXboxWrapper(
-      String name,
-      int inPort,
-      double joystickDeadband,
-      double triggerDeadZone,
-      boolean faultsWhenDisconnected) {
+  public LazyCommandXboxWrapper(String name, int inPort, double joystickDeadband,
+      double triggerDeadZone, boolean faultsWhenDisconnected) {
     xbox = new CommandXBoxWrapper(name, inPort, joystickDeadband, triggerDeadZone, false);
   }
 
@@ -25,14 +21,13 @@ public class LazyCommandXboxWrapper {
   }
 
   public Trigger lazyTrigger(Trigger trigger) {
-    return new Trigger(
-        () -> {
-          if (xbox.isConnected()) {
-            return trigger.getAsBoolean();
-          } else {
-            return false;
-          }
-        });
+    return new Trigger(() -> {
+      if (xbox.isConnected()) {
+        return trigger.getAsBoolean();
+      } else {
+        return false;
+      }
+    });
   }
 
   public double lazyDouble(DoubleSupplier doubleSup) {
@@ -55,8 +50,8 @@ public class LazyCommandXboxWrapper {
   /**
    * Constructs an event instance around the left bumper's digital signal.
    *
-   * @return an event instance representing the left bumper's digital signal attached to the {@link
-   *     CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   * @return an event instance representing the left bumper's digital signal attached to the
+   *         {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
    * @see #leftBumper(EventLoop)
    */
   public Trigger leftBumper() {
@@ -70,8 +65,8 @@ public class LazyCommandXboxWrapper {
   /**
    * Constructs an event instance around the right bumper's digital signal.
    *
-   * @return an event instance representing the right bumper's digital signal attached to the {@link
-   *     CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   * @return an event instance representing the right bumper's digital signal attached to the
+   *         {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
    */
   public Trigger rightBumper() {
     return lazyTrigger(xbox.rightBumper());
@@ -81,7 +76,7 @@ public class LazyCommandXboxWrapper {
    * Constructs an event instance around the left stick button's digital signal.
    *
    * @return an event instance representing the left stick button's digital signal attached to the
-   *     {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *         {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
    * @see #leftStick(EventLoop)
    */
   public Trigger leftStick() {
@@ -92,7 +87,7 @@ public class LazyCommandXboxWrapper {
    * Constructs an event instance around the right stick button's digital signal.
    *
    * @return an event instance representing the right stick button's digital signal attached to the
-   *     {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *         {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
    * @see #rightStick(EventLoop)
    */
   public Trigger rightStick() {
@@ -102,8 +97,8 @@ public class LazyCommandXboxWrapper {
   /**
    * Constructs an event instance around the A button's digital signal.
    *
-   * @return an event instance representing the A button's digital signal attached to the {@link
-   *     CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   * @return an event instance representing the A button's digital signal attached to the
+   *         {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
    * @see #a(EventLoop)
    */
   public Trigger a() {
@@ -113,8 +108,8 @@ public class LazyCommandXboxWrapper {
   /**
    * Constructs an event instance around the B button's digital signal.
    *
-   * @return an event instance representing the B button's digital signal attached to the {@link
-   *     CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   * @return an event instance representing the B button's digital signal attached to the
+   *         {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
    * @see #b(EventLoop)
    */
   public Trigger b() {
@@ -124,8 +119,8 @@ public class LazyCommandXboxWrapper {
   /**
    * Constructs an event instance around the X button's digital signal.
    *
-   * @return an event instance representing the X button's digital signal attached to the {@link
-   *     CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   * @return an event instance representing the X button's digital signal attached to the
+   *         {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
    * @see #x(EventLoop)
    */
   public Trigger x() {
@@ -135,8 +130,8 @@ public class LazyCommandXboxWrapper {
   /**
    * Constructs an event instance around the Y button's digital signal.
    *
-   * @return an event instance representing the Y button's digital signal attached to the {@link
-   *     CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   * @return an event instance representing the Y button's digital signal attached to the
+   *         {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
    * @see #y(EventLoop)
    */
   public Trigger y() {
@@ -146,8 +141,8 @@ public class LazyCommandXboxWrapper {
   /**
    * Constructs an event instance around the start button's digital signal.
    *
-   * @return an event instance representing the start button's digital signal attached to the {@link
-   *     CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   * @return an event instance representing the start button's digital signal attached to the
+   *         {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
    * @see #start(EventLoop)
    */
   public Trigger start() {
@@ -157,8 +152,8 @@ public class LazyCommandXboxWrapper {
   /**
    * Constructs an event instance around the back button's digital signal.
    *
-   * @return an event instance representing the back button's digital signal attached to the {@link
-   *     CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   * @return an event instance representing the back button's digital signal attached to the
+   *         {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
    * @see #back(EventLoop)
    */
   public Trigger back() {
@@ -170,7 +165,7 @@ public class LazyCommandXboxWrapper {
    * will be true when the axis value is greater than 0.5.
    *
    * @return a Trigger instance that is true when the left trigger's axis exceeds 0.5, attached to
-   *     the {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *         the {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
    */
   public Trigger leftTrigger() {
     return lazyTrigger(xbox.leftTrigger());
@@ -181,7 +176,7 @@ public class LazyCommandXboxWrapper {
    * will be true when the axis value is greater than 0.5.
    *
    * @return a Trigger instance that is true when the right trigger's axis exceeds 0.5, attached to
-   *     the {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *         the {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
    */
   public Trigger rightTrigger() {
     return lazyTrigger(xbox.rightTrigger());
@@ -276,7 +271,8 @@ public class LazyCommandXboxWrapper {
    * attached to {@link CommandScheduler#getDefaultButtonLoop() the default command scheduler button
    * loop}.
    *
-   * <p>The POV angles start at 0 in the up direction, and increase clockwise (e.g. right is 90,
+   * <p>
+   * The POV angles start at 0 in the up direction, and increase clockwise (e.g. right is 90,
    * upper-left is 315).
    *
    * @param angle POV angle in degrees, or -1 for the center / not pressed.
@@ -289,13 +285,15 @@ public class LazyCommandXboxWrapper {
   /**
    * Constructs a Trigger instance based around this angle of a POV on the HID.
    *
-   * <p>The POV angles start at 0 in the up direction, and increase clockwise (e.g. right is 90,
+   * <p>
+   * The POV angles start at 0 in the up direction, and increase clockwise (e.g. right is 90,
    * upper-left is 315).
    *
    * @param pov index of the POV to read (starting at 0). Defaults to 0.
    * @param angle POV angle in degrees, or -1 for the center / not pressed.
-   * @param loop the event loop instance to attach the event to. Defaults to {@link
-   *     CommandScheduler#getDefaultButtonLoop() the default command scheduler button loop}.
+   * @param loop the event loop instance to attach the event to. Defaults to
+   *        {@link CommandScheduler#getDefaultButtonLoop() the default command scheduler button
+   *        loop}.
    * @return a Trigger instance based around this angle of a POV on the HID.
    */
   public Trigger pov(int pov, int angle, EventLoop loop) {

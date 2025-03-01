@@ -276,8 +276,7 @@ public class TalonFXWrapper implements ShuffleBoardTabWrapper {
     isPositionBeingHeld = false;
   }
 
-  public static record FollowerConfig(int id, boolean isInverted) {
-  }
+  public static record FollowerConfig(int id, boolean isInverted) {}
 
   public boolean isAtPositionReference(Angle speed, Angle tolerance) {
     var diff = (getPosition().minus(speed));

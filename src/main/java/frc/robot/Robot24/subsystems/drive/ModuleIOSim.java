@@ -44,10 +44,8 @@ public class ModuleIOSim implements ModuleIO {
 
   public ModuleIOSim(SwerveModuleSimulation moduleSimulation) {
     this.moduleSimulation = moduleSimulation;
-    this.driveMotor =
-        moduleSimulation
-            .useGenericMotorControllerForDrive()
-            .withCurrentLimit(Amps.of(DriveConstants.FrontLeft.SlipCurrent));
+    this.driveMotor = moduleSimulation.useGenericMotorControllerForDrive()
+        .withCurrentLimit(Amps.of(DriveConstants.FrontLeft.SlipCurrent));
     this.turnMotor = moduleSimulation.useGenericControllerForSteer().withCurrentLimit(Amps.of(20));
 
     driveController = new PIDController(DRIVE_KP, DRIVE_KI, DRIVE_KD);
@@ -62,10 +60,8 @@ public class ModuleIOSim implements ModuleIO {
   public void updateInputs(ModuleIOInputs inputs) {
     // Run closed-loop control
     if (driveClosedLoop) {
-      driveAppliedVolts =
-          driveFFVolts
-              + driveController.calculate(
-                  moduleSimulation.getDriveWheelFinalSpeed().in(RadiansPerSecond));
+      driveAppliedVolts = driveFFVolts + driveController
+          .calculate(moduleSimulation.getDriveWheelFinalSpeed().in(RadiansPerSecond));
     } else {
       driveController.reset();
     }
@@ -101,8 +97,7 @@ public class ModuleIOSim implements ModuleIO {
     inputs.odometryTimestamps = PhoenixUtil.getSimulationOdometryTimeStamps();
     inputs.odometryDrivePositionsRad =
         Arrays.stream(moduleSimulation.getCachedDriveWheelFinalPositions())
-            .mapToDouble(angle -> angle.in(Radians))
-            .toArray();
+            .mapToDouble(angle -> angle.in(Radians)).toArray();
     inputs.odometryTurnPositions = moduleSimulation.getCachedSteerAbsolutePositions();
   }
 
