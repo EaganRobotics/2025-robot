@@ -21,6 +21,12 @@
           "data": {
             "name": "Exhaust"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L1"
+          }
         }
       ]
     }
