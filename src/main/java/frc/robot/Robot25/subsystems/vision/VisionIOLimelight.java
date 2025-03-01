@@ -58,9 +58,6 @@ public class VisionIOLimelight implements VisionIO {
     latencySubscriber = limelightTable.getDoubleTopic("tl").subscribe(0.0);
     txSubscriber = limelightTable.getDoubleTopic("tx").subscribe(0.0);
     tySubscriber = limelightTable.getDoubleTopic("ty").subscribe(0.0);
-
-    // alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
-    // setUpMegaTags();
     megatag1Subscriber =
         limelightTable.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[] {});
     megatag2Subscriber =
@@ -70,24 +67,8 @@ public class VisionIOLimelight implements VisionIO {
 
   }
 
-  public void setUpMegaTags() {
-    if (DriverStation.getAlliance().get() == Alliance.Blue) {
-      System.out.println("allainceBlue");
-      megatag1Subscriber =
-          limelightTable.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[] {});
-      megatag2Subscriber =
-          limelightTable.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[] {});
-
-    } else {
-      System.out.println("allianceRed");
-      megatag1Subscriber =
-          limelightTable.getDoubleArrayTopic("botpose_wpired").subscribe(new double[] {});
-      megatag2Subscriber =
-          limelightTable.getDoubleArrayTopic("botpose_orb_wpired").subscribe(new double[] {});
-
-    }
-
-  }
+ 
+  
 
   @Override
   public void updateInputs(VisionIOInputs inputs) {

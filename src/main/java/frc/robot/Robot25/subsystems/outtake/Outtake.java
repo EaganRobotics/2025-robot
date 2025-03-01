@@ -2,9 +2,13 @@ package frc.robot.Robot25.subsystems.outtake;
 
 import static edu.wpi.first.units.Units.Volts;
 
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Outtake extends SubsystemBase {
@@ -26,6 +30,16 @@ public class Outtake extends SubsystemBase {
       io.setOpenLoop(output);
     }, () -> {
       io.setOpenLoop(Volts.of(0));
+    }
+
+    );
+  }
+
+  public Command setRopenLoop(Voltage output) {
+    return this.startEnd(() -> {
+      io.setRollerOpenLoop(output);
+    }, () -> {
+      io.setRollerOpenLoop(Volts.of(0));
     }
 
     );
@@ -55,6 +69,10 @@ public class Outtake extends SubsystemBase {
     });
   }
 
+  public Command autoQueueCoralOveride() {
+    return Commands.run(() -> io.setRollerOpenLoop(Volts.of(0)));
+  }
+
   public Command autoQueueCoral2() {
     return this.runEnd(() -> {
       Logger.recordOutput("Outtake/AutoQueuing", true);
@@ -72,18 +90,18 @@ public class Outtake extends SubsystemBase {
   }
 
   public Command depositCoral() {
-    return setOpenLoop(Volts.of(6)).withTimeout(1);
+    return setOpenLoop(Volts.of(6)).until(seesAtOutputTrigger.negate().debounce(0.1)).withTimeout(1);
   }
 
-  public Command depositCoralAuto() {
-    return setOpenLoop(Volts.of(7)).withTimeout(2);
-  }
+
+
+  public final Trigger seesAtOutputTrigger = new Trigger(() -> inputs.seesCoralAtOutput);
 
   // public Command specialDepositCoral() {
   // return setOpenLop(Volts.of(5));
   // }
 
   public Command reverseCoral() {
-    return setOpenLoop(Volts.of(-5)).withTimeout(1);
+    return setRopenLoop(Volts.of(-5)).withTimeout(1);
   }
 }

@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import java.security.PublicKey;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -48,13 +49,13 @@ public class Elevator extends SubsystemBase {
   // zeroingMinhight, minHeight, L1, l2, l3, l4, maxHeight
   // }
 
-  private enum Level {
+  public enum Level {
 
     // original value during W0 = L4 = 72 + 6
 
-    minHeight(MIN_HEIGHT), L11(Inches.of(16.4 + 4.4)), L1(Inches.of(18 + 14)), L2(
+    minHeight(MIN_HEIGHT), Intake(Inches.of(16.4 + 4.4)), L1(Inches.of(18 + 14)), L2(
         Inches.of(31.9 + 7)),
-    L3(Inches.of(47.6 + 7)), L4(Inches.of(72 + 6));
+    L3(Inches.of(47.6 + 7)), L4(Inches.of(72 + 7.75));
 
     private final Distance height;
 
@@ -98,7 +99,7 @@ public class Elevator extends SubsystemBase {
 
   };
 
-  private Level currentLevel = Level.minHeight;
+  private Level desiredLevel = Level.minHeight;
 
   public Elevator(ElevatorIO io) {
     this.io = io;
@@ -111,7 +112,7 @@ public class Elevator extends SubsystemBase {
     lowerLimitHit.onTrue(Commands.runOnce(() -> {
       System.out.println(
           "[Elevator] Lower limit hit, setting state to minHeight and setting motor volts to 0");
-      currentLevel = Level.minHeight;
+      desiredLevel = Level.minHeight;
       io.setWinchOpenLoop(Volts.of(0));
       io.zeroEncoder();
 
@@ -133,8 +134,8 @@ public class Elevator extends SubsystemBase {
     Logger.recordOutput("Elevator/EstimatedHeight",
         radiansToInches(inputs.winchPosition).in(Meters));
 
-    Logger.recordOutput("Elevator/CurrentLevel", currentLevel);
-    Logger.recordOutput("Elevator/CurrentLevelHeight", currentLevel.getHeight());
+    Logger.recordOutput("Elevator/CurrentLevel", desiredLevel);
+    Logger.recordOutput("Elevator/CurrentLevelHeight", desiredLevel.getHeight());
     Logger.recordOutput("Elevator/isAtGoal", isAtGoal());
     Logger.recordOutput("Elevator/lowerLimitHIt", lowerLimitHit);
   }
@@ -151,7 +152,7 @@ public class Elevator extends SubsystemBase {
 
   public Command goToLevel(Level level) {
     return this.runOnce(() -> {
-      currentLevel = level;
+      desiredLevel = level;
       Distance height = level.getHeight();
       Angle r = inchesToRadians(height);
       io.setWinchPosition(r);
@@ -160,7 +161,7 @@ public class Elevator extends SubsystemBase {
 
   public Command minHeight() {
     return this.runOnce(() -> {
-      currentLevel = Level.minHeight;
+      desiredLevel = Level.minHeight;
       Distance height = Level.minHeight.getHeight();
       Angle r = inchesToRadians(height);
       io.setWinchPosition(r);
@@ -174,7 +175,7 @@ public class Elevator extends SubsystemBase {
 
   public Command miniHeight() {
     return this.runOnce(() -> {
-      currentLevel = Level.minHeight;
+      desiredLevel = Level.minHeight;
       Distance height = Level.minHeight.getHeight();
       Angle r = inchesToRadians(height);
       io.setWinchPosition(r);
@@ -192,13 +193,18 @@ public class Elevator extends SubsystemBase {
   // .andThen(Commands.runOnce(() -> io.setWinchOpenLoop(Volts.of(-10))));
 
   // }
-
-  public Command L0() {
-    return goToLevel(Level.L11);
+  public Command zeroElevator() {
+    return Commands.runOnce(() -> io.zeroEncoder());
   }
 
-  public Command IntakeHight() {
-    return goToLevel(Level.L11);
+  // src/main/java/frc/robot/Robot25/subsystems/elevator/Elevator.java
+
+  public Command L0() {
+    return goToLevel(Level.Intake);
+  }
+
+  public Command intakeHeight() {
+    return goToLevel(Level.Intake);
   }
 
   public Command L1() {
@@ -223,8 +229,8 @@ public class Elevator extends SubsystemBase {
 
   public Command upLevel() {
     return this.runOnce(() -> {
-      currentLevel = currentLevel.up();
-      Distance height = currentLevel.getHeight();
+      desiredLevel = desiredLevel.up();
+      Distance height = desiredLevel.getHeight();
       Angle r = inchesToRadians(height);
       io.setWinchPosition(r);
     });
@@ -232,8 +238,8 @@ public class Elevator extends SubsystemBase {
 
   public Command downLevel() {
     return this.runOnce(() -> {
-      currentLevel = currentLevel.down();
-      Distance height = currentLevel.getHeight();
+      desiredLevel = desiredLevel.down();
+      Distance height = desiredLevel.getHeight();
       Angle r = inchesToRadians(height);
       io.setWinchPosition(r);
     });
@@ -289,17 +295,19 @@ public class Elevator extends SubsystemBase {
             0, stage1Contribution + stage2Contribution + stage3Contribution, Rotation3d.kZero), };
   }
 
-  public Trigger elevatorAtMinHeight() {
-    return new Trigger(() -> currentLevel == Level.L11);
-  }
-
   public final Trigger lowerLimitHit = new Trigger(() -> inputs.lowerLimit);
+
+  public Trigger isAtHeight(Level desiredLevel) {
+
+    return isAtGoal().and(() -> desiredLevel == this.desiredLevel);
+
+  }
 
   // todo CHECK VALID TOLERANCE
   public Trigger isAtGoal() {
     return new Trigger(() -> {
       return Math.abs((inputs.winchPosition.in(Radians)
-          - inchesToRadians(currentLevel.getHeight()).in(Radians))) < 1.5;
+          - inchesToRadians(desiredLevel.getHeight()).in(Radians))) < 1.5;
 
     });
   }
