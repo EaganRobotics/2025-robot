@@ -251,9 +251,9 @@ public class RobotContainer extends frc.lib.RobotContainer {
     operatorController.start().onTrue(elevator.zeroElevator());
     operatorController.back().onTrue(elevator.zeroElevator());
     // operatorController.rightTrigger().onTrue(outtake.depositCoral());
-    operatorController.leftBumper().onTrue(outtake.depositCoral().andThen(elevator.intake()));
+    operatorController.leftBumper().onTrue(outtake.depositCoral().andThen(elevator.intakeHeight()));
     operatorController.leftTrigger().onTrue(outtake.reverseCoral());
-    operatorController.rightBumper().onTrue(elevator.intake());
+    operatorController.rightBumper().onTrue(elevator.intakeHeight());
     operatorController.a().onTrue(elevator.L2());
     operatorController.x().onTrue(elevator.L1());
     operatorController.b().onTrue(elevator.L3());
