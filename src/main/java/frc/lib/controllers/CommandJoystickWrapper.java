@@ -15,19 +15,15 @@ public class CommandJoystickWrapper {
   private final double joystickDeadband;
   private final double throttleDeadZone;
 
-  public CommandJoystickWrapper(
-      String name,
-      int inPort,
-      double joystickDeadband,
-      double throttleDeadZone,
-      boolean faultsWhenDisconnected) {
+  public CommandJoystickWrapper(String name, int inPort, double joystickDeadband,
+      double throttleDeadZone, boolean faultsWhenDisconnected) {
     joystick = new CommandJoystick(inPort);
     this.joystickDeadband = joystickDeadband;
     this.throttleDeadZone = throttleDeadZone;
 
     if (faultsWhenDisconnected) {
-      Fault.autoUpdating(
-          "Controller " + name + " (Port: " + inPort + ") is disconnected.", () -> !isConnected());
+      Fault.autoUpdating("Controller " + name + " (Port: " + inPort + ") is disconnected.",
+          () -> !isConnected());
     }
   }
 
@@ -40,14 +36,13 @@ public class CommandJoystickWrapper {
   }
 
   private Trigger lazyTrigger(Trigger trigger) {
-    return new Trigger(
-        () -> {
-          if (isConnected()) {
-            return trigger.getAsBoolean();
-          } else {
-            return false;
-          }
-        });
+    return new Trigger(() -> {
+      if (isConnected()) {
+        return trigger.getAsBoolean();
+      } else {
+        return false;
+      }
+    });
   }
 
   private double lazyDouble(DoubleSupplier doubleSup) {
@@ -85,39 +80,34 @@ public class CommandJoystickWrapper {
 
   // did math to make it a precentage 0 - 1
   public double getThrottle() {
-    return lazyDouble(
-        () -> {
-          double throttle = (joystick.getThrottle() + 1.0) / 2.0;
-          return MathUtil.applyDeadband(throttle, throttleDeadZone);
-        });
+    return lazyDouble(() -> {
+      double throttle = (joystick.getThrottle() + 1.0) / 2.0;
+      return MathUtil.applyDeadband(throttle, throttleDeadZone);
+    });
   }
 
   public Trigger joysticksTrigger() {
-    return new Trigger(
-        () -> {
-          return Math.abs(getX()) > 0 || Math.abs(getY()) > 0 || Math.abs(getZ()) > 0;
-        });
+    return new Trigger(() -> {
+      return Math.abs(getX()) > 0 || Math.abs(getY()) > 0 || Math.abs(getZ()) > 0;
+    });
   }
 
   public Trigger xTrigger() {
-    return new Trigger(
-        () -> {
-          return Math.abs(getX()) > 0;
-        });
+    return new Trigger(() -> {
+      return Math.abs(getX()) > 0;
+    });
   }
 
   public Trigger yTrigger() {
-    return new Trigger(
-        () -> {
-          return Math.abs(getY()) > 0;
-        });
+    return new Trigger(() -> {
+      return Math.abs(getY()) > 0;
+    });
   }
 
   public Trigger zTrigger() {
-    return new Trigger(
-        () -> {
-          return Math.abs(getZ()) > 0;
-        });
+    return new Trigger(() -> {
+      return Math.abs(getZ()) > 0;
+    });
   }
 
   private Trigger pov(int angle) {

@@ -9,11 +9,9 @@ public class NavXWrapper {
   private AHRS navx = new AHRS(NavXComType.kMXP_SPI);
 
   public NavXWrapper() {
-    Fault.autoUpdating(
-        "NavX Disconnected",
-        () -> {
-          return !navx.isConnected();
-        });
+    Fault.autoUpdating("NavX Disconnected", () -> {
+      return !navx.isConnected();
+    });
   }
 
   public Rotation2d getAngle() {

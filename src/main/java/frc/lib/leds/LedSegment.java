@@ -11,10 +11,9 @@ public class LedSegment {
   }
 
   public LedSegment(CANdleWrapper candle) {
-    this(
-        (animation) -> {
-          animation.run(candle);
-        });
+    this((animation) -> {
+      animation.run(candle);
+    });
   }
 
   public boolean reset() {

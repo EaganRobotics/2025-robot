@@ -48,12 +48,11 @@ import org.littletonrobotics.junction.Logger;
  * Module IO implementation for Talon FX drive motor controller, Talon FX turn motor controller, and
  * CANcoder. Configured using a set of module constants from Phoenix.
  *
- * <p>Device configuration and other behaviors not exposed by DriveConstants can be customized here.
+ * <p>
+ * Device configuration and other behaviors not exposed by DriveConstants can be customized here.
  */
 public class ModuleIOTalonFX implements ModuleIO {
-  private final SwerveModuleConstants<
-          TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
-      constants;
+  private final SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> constants;
 
   // Hardware objects
   private final TalonFX driveTalon;
@@ -98,8 +97,7 @@ public class ModuleIOTalonFX implements ModuleIO {
   // private final Debouncer turnEncoderConnectedDebounce = new Debouncer(0.5);
 
   public ModuleIOTalonFX(
-      SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
-          constants) {
+      SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> constants) {
     this.constants = constants;
     driveTalon = new TalonFX(constants.DriveMotorId, DriveConstants.DrivetrainConstants.CANBusName);
     turnTalon = new TalonFX(constants.SteerMotorId, DriveConstants.DrivetrainConstants.CANBusName);
@@ -115,8 +113,7 @@ public class ModuleIOTalonFX implements ModuleIO {
     driveConfig.CurrentLimits.StatorCurrentLimit = constants.SlipCurrent;
     driveConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     driveConfig.MotorOutput.Inverted =
-        constants.DriveMotorInverted
-            ? InvertedValue.Clockwise_Positive
+        constants.DriveMotorInverted ? InvertedValue.Clockwise_Positive
             : InvertedValue.CounterClockwise_Positive;
     tryUntilOk(5, () -> driveTalon.getConfigurator().apply(driveConfig, 0.25));
     tryUntilOk(5, () -> driveTalon.setPosition(0.0, 0.25));
@@ -135,8 +132,7 @@ public class ModuleIOTalonFX implements ModuleIO {
     turnConfig.MotionMagic.MotionMagicExpo_kA = 0.1;
     turnConfig.ClosedLoopGeneral.ContinuousWrap = true;
     turnConfig.MotorOutput.Inverted =
-        constants.SteerMotorInverted
-            ? InvertedValue.Clockwise_Positive
+        constants.SteerMotorInverted ? InvertedValue.Clockwise_Positive
             : InvertedValue.CounterClockwise_Positive;
     tryUntilOk(5, () -> turnTalon.getConfigurator().apply(turnConfig, 0.25));
     tryUntilOk(5, () -> turnTalon.setPosition(customEncoder.getPosition(), 0.25));
@@ -145,9 +141,9 @@ public class ModuleIOTalonFX implements ModuleIO {
     // CANcoderConfiguration cancoderConfig = constants.EncoderInitialConfigs;
     // cancoderConfig.MagnetSensor.MagnetOffset = constants.EncoderOffset;
     // cancoderConfig.MagnetSensor.SensorDirection =
-    //     constants.EncoderInverted
-    //         ? SensorDirectionValue.Clockwise_Positive
-    //         : SensorDirectionValue.CounterClockwise_Positive;
+    // constants.EncoderInverted
+    // ? SensorDirectionValue.Clockwise_Positive
+    // : SensorDirectionValue.CounterClockwise_Positive;
     // cancoder.getConfigurator().apply(cancoderConfig);
 
     // Create timestamp queue
@@ -170,17 +166,11 @@ public class ModuleIOTalonFX implements ModuleIO {
     turnCurrent = turnTalon.getStatorCurrent();
 
     // Configure periodic frames
-    BaseStatusSignal.setUpdateFrequencyForAll(
-        DriveConstants.ODOMETRY_FREQUENCY, drivePosition, turnPosition);
-    BaseStatusSignal.setUpdateFrequencyForAll(
-        50.0,
-        driveVelocity,
-        driveAppliedVolts,
-        driveCurrent,
+    BaseStatusSignal.setUpdateFrequencyForAll(DriveConstants.ODOMETRY_FREQUENCY, drivePosition,
+        turnPosition);
+    BaseStatusSignal.setUpdateFrequencyForAll(50.0, driveVelocity, driveAppliedVolts, driveCurrent,
         // turnAbsolutePosition,
-        turnVelocity,
-        turnAppliedVolts,
-        turnCurrent);
+        turnVelocity, turnAppliedVolts, turnCurrent);
     ParentDevice.optimizeBusUtilizationForAll(driveTalon, turnTalon);
   }
 
@@ -215,14 +205,10 @@ public class ModuleIOTalonFX implements ModuleIO {
     // Update odometry inputs
     inputs.odometryTimestamps =
         timestampQueue.stream().mapToDouble((Double value) -> value).toArray();
-    inputs.odometryDrivePositionsRad =
-        drivePositionQueue.stream()
-            .mapToDouble((Double value) -> Units.rotationsToRadians(value))
-            .toArray();
-    inputs.odometryTurnPositions =
-        turnPositionQueue.stream()
-            .map((Double value) -> Rotation2d.fromRotations(value))
-            .toArray(Rotation2d[]::new);
+    inputs.odometryDrivePositionsRad = drivePositionQueue.stream()
+        .mapToDouble((Double value) -> Units.rotationsToRadians(value)).toArray();
+    inputs.odometryTurnPositions = turnPositionQueue.stream()
+        .map((Double value) -> Rotation2d.fromRotations(value)).toArray(Rotation2d[]::new);
     timestampQueue.clear();
     drivePositionQueue.clear();
     turnPositionQueue.clear();

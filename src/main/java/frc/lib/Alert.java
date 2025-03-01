@@ -91,10 +91,7 @@ public class Alert {
       Predicate<Alert> activeFilter = (Alert x) -> x.type == type && x.active;
       Comparator<Alert> timeSorter =
           (Alert a1, Alert a2) -> (int) (a2.activeStartTime - a1.activeStartTime);
-      return alerts.stream()
-          .filter(activeFilter)
-          .sorted(timeSorter)
-          .map((Alert a) -> a.text)
+      return alerts.stream().filter(activeFilter).sorted(timeSorter).map((Alert a) -> a.text)
           .toArray(String[]::new);
     }
 

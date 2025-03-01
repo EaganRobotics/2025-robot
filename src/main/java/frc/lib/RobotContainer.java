@@ -68,20 +68,22 @@ public abstract class RobotContainer {
   public void simulationPeriodic() {}
 
   public void resetSimulation() {
-    if (SimConstants.CURRENT_MODE != SimConstants.Mode.SIM) return;
+    if (SimConstants.CURRENT_MODE != SimConstants.Mode.SIM)
+      return;
 
     driveSimulation.setSimulationWorldPose(SimConstants.SIM_INITIAL_FIELD_POSE);
     SimulatedArena.getInstance().resetFieldForAuto();
   }
 
   public void displaySimFieldToAdvantageScope() {
-    if (SimConstants.CURRENT_MODE != SimConstants.Mode.SIM) return;
+    if (SimConstants.CURRENT_MODE != SimConstants.Mode.SIM)
+      return;
 
-    Logger.recordOutput(
-        "FieldSimulation/RobotPosition", driveSimulation.getSimulatedDriveTrainPose());
-    Logger.recordOutput(
-        "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
-    Logger.recordOutput(
-        "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
+    Logger.recordOutput("FieldSimulation/RobotPosition",
+        driveSimulation.getSimulatedDriveTrainPose());
+    Logger.recordOutput("FieldSimulation/Coral",
+        SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
+    Logger.recordOutput("FieldSimulation/Algae",
+        SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
   }
 }

@@ -10,21 +10,21 @@
 // import frc.lib.eventLoops.EventLoops;
 
 // public class SparkMaxLogPowerFaults {
-//     public static void setupCheck(SparkMaxWrapper sparkMax) {
-//         HashMap<CANSparkMax.FaultID, Fault> map = new HashMap<>();
-//         for (CANSparkBase.FaultID c : CANSparkBase.FaultID.values()) {
-//             map.put(c, new Fault(sparkMax.getName() + " " + c.toString()));
-//         }
-//         EventLoops.oncePerSec.bind(() -> {
-//             for (CANSparkBase.FaultID c : CANSparkBase.FaultID.values()) {
-//                 boolean isActive = sparkMax.getStickyFault(c);
-//                 map.get(c).setIsActive(isActive);
-//             }
-//             sparkMax.clearFaults();
-//         });
+// public static void setupCheck(SparkMaxWrapper sparkMax) {
+// HashMap<CANSparkMax.FaultID, Fault> map = new HashMap<>();
+// for (CANSparkBase.FaultID c : CANSparkBase.FaultID.values()) {
+// map.put(c, new Fault(sparkMax.getName() + " " + c.toString()));
+// }
+// EventLoops.oncePerSec.bind(() -> {
+// for (CANSparkBase.FaultID c : CANSparkBase.FaultID.values()) {
+// boolean isActive = sparkMax.getStickyFault(c);
+// map.get(c).setIsActive(isActive);
+// }
+// sparkMax.clearFaults();
+// });
 
-//         Fault.autoUpdating("SparkMax:" + sparkMax.getName() + "MoterTempToHigh", () -> {
-//             return sparkMax.getTemperature().gt(Units.Celsius.of(65));
-//         });
-//     }
+// Fault.autoUpdating("SparkMax:" + sparkMax.getName() + "MoterTempToHigh", () -> {
+// return sparkMax.getTemperature().gt(Units.Celsius.of(65));
+// });
+// }
 // }
