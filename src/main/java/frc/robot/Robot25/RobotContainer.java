@@ -203,6 +203,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
     driverController.y().whileTrue(DriveCommands.Snapper(drive));
 
     operatorController.leftTrigger().whileTrue(outtake.autoQueueCoralOveride());
+    operatorController.rightTrigger().whileTrue(outtake.reverseCoral());
     operatorController.povDown().onTrue(elevator.downLevel());
     operatorController.povUp().onTrue(elevator.upLevel());
     operatorController.start().onTrue(elevator.zeroElevator());
