@@ -88,11 +88,11 @@ public class Outtake extends SubsystemBase {
   }
 
   public Command depositCoral() {
-    return setOpenLoop(Volts.of(6)).withTimeout(1);
+    return setOpenLoop(Volts.of(6)).until(() -> inputs.seesCoralAtOutput == false).withTimeout(1);
   }
 
   public Command depositCoralAuto() {
-    return setOpenLoop(Volts.of(7)).withTimeout(2);
+    return setOpenLoop(Volts.of(7)).until(() -> inputs.seesCoralAtOutput == false).withTimeout(2);
   }
 
   // public Command specialDepositCoral() {
