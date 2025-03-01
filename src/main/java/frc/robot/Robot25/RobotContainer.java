@@ -38,6 +38,7 @@ import frc.robot.Robot25.subsystems.elevator.Elevator;
 import frc.robot.Robot25.subsystems.elevator.ElevatorIO;
 import frc.robot.Robot25.subsystems.elevator.ElevatorIOSim;
 import frc.robot.Robot25.subsystems.elevator.ElevatorIOTalonFX;
+import frc.robot.Robot25.subsystems.elevator.ElevatorIOTalonFXNew;
 import frc.robot.Robot25.subsystems.gyro.GyroIO;
 import frc.robot.Robot25.subsystems.gyro.GyroIOPigeon2;
 import frc.robot.Robot25.subsystems.gyro.GyroIOSim;
@@ -57,12 +58,9 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
- * This class is where the bulk of the robot should be declared. Since
- * Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in
- * the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of
- * the robot (including
+ * This class is where the bulk of the robot should be declared. Since Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer extends frc.lib.RobotContainer {
@@ -75,8 +73,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
   private final Vision vision;
 
   // Drive simulation
-  private static final SwerveDriveSimulation driveSimulation = new SwerveDriveSimulation(Drive.MAPLE_SIM_CONFIG,
-      SimConstants.SIM_INITIAL_FIELD_POSE);
+  private static final SwerveDriveSimulation driveSimulation =
+      new SwerveDriveSimulation(Drive.MAPLE_SIM_CONFIG, SimConstants.SIM_INITIAL_FIELD_POSE);
 
   // Controller
   private final CommandXboxController driverController = new CommandXboxController(0);
@@ -89,7 +87,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
   private static DigitalInputWrapper coastButton = new DigitalInputWrapper(4, "coastButton", false);
 
   @AutoLogOutput
-  public final Pose3d[] mechanismPoses = new Pose3d[] { Pose3d.kZero, Pose3d.kZero, Pose3d.kZero, };
+  public final Pose3d[] mechanismPoses = new Pose3d[] {Pose3d.kZero, Pose3d.kZero, Pose3d.kZero,};
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -97,8 +95,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
   public RobotContainer() {
     super(driveSimulation);
     // Check for valid swerve config
-    var modules = new SwerveModuleConstants[] { DriveConstants.FrontLeft, DriveConstants.FrontRight,
-        DriveConstants.BackLeft, DriveConstants.BackRight, };
+    var modules = new SwerveModuleConstants[] {DriveConstants.FrontLeft, DriveConstants.FrontRight,
+        DriveConstants.BackLeft, DriveConstants.BackRight,};
     for (var constants : modules) {
       if (constants.DriveMotorType != DriveMotorArrangement.TalonFX_Integrated
           || constants.SteerMotorType != SteerMotorArrangement.TalonFX_Integrated) {
@@ -115,7 +113,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
             new ModuleIOTalonFX(DriveConstants.BackLeft),
             new ModuleIOTalonFX(DriveConstants.BackRight));
 
-        elevator = new Elevator(new ElevatorIOTalonFX());
+        elevator = new Elevator(new ElevatorIOTalonFXNew());
         outtake = new Outtake(new OuttakeIOTalonFX());
         vision = new Vision(drive,
             new VisionIOLimelight("limelight-front", () -> drive.getPose().getRotation()),
@@ -141,22 +139,14 @@ public class RobotContainer extends frc.lib.RobotContainer {
         break;
       default:
         // Replayed robot, disable IO implementations
-        drive = new Drive(new GyroIO() {
-        }, new ModuleIO() {
-        }, new ModuleIO() {
-        }, new ModuleIO() {
-        },
-            new ModuleIO() {
-            });
+        drive = new Drive(new GyroIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {},
+            new ModuleIO() {});
 
-        elevator = new Elevator(new ElevatorIO() {
-        });
+        elevator = new Elevator(new ElevatorIO() {});
 
-        outtake = new Outtake(new OuttakeIO() {
-        });
+        outtake = new Outtake(new OuttakeIO() {});
 
-        vision = new Vision(drive, new VisionIO() {
-        });
+        vision = new Vision(drive, new VisionIO() {});
         break;
     }
 
@@ -194,11 +184,9 @@ public class RobotContainer extends frc.lib.RobotContainer {
   }
 
   /**
-   * Use this method to define your button->command mappings. Buttons can be
-   * created by
+   * Use this method to define your button->command mappings. Buttons can be created by
    * instantiating a {@link GenericHID} or one of its subclasses
-   * ({@link edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then
-   * passing it to a
+   * ({@link edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
@@ -255,15 +243,15 @@ public class RobotContainer extends frc.lib.RobotContainer {
             () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
             drive).ignoringDisable(true));
 
-    // OperatorController.povDown().onTrue(elevator.downLevel());
-    // OperatorController.povUp().onTrue(elevator.upLevel());
-    // DriverController.rightTrigger().onTrue(outtake.depositCoral());
-    // DriverController.leftTrigger().onTrue(outtake.reverseCoral());
-    // OperatorController.rightBumper().onTrue(elevator.L1());
-    // DriverController.a().onTrue(elevator.minHeight());
-    // DriverController.x().onTrue(elevator.L2());
-    // DriverController.b().onTrue(elevator.L3());
-    // DriverController.y().onTrue(elevator.L4());
+    operatorController.povDown().onTrue(elevator.downLevel());
+    operatorController.povUp().onTrue(elevator.upLevel());
+    operatorController.rightTrigger().onTrue(outtake.depositCoral());
+    operatorController.leftTrigger().onTrue(elevator.L11());
+    operatorController.rightBumper().onTrue(elevator.L1());
+    operatorController.a().onTrue(elevator.minHeight());
+    operatorController.x().onTrue(elevator.L2());
+    operatorController.b().onTrue(elevator.L3());
+    operatorController.y().onTrue(elevator.L4());
     // elevator.setDefaultCommand(elevator.openLoop(OperatorController::getLeftY));
 
     driverController.y()
@@ -271,7 +259,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
         // Rotation2d.fromDegrees(90))));
         .whileTrue(DriveCommands.Snapper(drive));
 
-    elevator.setDefaultCommand(elevator.openLoop(operatorController::getLeftY));
+    operatorController.axisMagnitudeGreaterThan(1, 0.1)
+        .whileTrue(elevator.openLoop(operatorController::getLeftY));
 
   }
 

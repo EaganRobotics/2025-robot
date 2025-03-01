@@ -59,8 +59,12 @@ public class VisionIOLimelight implements VisionIO {
     txSubscriber = limelightTable.getDoubleTopic("tx").subscribe(0.0);
     tySubscriber = limelightTable.getDoubleTopic("ty").subscribe(0.0);
 
-    alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
-    setUpMegaTags();
+    // alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+    // setUpMegaTags();
+    megatag1Subscriber =
+        limelightTable.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[] {});
+    megatag2Subscriber =
+        limelightTable.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[] {});
 
 
 
@@ -68,12 +72,14 @@ public class VisionIOLimelight implements VisionIO {
 
   public void setUpMegaTags() {
     if (DriverStation.getAlliance().get() == Alliance.Blue) {
+      System.out.println("allainceBlue");
       megatag1Subscriber =
           limelightTable.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[] {});
       megatag2Subscriber =
           limelightTable.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[] {});
 
     } else {
+      System.out.println("allianceRed");
       megatag1Subscriber =
           limelightTable.getDoubleArrayTopic("botpose_wpired").subscribe(new double[] {});
       megatag2Subscriber =
@@ -85,10 +91,10 @@ public class VisionIOLimelight implements VisionIO {
 
   @Override
   public void updateInputs(VisionIOInputs inputs) {
-    if (alliance != DriverStation.getAlliance().orElse(Alliance.Blue)) {
-      setUpMegaTags();
-      alliance = DriverStation.getAlliance().get();
-    }
+    // if (alliance != DriverStation.getAlliance().orElse(Alliance.Blue)) {
+    // setUpMegaTags();
+    // alliance = DriverStation.getAlliance().get();
+    // }
 
     // Update connection status based on whether an update has been seen in the last
     // 250ms
