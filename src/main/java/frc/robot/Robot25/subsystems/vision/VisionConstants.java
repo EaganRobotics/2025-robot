@@ -13,6 +13,7 @@
 
 package frc.robot.Robot25.subsystems.vision;
 
+import static edu.wpi.first.units.Units.Degrees;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -20,16 +21,19 @@ import edu.wpi.first.math.geometry.Transform3d;
 
 public class VisionConstants {
   // AprilTag layout
-  public static AprilTagFieldLayout aprilTagLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+  public static AprilTagFieldLayout aprilTagLayout =
+      AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
   // Camera names, must match names configured on coprocessor
-  public static String camera0Name = "camera_0";
-  public static String camera1Name = "camera_1";
+  public static String limelightFrontName = "limelight-front";
+  public static String limelightBackName = "limelight-back";
 
   // Robot to camera transforms
   // (Not used by Limelight, configure in web UI instead)
-  public static Transform3d robotToCamera0 = new Transform3d(0.2, 0.0, 0.2, new Rotation3d(0.0, -0.4, 0.0));
-  public static Transform3d robotToCamera1 = new Transform3d(-0.2, 0.0, 0.2, new Rotation3d(0.0, -0.4, Math.PI));
+  public static Transform3d limelightFrontTransform = new Transform3d(-0.2286, -0.127, 0.3048,
+      new Rotation3d(Degrees.of(0), Degrees.of(0), Degrees.of(-20)));
+  public static Transform3d limelightBackTransform =
+      new Transform3d(0.0508, 0.1895, 0.6493, new Rotation3d(0.0, 0, Math.PI));
 
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.3;
@@ -42,12 +46,12 @@ public class VisionConstants {
 
   // Standard deviation multipliers for each camera
   // (Adjust to trust some cameras more than others)
-  public static double[] cameraStdDevFactors = new double[] {
-      1.0, // Camera 0
+  public static double[] cameraStdDevFactors = new double[] {1.0, // Camera 0
       1.0 // Camera 1
   };
 
   // Multipliers to apply for MegaTag 2 observations
   public static double linearStdDevMegatag2Factor = 0.5; // More stable than full 3D solve
-  public static double angularStdDevMegatag2Factor = Double.POSITIVE_INFINITY; // No rotation data available
+  public static double angularStdDevMegatag2Factor = Double.POSITIVE_INFINITY; // No rotation data
+                                                                               // available
 }

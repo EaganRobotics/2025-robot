@@ -11,55 +11,49 @@
       "degrees": 90
     }
   ],
-  "position": [0, 0, 0],
+  "position": [
+    0,
+    0,
+    0
+  ],
   "cameras": [
     {
-      "name": "Northstar 0",
+      "name": "limelight-front",
       "rotations": [
         {
-          "axis": "y",
-          "degrees": -28.125
-        },
-        {
           "axis": "z",
-          "degrees": 30.0
+          "degrees": -20.0
         }
       ],
-      "position": [0.225425, 0.2667, 0.20955],
-      "resolution": [1600, 1200],
-      "fov": 75
+      "position": [
+        -0.2286,
+        -0.127,
+        0.3048
+      ],
+      "resolution": [
+        1280,
+        960
+      ],
+      "fov": 80
     },
     {
-      "name": "Northstar 1",
+      "name": "limelight-back",
       "rotations": [
         {
-          "axis": "y",
-          "degrees": -16.875
-        },
-        {
           "axis": "z",
-          "degrees": -4.709
+          "degrees": 180
         }
       ],
-      "position": [0.08255, 0.127, 0.16256],
-      "resolution": [1600, 1200],
-      "fov": 45
-    },
-    {
-      "name": "Northstar 2",
-      "rotations": [
-        {
-          "axis": "y",
-          "degrees": -28.125
-        },
-        {
-          "axis": "z",
-          "degrees": -30.0
-        }
+      "position": [
+        0.051,
+        0.189,
+        0.649
       ],
-      "position": [0.225425, -0.2667, 0.20955],
-      "resolution": [1600, 1200],
-      "fov": 75
+      "resolution": [
+        1280,
+        960
+      ],
+      "fov": 80
     }
   ],
   "components": [
@@ -74,7 +68,11 @@
           "degrees": 90
         }
       ],
-      "zeroedPosition": [0, 0, 0]
+      "zeroedPosition": [
+        0,
+        0,
+        0
+      ]
     },
     {
       "zeroedRotations": [
@@ -87,7 +85,11 @@
           "degrees": 90
         }
       ],
-      "zeroedPosition": [0, 0, 0]
+      "zeroedPosition": [
+        0,
+        0,
+        0
+      ]
     },
     {
       "zeroedRotations": [
@@ -100,7 +102,11 @@
           "degrees": 90
         }
       ],
-      "zeroedPosition": [0, 0, 0]
+      "zeroedPosition": [
+        0,
+        0,
+        0
+      ]
     }
   ]
 }

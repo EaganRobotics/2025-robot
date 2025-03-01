@@ -2,6 +2,7 @@
 
 package frc.robot.Robot25;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
@@ -14,6 +15,8 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -44,6 +47,7 @@ import frc.robot.Robot25.subsystems.outtake.OuttakeIO;
 import frc.robot.Robot25.subsystems.outtake.OuttakeIOSim;
 import frc.robot.Robot25.subsystems.outtake.OuttakeIOTalonFX;
 import frc.robot.Robot25.subsystems.vision.Vision;
+import frc.robot.Robot25.subsystems.vision.VisionConstants;
 import frc.robot.Robot25.subsystems.vision.VisionIO;
 import frc.robot.Robot25.subsystems.vision.VisionIOLimelight;
 import frc.robot.Robot25.subsystems.vision.VisionIOPhotonVisionSim;
@@ -135,7 +139,11 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
         outtake = new Outtake(new OuttakeIO() {});
 
-        vision = new Vision(drive, new VisionIO() {});
+        vision = new Vision(drive,
+            new VisionIOPhotonVisionSim(VisionConstants.limelightBackName,
+                VisionConstants.limelightBackTransform, () -> drive.getPose()),
+            new VisionIOPhotonVisionSim(VisionConstants.limelightFrontName,
+                VisionConstants.limelightFrontTransform, () -> drive.getPose()));
         break;
     }
 
