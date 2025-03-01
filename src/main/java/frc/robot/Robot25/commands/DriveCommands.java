@@ -520,7 +520,8 @@ public class DriveCommands {
 
       Logger.recordOutput("ReefPositions", DriveCommands.REEF_POSITIONS);
 
-      final double slowModeMultiplier = (slowModeSupplier.getAsBoolean() ? SLOW_MODE_MULTIPLIER : 1.0);
+      final double slowModeMultiplier =
+          (slowModeSupplier.getAsBoolean() ? SLOW_MODE_MULTIPLIER : 1.0);
 
       // Get linear velocity
       Translation2d linearVelocity =
