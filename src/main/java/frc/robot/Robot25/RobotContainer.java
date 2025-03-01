@@ -35,6 +35,7 @@ import frc.robot.Robot25.subsystems.drive.ModuleIO;
 import frc.robot.Robot25.subsystems.drive.ModuleIOSim;
 import frc.robot.Robot25.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.Robot25.subsystems.elevator.Elevator;
+import frc.robot.Robot25.subsystems.elevator.Elevator.Level;
 import frc.robot.Robot25.subsystems.elevator.ElevatorIO;
 import frc.robot.Robot25.subsystems.elevator.ElevatorIOSim;
 import frc.robot.Robot25.subsystems.elevator.ElevatorIOTalonFX;
@@ -209,7 +210,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
     drive.setDefaultCommand(DriveCommands.joystickDriveAssist(drive, ySupplier, xSupplier,
         omegaSupplier, driverController.rightTrigger()));
     operatorController.leftTrigger().whileTrue(outtake.autoQueueCoralOveride());
-    outtake.setDefaultCommand(outtake.autoQueueCoral().onlyWhile(elevator.elevatorAtMinHeight()));
+    outtake
+        .setDefaultCommand(outtake.autoQueueCoral().onlyWhile(elevator.isAtHeight(Level.Intake)));
 
     // POV snap to angles
     // DriverController.povUp().onTrue(DriveCommands.snapToRotation(drive,
