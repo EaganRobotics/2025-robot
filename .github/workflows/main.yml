@@ -33,9 +33,9 @@ jobs:
             ~/.gradle/caches
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-      # Runs a single command using the runners shell
-      - name: Compile and run tests on robot code
-        run: ./gradlew build
       # Formatting check
       - name: Check code formatting
         run: ./gradlew spotlessCheck
+      # Runs a single command using the runners shell
+      - name: Compile and run tests on robot code
+        run: ./gradlew build
