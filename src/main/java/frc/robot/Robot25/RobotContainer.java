@@ -171,9 +171,10 @@ public class RobotContainer extends frc.lib.RobotContainer {
     // due to how the deild works, we need to have joystick y in the x varable and
     // joystick x in the
     // y varible
-    drive.setDefaultCommand(DriveCommands.joystickDriveAssist(drive,
-        () -> driverController.getLeftY(), () -> driverController.getLeftX(),
-        () -> -driverController.getRightX(), driverController.rightTrigger()));
+    drive.setDefaultCommand(
+        DriveCommands.joystickDriveAssist(drive, () -> driverController.getLeftY(),
+            () -> driverController.getLeftX(), () -> -driverController.getRightX() * .85,
+            driverController.leftTrigger(), driverController.rightTrigger()));
     outtake
         .setDefaultCommand(outtake.autoQueueCoral().onlyWhile(elevator.isAtHeight(Level.Intake)));
     driverController.povUpRight()
@@ -195,6 +196,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
     driverController.y().whileTrue(DriveCommands.Snapper(drive));
 
     operatorController.leftTrigger().whileTrue(outtake.autoQueueCoralOveride());
+    operatorController.rightTrigger().whileTrue(outtake.reverseCoral());
     operatorController.povDown().onTrue(elevator.downLevel());
     operatorController.povUp().onTrue(elevator.upLevel());
     operatorController.start().onTrue(elevator.zeroElevator());
