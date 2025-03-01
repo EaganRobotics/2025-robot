@@ -15,6 +15,7 @@ public class GraphWrapper {
   }
 
   public void setDouble(double value) {
-    if (graph != null) graph.setDouble(value);
+    if (graph != null)
+      graph.setDouble(value);
   }
 }

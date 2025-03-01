@@ -29,7 +29,9 @@ public final class SimConstants {
 
   /* Simulation mode, initial position, and robot container */
 
-  /* This gets the value of environment variable AKIT_SIM_MODE otherwise sets SIM_MODE to Mode.SIM */
+  /*
+   * This gets the value of environment variable AKIT_SIM_MODE otherwise sets SIM_MODE to Mode.SIM
+   */
   public static final Mode SIM_MODE =
       Optional.ofNullable(System.getenv("AKIT_SIM_MODE")).map(Mode::valueOf).orElse(Mode.SIM);
 

@@ -13,12 +13,9 @@
 
 package frc.robot.Robot25.subsystems.gyro;
 
-import static edu.wpi.first.units.Units.Degrees;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.MountPoseConfigs;
-import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -63,7 +60,8 @@ public class GyroIOPigeon2 implements GyroIO {
     inputs.rollPosition = Rotation2d.fromDegrees(roll.getValueAsDouble());
     inputs.rollVelocityRadPerSec = Units.degreesToRadians(rollVelocity.getValueAsDouble());
 
-    inputs.odometryYawTimestamps = yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();
+    inputs.odometryYawTimestamps =
+        yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();
     inputs.odometryYawPositions = yawPositionQueue.stream()
         .map((Double value) -> Rotation2d.fromDegrees(value)).toArray(Rotation2d[]::new);
     yawTimestampQueue.clear();

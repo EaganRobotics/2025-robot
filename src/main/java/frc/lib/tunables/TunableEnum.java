@@ -24,14 +24,14 @@ public class TunableEnum<V extends Enum<V>> {
     this(name, defaultValue, klass, true, tab);
   }
 
-  public TunableEnum(
-      String name, V defaultValue, Class<V> klass, String tab, BooleanObjectConsumer<V> onChange) {
+  public TunableEnum(String name, V defaultValue, Class<V> klass, String tab,
+      BooleanObjectConsumer<V> onChange) {
     this(name, defaultValue, klass, tab);
     addChangeListener(onChange);
   }
 
-  public TunableEnum(
-      String name, V defaultValue, Class<V> klass, String tab, Consumer<V> onChange) {
+  public TunableEnum(String name, V defaultValue, Class<V> klass, String tab,
+      Consumer<V> onChange) {
     this(name, defaultValue, klass, tab);
     addChangeListener(onChange);
   }
@@ -54,19 +54,14 @@ public class TunableEnum<V extends Enum<V>> {
     }
   }
 
-  public TunableEnum(
-      String name,
-      V defaultValue,
-      Class<V> klass,
-      boolean tunable,
-      String tab,
+  public TunableEnum(String name, V defaultValue, Class<V> klass, boolean tunable, String tab,
       Consumer<V> onChange) {
     this(name, defaultValue, klass, tunable, tab);
     addChangeListener(onChange);
   }
 
-  public TunableEnum(
-      String name, V defaultValue, Class<V> klass, boolean tunable, Consumer<V> onChange) {
+  public TunableEnum(String name, V defaultValue, Class<V> klass, boolean tunable,
+      Consumer<V> onChange) {
     this(name, defaultValue, klass, tunable);
     addChangeListener(onChange);
   }
@@ -95,22 +90,19 @@ public class TunableEnum<V extends Enum<V>> {
 
   public void addChangeListener(BooleanObjectConsumer<V> onChange) {
     onChange.accept(true, getValue());
-    CommandScheduler.getInstance()
-        .getDefaultButtonLoop()
-        .bind(
-            new Runnable() {
-              private V oldValue = getValue();
+    CommandScheduler.getInstance().getDefaultButtonLoop().bind(new Runnable() {
+      private V oldValue = getValue();
 
-              @Override
-              public void run() {
-                V newValue = getValue();
+      @Override
+      public void run() {
+        V newValue = getValue();
 
-                if (oldValue != newValue) {
-                  onChange.accept(false, newValue);
-                  oldValue = newValue;
-                }
-              }
-            });
+        if (oldValue != newValue) {
+          onChange.accept(false, newValue);
+          oldValue = newValue;
+        }
+      }
+    });
   }
 
   public void addChangeListener(Consumer<V> onChange) {

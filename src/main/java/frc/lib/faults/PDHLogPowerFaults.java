@@ -27,23 +27,23 @@ public class PDHLogPowerFaults {
   }
 
   private static void checkPDH(IsolatedEventLoop oncepersec) {
-    oncepersec.bind(
-        () -> {
-          if (firstCheckPdh) {
-            logFaults(pdh.getStickyFaults());
-            pdh.clearStickyFaults();
-            firstCheckPdh = false;
-          }
+    oncepersec.bind(() -> {
+      if (firstCheckPdh) {
+        logFaults(pdh.getStickyFaults());
+        pdh.clearStickyFaults();
+        firstCheckPdh = false;
+      }
 
-          PowerDistributionStickyFaults faults = pdh.getStickyFaults();
-          updateFaults(faults);
-          pdh.clearStickyFaults();
-        });
+      PowerDistributionStickyFaults faults = pdh.getStickyFaults();
+      updateFaults(faults);
+      pdh.clearStickyFaults();
+    });
   }
 
   private static void addBreakerIgnore(int... unpluggedBreakers) {
     try {
-      for (int i : unpluggedBreakers) unusedBreakers.add(i);
+      for (int i : unpluggedBreakers)
+        unusedBreakers.add(i);
     } catch (Exception e) {
       System.out.println(e);
     }

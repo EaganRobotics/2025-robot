@@ -1,8 +1,13 @@
 package frc.lib;
 
-/* https://stackoverflow.com/questions/604424/how-to-get-an-enum-value-from-a-string-value-in-java */
+/*
+ * https://stackoverflow.com/questions/604424/how-to-get-an-enum-value-from-a-string-value-in-java
+ */
 
-/* https://www.tutorialspoint.com/java-program-to-get-system-mac-address-of-windows-and-linux-machine */
+/*
+ * https://www.tutorialspoint.com/java-program-to-get-system-mac-address-of-windows-and-linux-
+ * machine
+ */
 
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.lib.faults.Fault;
@@ -11,10 +16,8 @@ import java.net.NetworkInterface;
 import java.util.function.Function;
 
 public enum RobotInstance {
-  Robot24("00-80-2F-36-FE-34"),
-  Robot25("00-80-2F-36-FD-D6"),
-  KrackenSwerve("00-80-2F-17-F8-19"),
-  Simulator("Simulator");
+  Robot24("00-80-2F-36-FE-34"), Robot25("00-80-2F-36-FD-D6"), KrackenSwerve(
+      "00-80-2F-17-F8-19"), Simulator("Simulator");
 
   private String address;
   private static RobotInstance current = getMacAddress();

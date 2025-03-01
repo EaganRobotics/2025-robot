@@ -50,13 +50,12 @@ public final class Fault {
     return wasActive;
   }
 
-  public static void autoUpdating(
-      String description, IsolatedEventLoop oncepersec, BooleanSupplier booleanSupplier) {
+  public static void autoUpdating(String description, IsolatedEventLoop oncepersec,
+      BooleanSupplier booleanSupplier) {
     Fault fault = new Fault(description);
-    oncepersec.bind(
-        () -> {
-          fault.setIsActive(booleanSupplier.getAsBoolean());
-        });
+    oncepersec.bind(() -> {
+      fault.setIsActive(booleanSupplier.getAsBoolean());
+    });
   }
 
   public static void autoUpdating(String description, BooleanSupplier booleanSupplier) {
@@ -68,39 +67,31 @@ public final class Fault {
     // return RobotController.getCANStatus().percentBusUtilization > 0.8;
     // });
 
-    autoUpdating(
-        "No USB connected into RoboRio",
-        () -> {
-          if (RobotBase.isSimulation()) {
+    autoUpdating("No USB connected into RoboRio", () -> {
+      if (RobotBase.isSimulation()) {
+        return false;
+      } else {
+        try {
+          // prefer a mounted USB drive if one is accessible
+          Path usbDir = Paths.get("/u").toRealPath();
+          if (Files.isWritable(usbDir)) {
             return false;
           } else {
-            try {
-              // prefer a mounted USB drive if one is accessible
-              Path usbDir = Paths.get("/u").toRealPath();
-              if (Files.isWritable(usbDir)) {
-                return false;
-              } else {
-                return true;
-              }
-            } catch (IOException ex) {
-              return true;
-            }
+            return true;
           }
-        });
+        } catch (IOException ex) {
+          return true;
+        }
+      }
+    });
     // Different stages:
     // https://docs.wpilib.org/en/stable/docs/software/roborio-info/roborio-brownouts.html
     autoUpdating("RoboRio browned out", EventLoops.everyLoop, RobotController::isBrownedOut);
-    autoUpdating(
-        "RoboRio 3.3V browned out (Stage 2)",
-        EventLoops.everyLoop,
+    autoUpdating("RoboRio 3.3V browned out (Stage 2)", EventLoops.everyLoop,
         () -> !RobotController.getEnabled3V3());
-    autoUpdating(
-        "RoboRio 5V browned out (Stage 2)",
-        EventLoops.everyLoop,
+    autoUpdating("RoboRio 5V browned out (Stage 2)", EventLoops.everyLoop,
         () -> !RobotController.getEnabled5V());
-    autoUpdating(
-        "RoboRio 6V browned out (Stage 1)",
-        EventLoops.everyLoop,
+    autoUpdating("RoboRio 6V browned out (Stage 1)", EventLoops.everyLoop,
         () -> !RobotController.getEnabled6V());
   }
 }

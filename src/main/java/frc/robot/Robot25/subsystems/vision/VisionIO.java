@@ -21,7 +21,8 @@ public interface VisionIO {
   @AutoLog
   class VisionIOInputs {
     public boolean connected = false;
-    public TargetObservation latestTargetObservation = new TargetObservation(new Rotation2d(), new Rotation2d());
+    public TargetObservation latestTargetObservation =
+        new TargetObservation(new Rotation2d(), new Rotation2d());
     public PoseObservation[] poseObservations = new PoseObservation[0];
     public int[] tagIds = new int[0];
   }
@@ -41,11 +42,8 @@ public interface VisionIO {
   }
 
   enum PoseObservationType {
-    MEGATAG_1,
-    MEGATAG_2,
-    PHOTONVISION
+    MEGATAG_1, MEGATAG_2, PHOTONVISION
   }
 
-  default void updateInputs(VisionIOInputs inputs) {
-  }
+  default void updateInputs(VisionIOInputs inputs) {}
 }

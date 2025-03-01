@@ -27,7 +27,7 @@ public class ElevatorConstants {
 
   public static final Distance DRUM_RADIUS = Inches.of(1);
   public static final double GEARING = 5.0;
-  public static final Distance MIN_HEIGHT = Inches.of(16.3);
+  public static final Distance MIN_HEIGHT = Inches.of(16.4);
   public static final Distance INITIAL_HEIGHT = Inches.of(16.3);
   public static final Distance MAX_EXTENSION = Inches.of(80);
   public static final Mass CARRIAGE_MASS = Pounds.of(19.147);
@@ -39,7 +39,7 @@ public class ElevatorConstants {
   public static final class Real {
     public static final double kP = 2;
     public static final double kI = 0;
-    public static final double kD = 0;
+    public static final double kD = 0.1;
     public static final double kS = 0;
     public static final double kG = 0;
     public static final double kV = 0;

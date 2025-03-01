@@ -24,13 +24,8 @@ public class LedSignal {
   private LedSegment[] segments;
   BooleanLogEntry logEntry;
 
-  public LedSignal(
-      String name,
-      BooleanSupplier isActive,
-      LedAnimation animation,
-      double debounce,
-      DebounceType debounceType,
-      LedSegment[] segments) {
+  public LedSignal(String name, BooleanSupplier isActive, LedAnimation animation, double debounce,
+      DebounceType debounceType, LedSegment[] segments) {
     this.name = name;
     this.isActive = isActive;
     this.animation = animation;
@@ -44,23 +39,14 @@ public class LedSignal {
     this(name, isActive, animation, debounce, DebounceType.kFalling, new LedSegment[] {});
   }
 
-  public LedSignal(
-      String name,
-      BooleanSupplier isActive,
-      LedAnimation animation,
-      double debounce,
+  public LedSignal(String name, BooleanSupplier isActive, LedAnimation animation, double debounce,
       DebounceType debounceType) {
     this(name, isActive, animation, debounce, debounceType, new LedSegment[] {});
   }
 
   // $#####################//#endregion
-  public LedSignal(
-      String name,
-      BooleanSupplier isActive,
-      Animation animation,
-      double debounce,
-      DebounceType debounceType,
-      LedSegment[] segments) {
+  public LedSignal(String name, BooleanSupplier isActive, Animation animation, double debounce,
+      DebounceType debounceType, LedSegment[] segments) {
     this(name, isActive, new LedAnimation(animation), debounce, debounceType, segments);
   }
 
@@ -68,11 +54,7 @@ public class LedSignal {
     this(name, isActive, new LedAnimation(animation), debounce);
   }
 
-  public LedSignal(
-      String name,
-      BooleanSupplier isActive,
-      Animation animation,
-      double debounce,
+  public LedSignal(String name, BooleanSupplier isActive, Animation animation, double debounce,
       DebounceType debounceType) {
     this(name, isActive, new LedAnimation(animation), debounce, debounceType);
   }
@@ -104,29 +86,21 @@ public class LedSignal {
     // fade blue
     SingleFadeAnimation singleFadeAnimation = new SingleFadeAnimation(0, 0, 100, 0, .5, 164);
 
-    return new LedSignal(
-        "isDSConnected",
-        () -> {
-          return !DriverStation.isDSAttached();
-        },
-        singleFadeAnimation,
-        0);
+    return new LedSignal("isDSConnected", () -> {
+      return !DriverStation.isDSAttached();
+    }, singleFadeAnimation, 0);
   }
 
   public static LedSignal previouslyHadFault() {
     // fade orange
     SingleFadeAnimation singleFadeAnimation = new SingleFadeAnimation(255, 165, 0, 0, .5, 164);
-    return new LedSignal(
-        "previouslyHadFault",
-        () -> {
-          if (DriverStation.isDisabled()) {
-            return FaultRegistry.hasAnyPreviouslyActive();
-          } else {
-            return false;
-          }
-        },
-        singleFadeAnimation,
-        0);
+    return new LedSignal("previouslyHadFault", () -> {
+      if (DriverStation.isDisabled()) {
+        return FaultRegistry.hasAnyPreviouslyActive();
+      } else {
+        return false;
+      }
+    }, singleFadeAnimation, 0);
   }
 
   public static LedSignal isBrownedOut() {
@@ -156,40 +130,32 @@ public class LedSignal {
   public static LedSignal isEndGame() {
     // blink yellow
     StrobeAnimation strobeAnimation = new StrobeAnimation(246, 247, 0, 0, 0.1, 164);
-    return new LedSignal(
-        "isEndGame",
-        () -> {
-          // System.out.println(DriverStation.getMatchTime());
-          if (DriverStation.isTeleop()) {
-            if (DriverStation.getMatchTime() < 0) {
-              return false;
-            } else {
-              return DriverStation.getMatchTime() <= endgameTimeStart.getValue()
-                  && DriverStation.getMatchTime() >= endgameTimeEnd.getValue();
-            }
+    return new LedSignal("isEndGame", () -> {
+      // System.out.println(DriverStation.getMatchTime());
+      if (DriverStation.isTeleop()) {
+        if (DriverStation.getMatchTime() < 0) {
+          return false;
+        } else {
+          return DriverStation.getMatchTime() <= endgameTimeStart.getValue()
+              && DriverStation.getMatchTime() >= endgameTimeEnd.getValue();
+        }
 
-          } else {
-            return false;
-          }
-        },
-        strobeAnimation,
-        0);
+      } else {
+        return false;
+      }
+    }, strobeAnimation, 0);
   }
 
   public static LedSignal getLowBatteryLedSignal() {
     // blink red
     SingleFadeAnimation singleFadeAnimation = new SingleFadeAnimation(100, 0, 0, 0, .5, 164);
-    return new LedSignal(
-        "lowBattery",
-        () -> {
-          if (RobotController.getBatteryVoltage() < 12.3) {
-            return DriverStation.isDisabled();
-          } else {
-            return false;
-          }
-        },
-        singleFadeAnimation,
-        0);
+    return new LedSignal("lowBattery", () -> {
+      if (RobotController.getBatteryVoltage() < 12.3) {
+        return DriverStation.isDisabled();
+      } else {
+        return false;
+      }
+    }, singleFadeAnimation, 0);
   }
 
   public static LedSignal hasgamepiceBottomLedSignal(BooleanSupplier supplier) {

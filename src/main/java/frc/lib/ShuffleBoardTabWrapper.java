@@ -16,22 +16,15 @@ public interface ShuffleBoardTabWrapper {
   }
 
   default <U extends Unit> void addGraph(String name, Supplier<Measure<U>> supplier, U unit) {
-    Shuffleboard.getTab(getName())
-        .addDouble(
-            name,
-            () -> {
-              return supplier.get().in(unit);
-            })
-        .withWidget(BuiltInWidgets.kGraph);
+    Shuffleboard.getTab(getName()).addDouble(name, () -> {
+      return supplier.get().in(unit);
+    }).withWidget(BuiltInWidgets.kGraph);
   }
 
   default <U extends Unit> void addMeasure(String name, Supplier<Measure<U>> supplier, U unit) {
-    Shuffleboard.getTab(getName())
-        .addDouble(
-            name,
-            () -> {
-              return supplier.get().in(unit);
-            });
+    Shuffleboard.getTab(getName()).addDouble(name, () -> {
+      return supplier.get().in(unit);
+    });
   }
 
   String getName();

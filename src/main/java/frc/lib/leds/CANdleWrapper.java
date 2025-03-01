@@ -11,13 +11,11 @@ public class CANdleWrapper {
 
     candle = new CANdle(id);
     leds = numLed;
-  }
-  ;
+  };
 
   public void animate(Animation animation) {
     candle.animate(animation);
-  }
-  ;
+  };
 
   public void setLEDs(Color color, int startIdx, int count) {
     candle.setLEDs(color.getR(), color.getG(), color.getB(), 0, startIdx, count);

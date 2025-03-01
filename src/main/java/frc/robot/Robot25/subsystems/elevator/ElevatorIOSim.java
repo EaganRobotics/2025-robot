@@ -34,23 +34,26 @@ public class ElevatorIOSim implements ElevatorIO {
 
   private boolean winchClosedLoop = false;
   private Voltage winchAppliedVoltage = Volts.of(0);
-  private Voltage winchFFVoltage = Volts.of(0);
+  // private Voltage winchFFVoltage = Volts.of(0);
 
-  private final ProfiledPIDController pidController = new ProfiledPIDController(Sim.kP, Sim.kI, Sim.kD,
-      new TrapezoidProfile.Constraints(
-          MAX_VELOCITY.in(MetersPerSecond) / DRUM_RADIUS.in(Meters),
-          MAX_ACCELERATION.in(RadiansPerSecondPerSecond)));
+  private final ProfiledPIDController pidController =
+      new ProfiledPIDController(Sim.kP, Sim.kI, Sim.kD,
+          new TrapezoidProfile.Constraints(
+              MAX_VELOCITY.in(MetersPerSecond) / DRUM_RADIUS.in(Meters),
+              MAX_ACCELERATION.in(RadiansPerSecondPerSecond)));
 
-  private final ElevatorFeedforward feedForwardController = new ElevatorFeedforward(Sim.kS, Sim.kG, Sim.kV, Sim.kA);
+  private final ElevatorFeedforward feedForwardController =
+      new ElevatorFeedforward(Sim.kS, Sim.kG, Sim.kV, Sim.kA);
 
-  private final ElevatorSim elevatorSim = new ElevatorSim(elevatorGearbox, GEARING, CARRIAGE_MASS.in(Kilograms),
-      DRUM_RADIUS.in(Meters),
-      0, MAX_EXTENSION.in(Meters), true, 0, 0.000015, 0);
+  private final ElevatorSim elevatorSim =
+      new ElevatorSim(elevatorGearbox, GEARING, CARRIAGE_MASS.in(Kilograms), DRUM_RADIUS.in(Meters),
+          0, MAX_EXTENSION.in(Meters), true, 0, 0.000015, 0);
 
   public ElevatorIOSim() {
     elevatorMotor = new MapleMotorSim(
         new SimMotorConfigs(elevatorGearbox, GEARING, Sim.MOTOR_LOAD_MOI, Sim.FRICTION_VOLTAGE));
-    winchMotorController = elevatorMotor.useSimpleDCMotorController().withCurrentLimit(CURRENT_LIMIT);
+    winchMotorController =
+        elevatorMotor.useSimpleDCMotorController().withCurrentLimit(CURRENT_LIMIT);
   }
 
   @Override
@@ -76,7 +79,8 @@ public class ElevatorIOSim implements ElevatorIO {
     // Update motor inputs
     inputs.winchConnected = true;
     inputs.winchPosition = Radians.of(winchPositionRads);
-    inputs.winchVelocity = RadiansPerSecond.of(elevatorSim.getVelocityMetersPerSecond() / DRUM_RADIUS.in(Meters));
+    inputs.winchVelocity =
+        RadiansPerSecond.of(elevatorSim.getVelocityMetersPerSecond() / DRUM_RADIUS.in(Meters));
     inputs.winchAppliedVolts = winchAppliedVoltage;
     inputs.winchCurrent = Amps.of(elevatorSim.getCurrentDrawAmps());
   }

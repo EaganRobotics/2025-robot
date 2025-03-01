@@ -2,9 +2,7 @@ package frc.robot.Robot25.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Volts;
@@ -23,22 +21,18 @@ import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.DigitalInput;
 import frc.lib.devices.DigitalInputWrapper;
-import frc.lib.devices.TalonFXWrapper;
-import frc.lib.devices.TalonFXWrapper.FollowerConfig;
 import frc.robot.Robot25.subsystems.elevator.ElevatorConstants.Real;
 import org.littletonrobotics.junction.Logger;
 
 public class ElevatorIOTalonFXNew implements ElevatorIO {
 
   private final DigitalInputWrapper lowerLimitSwitch =
-      new DigitalInputWrapper(3, "lowerLimit", false);
+      new DigitalInputWrapper(3, "lowerLimit", true);
   private final TalonFX lead, follower;
   private final StatusSignal<Angle> leadPosition;
   private final StatusSignal<AngularVelocity> leadVelocity;
@@ -52,7 +46,6 @@ public class ElevatorIOTalonFXNew implements ElevatorIO {
 
     lead = new TalonFX(rightMotorID);
     follower = new TalonFX(leftMotorID);
-
 
     var leadConfig = new TalonFXConfiguration();
 

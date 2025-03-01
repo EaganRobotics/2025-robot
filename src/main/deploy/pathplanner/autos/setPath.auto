@@ -11,33 +11,15 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "set 2"
-          }
-        },
-        {
           "type": "named",
           "data": {
-            "name": "L2"
+            "name": "L4"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "Exhaust"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "MinHeight"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "set 3"
           }
         }
       ]

@@ -4,6 +4,9 @@ plugins {
 
     // Add gversion plugin for AdvantageKit
     id "com.peterabeles.gversion" version "1.10"
+
+    // Spotless for format checking
+    id "com.diffplug.spotless" version "7.0.2"
 }
 
 java {
@@ -159,3 +162,10 @@ task(eventDeploy) {
     }
 }
 createVersionFile.dependsOn(eventDeploy)
+
+spotless {
+  java {
+    eclipse().configFile('config/eclipse-java-google-style.xml')
+    targetExclude('build/**', 'src/main/java/frc/robot/BuildConstants.java')
+  }
+}

@@ -15,16 +15,13 @@ public class TunableMeasure<U extends Unit> {
     tunable = new TunableDouble(name, defaultValue.in(unit), tab);
   }
 
-  public TunableMeasure(
-      String name, Measure<U> defaultValue, String tab, Consumer<Measure<U>> onChange) {
+  public TunableMeasure(String name, Measure<U> defaultValue, String tab,
+      Consumer<Measure<U>> onChange) {
     this(name, defaultValue, tab);
     addChangeListener(onChange);
   }
 
-  public TunableMeasure(
-      String name,
-      Measure<U> defaultValue,
-      String tab,
+  public TunableMeasure(String name, Measure<U> defaultValue, String tab,
       BooleanObjectConsumer<Measure<U>> onChange) {
     this(name, defaultValue, tab);
     addChangeListener(onChange);
@@ -35,10 +32,9 @@ public class TunableMeasure<U extends Unit> {
   }
 
   public void addChangeListener(BooleanObjectConsumer<Measure<U>> onChange) {
-    tunable.addChangeListener(
-        (isInit, value) -> {
-          onChange.accept(isInit, ImmutableMeasure.ofBaseUnits(tunable.getValue(), unit));
-        });
+    tunable.addChangeListener((isInit, value) -> {
+      onChange.accept(isInit, ImmutableMeasure.ofBaseUnits(tunable.getValue(), unit));
+    });
   }
 
   public void addChangeListener(Consumer<Measure<U>> onChange) {
