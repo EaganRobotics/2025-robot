@@ -549,13 +549,18 @@ public class DriveCommands {
           Pose2d closestPose = closestOptionalPose.orElse(Pose2d.kZero);
           Logger.recordOutput("DriveState", "Robot");
           Logger.recordOutput("Snap/desiredPos", closestPose);
+          if (angleController.atGoal() && xController.atGoal() && yController.atGoal()) {
+            x = 0;
+            y = 0;
+            omega = 0;
+          } else {
+            x = xController.calculate(drive.getPose().getX(), closestPose.getX());
 
-          x = xController.calculate(drive.getPose().getX(), closestPose.getX());
+            y = yController.calculate(drive.getPose().getY(), closestPose.getY());
 
-          y = yController.calculate(drive.getPose().getY(), closestPose.getY());
-
-          omega = angleController.calculate(drive.getRotation().getRadians(),
-              closestPose.getRotation().getRadians());
+            omega = angleController.calculate(drive.getRotation().getRadians(),
+                closestPose.getRotation().getRadians());
+          }
 
 
         }
