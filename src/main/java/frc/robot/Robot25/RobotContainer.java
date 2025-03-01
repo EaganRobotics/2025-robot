@@ -49,6 +49,7 @@ import frc.robot.Robot25.subsystems.vision.Vision;
 import frc.robot.Robot25.subsystems.vision.VisionConstants;
 import frc.robot.Robot25.subsystems.vision.VisionIO;
 import frc.robot.Robot25.subsystems.vision.VisionIOLimelight;
+import frc.robot.Robot25.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.SimConstants;
 import java.util.function.DoubleSupplier;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -128,7 +129,11 @@ public class RobotContainer extends frc.lib.RobotContainer {
         elevator = new Elevator(new ElevatorIOSim());
         outtake = new Outtake(new OuttakeIOSim());
         // TODO use photon vision in SIM with actual camera positions
-        vision = new Vision(drive, new VisionIO() {});
+        vision = new Vision(drive,
+            new VisionIOPhotonVisionSim(VisionConstants.limelightBackName,
+                VisionConstants.limelightBackTransform, () -> drive.getPose()),
+            new VisionIOPhotonVisionSim(VisionConstants.limelightFrontName,
+                VisionConstants.limelightFrontTransform, () -> drive.getPose()));
         break;
       default:
         // Replayed robot, disable IO implementations
@@ -139,11 +144,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
         outtake = new Outtake(new OuttakeIO() {});
 
-        vision = new Vision(drive,
-            new VisionIOPhotonVisionSim(VisionConstants.limelightBackName,
-                VisionConstants.limelightBackTransform, () -> drive.getPose()),
-            new VisionIOPhotonVisionSim(VisionConstants.limelightFrontName,
-                VisionConstants.limelightFrontTransform, () -> drive.getPose()));
+        vision = new Vision(drive, new VisionIO() {});
         break;
     }
 
