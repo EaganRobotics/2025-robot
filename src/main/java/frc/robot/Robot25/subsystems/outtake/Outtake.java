@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
@@ -40,10 +41,10 @@ public class Outtake extends SubsystemBase {
     }).withTimeout(2);
   }
 
-  public Command autoQueueCoral(BooleanSupplier override) {
+  public Command autoQueueCoral() {
     return this.runEnd(() -> {
       Logger.recordOutput("Outtake/AutoQueuing", true);
-      if (inputs.seesCoralAtOutput || override.getAsBoolean()) {
+      if (inputs.seesCoralAtOutput) {
         io.setRollerOpenLoop(Volts.of(0));
         // } else if (inputs.seesCoralAtInput) {
         // io.setOpenLoop(Volts.of(6));
@@ -55,6 +56,11 @@ public class Outtake extends SubsystemBase {
       io.setRollerOpenLoop(Volts.of(0));
     });
   }
+
+  public Command autoQueueCoral1() {
+    return Commands.run(() -> io.setRollerOpenLoop(Volts.of(0)));
+  }
+
 
   public Command autoQueueCoral2() {
     return this.runEnd(() -> {
