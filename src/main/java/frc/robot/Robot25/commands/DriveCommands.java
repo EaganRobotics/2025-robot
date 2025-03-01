@@ -65,7 +65,7 @@ public class DriveCommands {
   /// Auto snap to position distance
   private static final Distance SNAPPY_RADIUS = Inches.of(12);
 
-  private static final double INCHES_FROM_REEF = 16.75 + 11.757361;
+  private static final double INCHES_FROM_REEF = 16.75 + 11.757361 - 2;
   private static final double REEF_CENTER_X_INCHES = 176.745545;
   private static final double REEF_CENTER_Y_INCHES = 158.500907;
 
@@ -112,11 +112,13 @@ public class DriveCommands {
       new Pose2d(REEF_CENTER.plus(new Translation2d(Inches.of(-15.982577), Inches.of(14.718635))),
           Rotation2d.fromDegrees(300)).transformBy(REEF_BRANCH_TO_ROBOT),
 
-      // new Pose2d(Left_Loading_Station.plus(new Translation2d(Inches.of(0), Inches.of(0))),
-      //     Rotation2d.fromDegrees(-50 + 180 + 180)),
-      // new Pose2d(Right_Loading_Station.plus(new Translation2d(Inches.of(0), Inches.of(0))),
-      //     Rotation2d.fromDegrees(130 + 90 + 180)) 
-      };
+      // new Pose2d(Left_Loading_Station.plus(new Translation2d(Inches.of(0),
+      // Inches.of(0))),
+      // Rotation2d.fromDegrees(-50 + 180 + 180)),
+      // new Pose2d(Right_Loading_Station.plus(new Translation2d(Inches.of(0),
+      // Inches.of(0))),
+      // Rotation2d.fromDegrees(130 + 90 + 180))
+  };
 
   // public static final TunableDouble ANGLE_KP =/
   // new TunableDouble("ANGLE_KP", 7.0, "driver").setSpot(0, 0);

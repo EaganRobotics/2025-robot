@@ -68,23 +68,22 @@ public class RobotContainer extends frc.lib.RobotContainer {
   private final Vision vision;
 
   // Drive simulation
-  private static final SwerveDriveSimulation driveSimulation =
-      new SwerveDriveSimulation(Drive.MAPLE_SIM_CONFIG, SimConstants.SIM_INITIAL_FIELD_POSE);
+  private static final SwerveDriveSimulation driveSimulation = new SwerveDriveSimulation(Drive.MAPLE_SIM_CONFIG,
+      SimConstants.SIM_INITIAL_FIELD_POSE);
 
   private final CommandXboxController driverController = new CommandXboxController(0);
   private final CommandXboxController operatorController = new CommandXboxController(1);
 
   private final LoggedDashboardChooser<Command> autoChooser;
 
-
   @AutoLogOutput
-  public final Pose3d[] mechanismPoses = new Pose3d[] {Pose3d.kZero, Pose3d.kZero, Pose3d.kZero,};
+  public final Pose3d[] mechanismPoses = new Pose3d[] { Pose3d.kZero, Pose3d.kZero, Pose3d.kZero, };
 
   public RobotContainer() {
     super(driveSimulation);
     // Check for valid swerve config
-    var modules = new SwerveModuleConstants[] {DriveConstants.FrontLeft, DriveConstants.FrontRight,
-        DriveConstants.BackLeft, DriveConstants.BackRight,};
+    var modules = new SwerveModuleConstants[] { DriveConstants.FrontLeft, DriveConstants.FrontRight,
+        DriveConstants.BackLeft, DriveConstants.BackRight, };
     for (var constants : modules) {
       if (constants.DriveMotorType != DriveMotorArrangement.TalonFX_Integrated
           || constants.SteerMotorType != SteerMotorArrangement.TalonFX_Integrated) {
@@ -125,14 +124,22 @@ public class RobotContainer extends frc.lib.RobotContainer {
         break;
       default:
         // Replayed robot, disable IO implementations
-        drive = new Drive(new GyroIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {},
-            new ModuleIO() {});
+        drive = new Drive(new GyroIO() {
+        }, new ModuleIO() {
+        }, new ModuleIO() {
+        }, new ModuleIO() {
+        },
+            new ModuleIO() {
+            });
 
-        elevator = new Elevator(new ElevatorIO() {});
+        elevator = new Elevator(new ElevatorIO() {
+        });
 
-        outtake = new Outtake(new OuttakeIO() {});
+        outtake = new Outtake(new OuttakeIO() {
+        });
 
-        vision = new Vision(drive, new VisionIO() {});
+        vision = new Vision(drive, new VisionIO() {
+        });
         break;
     }
 
@@ -169,9 +176,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
   private void configureButtonBindings() {
 
-
-
-    // due to how the deild works, we need to have joystick y in the x varable and joystick x in the
+    // due to how the deild works, we need to have joystick y in the x varable and
+    // joystick x in the
     // y varible
     drive.setDefaultCommand(DriveCommands.joystickDriveAssist(drive,
         () -> driverController.getLeftY(), () -> driverController.getLeftX(),
@@ -196,8 +202,6 @@ public class RobotContainer extends frc.lib.RobotContainer {
             drive).ignoringDisable(true));
     driverController.y().whileTrue(DriveCommands.Snapper(drive));
 
-
-
     operatorController.leftTrigger().whileTrue(outtake.autoQueueCoralOveride());
     operatorController.povDown().onTrue(elevator.downLevel());
     operatorController.povUp().onTrue(elevator.upLevel());
@@ -209,7 +213,6 @@ public class RobotContainer extends frc.lib.RobotContainer {
     operatorController.x().onTrue(elevator.L1());
     operatorController.b().onTrue(elevator.L3());
     operatorController.y().onTrue(elevator.L4());
-
 
     operatorController.axisMagnitudeGreaterThan(1, 0.1)
         .whileTrue(elevator.openLoop(operatorController::getLeftY));
@@ -227,7 +230,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
   }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+  }
 
   @Override
   public void robotPeriodic() {
@@ -238,5 +242,6 @@ public class RobotContainer extends frc.lib.RobotContainer {
   }
 
   @Override
-  public void simulationPeriodic() {}
+  public void simulationPeriodic() {
+  }
 }
