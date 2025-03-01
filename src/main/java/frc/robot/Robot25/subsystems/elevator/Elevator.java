@@ -54,7 +54,7 @@ public class Elevator extends SubsystemBase {
     // original value during W0 = L4 = 72 + 6
 
     minHeight(MIN_HEIGHT), L11(Inches.of(16.4 + 4.4)), L1(Inches.of(18 + 14)), L2(
-        Inches.of(31.9 + 7)), L3(Inches.of(47.6 + 7)), L4(Inches.of(72 + 6.5));
+        Inches.of(31.9 + 7)), L3(Inches.of(47.6 + 7)), L4(Inches.of(72 + 6.75));
 
     private final Distance height;
 
@@ -167,7 +167,7 @@ public class Elevator extends SubsystemBase {
     })
         // .andThen(Commands.runOnce(() -> io.setWinchOpenLoop(Volts.of(-9))))
         .andThen(Commands.waitUntil(lowerLimitHit)).andThen(Commands.runOnce(() -> {
-          io.zeroEncoder();
+          // io.zeroEncoder();
           io.setWinchOpenLoop(Volts.of(0));
         }));
   }
@@ -182,7 +182,7 @@ public class Elevator extends SubsystemBase {
     }).andThen(Commands.waitUntil(isAtGoal()))
         // .andThen(Commands.runOnce(() -> io.setWinchOpenLoop(Volts.of(-9))))
         .andThen(Commands.waitUntil(lowerLimitHit)).andThen(Commands.runOnce(() -> {
-          io.zeroEncoder();
+          // io.zeroEncoder();
           io.setWinchOpenLoop(Volts.of(0));
         }));
   }
@@ -288,8 +288,7 @@ public class Elevator extends SubsystemBase {
     return new Trigger(() -> currentLevel == Level.L11);
   }
 
-  public final Trigger lowerLimitHit =
-      new Trigger(() -> inputs.lowerLimit || Math.abs(inputs.winchCurrent.in(Amps)) > 80);
+  public final Trigger lowerLimitHit = new Trigger(() -> inputs.lowerLimit);
 
 
   // todo CHECK VALID TOLERANCE

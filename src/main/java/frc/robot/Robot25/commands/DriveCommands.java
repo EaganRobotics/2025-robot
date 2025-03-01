@@ -112,10 +112,11 @@ public class DriveCommands {
       new Pose2d(REEF_CENTER.plus(new Translation2d(Inches.of(-15.982577), Inches.of(14.718635))),
           Rotation2d.fromDegrees(300)).transformBy(REEF_BRANCH_TO_ROBOT),
 
-      new Pose2d(Left_Loading_Station.plus(new Translation2d(Inches.of(0), Inches.of(0))),
-          Rotation2d.fromDegrees(-50 + 180 + 180)),
-      new Pose2d(Right_Loading_Station.plus(new Translation2d(Inches.of(0), Inches.of(0))),
-          Rotation2d.fromDegrees(130 + 90 + 180)) };
+      // new Pose2d(Left_Loading_Station.plus(new Translation2d(Inches.of(0), Inches.of(0))),
+      //     Rotation2d.fromDegrees(-50 + 180 + 180)),
+      // new Pose2d(Right_Loading_Station.plus(new Translation2d(Inches.of(0), Inches.of(0))),
+      //     Rotation2d.fromDegrees(130 + 90 + 180)) 
+      };
 
   // public static final TunableDouble ANGLE_KP =/
   // new TunableDouble("ANGLE_KP", 7.0, "driver").setSpot(0, 0);
@@ -527,7 +528,7 @@ public class DriveCommands {
       if ((Math.abs(omega) > 1E-6) || (Math.abs(x) > 1E-6) || (Math.abs(y) > 1E-6)) {
         Logger.recordOutput("DriveState", "Driver");
         Logger.recordOutput("Snap/desiredPos", new Pose2d(-50, -50, Rotation2d.kZero));
-      } else if (!snapSupplier.getAsBoolean()) {
+      } else if (snapSupplier.getAsBoolean()) {
         Optional<Pose2d> closestOptionalPose = getClosestPosition(drive, SNAPPY_RADIUS);
 
         if (closestOptionalPose.isPresent()) {
