@@ -21,7 +21,6 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -50,7 +49,6 @@ import frc.robot.Robot25.subsystems.vision.Vision;
 import frc.robot.Robot25.subsystems.vision.VisionConstants;
 import frc.robot.Robot25.subsystems.vision.VisionIO;
 import frc.robot.Robot25.subsystems.vision.VisionIOLimelight;
-import frc.robot.Robot25.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.SimConstants;
 import java.util.function.DoubleSupplier;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -69,6 +67,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
   private final Drive drive;
   private final Elevator elevator;
   private final Outtake outtake;
+  @SuppressWarnings("unused")
   private final Vision vision;
 
   // Drive simulation
@@ -76,8 +75,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
       new SwerveDriveSimulation(Drive.MAPLE_SIM_CONFIG, SimConstants.SIM_INITIAL_FIELD_POSE);
 
   // Controller
-  private final CommandXboxController DriverController = new CommandXboxController(0);
-  private final CommandXboxController OperatorController = new CommandXboxController(1);
+  private final CommandXboxController driverController = new CommandXboxController(0);
+  private final CommandXboxController operatorController = new CommandXboxController(1);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -124,6 +123,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
             new ModuleIOSim(driveSimulation.getModules()[1]),
             new ModuleIOSim(driveSimulation.getModules()[2]),
             new ModuleIOSim(driveSimulation.getModules()[3]));
+        drive.setPose(SimConstants.SIM_INITIAL_FIELD_POSE);
 
         elevator = new Elevator(new ElevatorIOSim());
         outtake = new Outtake(new OuttakeIOSim());
@@ -147,13 +147,14 @@ public class RobotContainer extends frc.lib.RobotContainer {
         break;
     }
 
-    NamedCommands.registerCommand("MinHeight", elevator.minHeight());
+    NamedCommands.registerCommand("L0", elevator.L0().andThen(outtake.autoQueueCoral2()));
 
     NamedCommands.registerCommand("L1", elevator.L1());
     NamedCommands.registerCommand("L2", elevator.L2());
     NamedCommands.registerCommand("L3", elevator.L3());
     NamedCommands.registerCommand("L4", elevator.L4());
     NamedCommands.registerCommand("Exhaust", outtake.depositCoral());
+    // NamedCommands.registerCommand();
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -194,39 +195,34 @@ public class RobotContainer extends frc.lib.RobotContainer {
     }));
 
     // Xbox controller is mapped incorrectly on Mac OS
-    DoubleSupplier xSupplier = () -> DriverController.getLeftX();
-    DoubleSupplier ySupplier = () -> DriverController.getLeftY();
-    DoubleSupplier omegaSupplier = () -> -DriverController.getRightX();
+    DoubleSupplier xSupplier = () -> driverController.getLeftX();
+    DoubleSupplier ySupplier = () -> driverController.getLeftY();
+    DoubleSupplier omegaSupplier = () -> -driverController.getRightX();
     // BooleanSupplier slowModeSupplier =
     // () -> !SimConstants.IS_MAC ? DriverController.getRightTriggerAxis() > 0.5
     // : DriverController.getRightX() > 0.0;
 
     // Default command, normal field-relative drive
-    // drive.setDefaultCommand(DriveCommands.joystickDriveAssist(drive,
-    // new Pose2d(3, 3, Rotation2d.fromDegrees(90)), ySupplier, xSupplier, omegaSupplier));
-
-    DriverController.leftTrigger().whileTrue(DriveCommands.joystickDriveAssist(drive,
-        new Pose2d(3, 3, Rotation2d.fromDegrees(90)), ySupplier, xSupplier, omegaSupplier));
-    drive
-        .setDefaultCommand(DriveCommands.joystickDrive(drive, ySupplier, xSupplier, omegaSupplier));
+    drive.setDefaultCommand(DriveCommands.joystickDriveAssist(drive, ySupplier, xSupplier,
+        omegaSupplier, driverController.rightTrigger()));
     outtake.setDefaultCommand(outtake.autoQueueCoral().onlyWhile(elevator.elevatorAtMinHeight()));
 
     // POV snap to angles
     // DriverController.povUp().onTrue(DriveCommands.snapToRotation(drive,
     // Rotation2d.kZero));
-    DriverController.povUpRight()
+    driverController.povUpRight()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-45)));
-    DriverController.povRight()
+    driverController.povRight()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-90)));
-    DriverController.povDownRight()
+    driverController.povDownRight()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-135)));
     // DriverController.povDown()
     // .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-180)));
-    DriverController.povDownLeft()
+    driverController.povDownLeft()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(135)));
-    DriverController.povLeft()
+    driverController.povLeft()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(90)));
-    DriverController.povUpLeft()
+    driverController.povUpLeft()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(45)));
 
     // DriverController.povDown().onTrue(elevator.downLevel());
@@ -239,7 +235,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
     // DriverController.y().onTrue(elevator.L4());
 
     // Reset gyro to 0° when START button is pressed
-    DriverController.start()
+    driverController.start()
         .onTrue(Commands.runOnce(
             () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
             drive).ignoringDisable(true));
@@ -255,12 +251,12 @@ public class RobotContainer extends frc.lib.RobotContainer {
     // DriverController.y().onTrue(elevator.L4());
     // elevator.setDefaultCommand(elevator.openLoop(OperatorController::getLeftY));
 
-    DriverController.y()
+    driverController.y()
         // .onTrue(DriveCommands.snapToPosition(drive, new Pose2d(3, 3,
         // Rotation2d.fromDegrees(90))));
         .whileTrue(DriveCommands.Snapper(drive));
 
-    elevator.setDefaultCommand(elevator.openLoop(OperatorController::getLeftY));
+    elevator.setDefaultCommand(elevator.openLoop(operatorController::getLeftY));
 
 
 

@@ -10,7 +10,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.DigitalInput;
 import frc.lib.devices.DigitalInputWrapper;
 import frc.lib.devices.TalonFXWrapper;
 import frc.lib.devices.TalonFXWrapper.FollowerConfig;
@@ -29,7 +28,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
   public ElevatorIOTalonFX() {
     elevatorTalonFX = new TalonFXWrapper(rightMotorID, "Elevator", false, NeutralModeValue.Brake,
-        gearRatio, P, I, D, RotationsPerSecondPerSecond.of(200), RotationsPerSecond.of(200), false,
+        gearRatio, P, I, D, RotationsPerSecondPerSecond.of(150), RotationsPerSecond.of(150), false,
         false, Rotations.of(0), Rotations.of(0), new FollowerConfig(leftMotorID, true),
         Units.Seconds.of(3), Units.Amps.of(75), Units.RotationsPerSecond.of(0));
   }

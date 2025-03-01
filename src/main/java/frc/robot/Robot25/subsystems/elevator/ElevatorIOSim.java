@@ -34,7 +34,7 @@ public class ElevatorIOSim implements ElevatorIO {
 
   private boolean winchClosedLoop = false;
   private Voltage winchAppliedVoltage = Volts.of(0);
-  private Voltage winchFFVoltage = Volts.of(0);
+  // private Voltage winchFFVoltage = Volts.of(0);
 
   private final ProfiledPIDController pidController = new ProfiledPIDController(Sim.kP, Sim.kI, Sim.kD,
       new TrapezoidProfile.Constraints(

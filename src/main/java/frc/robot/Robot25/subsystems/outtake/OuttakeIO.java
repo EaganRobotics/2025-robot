@@ -23,11 +23,11 @@ public interface OuttakeIO {
   }
 
   /** Updates the set of loggable inputs. */
-  public default void updateInputs(OuttakeIOInputs inputs) {
-  }
+  public default void updateInputs(OuttakeIOInputs inputs) {}
 
   /** Run the drive side at the specified open loop value. */
-  public default void setOpenLoop(Voltage output) {
-  }
+  public default void setOpenLoop(Voltage output) {}
+
+  public default void setRollerOpenLoop(Voltage OuttakeOutput) {}
 
 }

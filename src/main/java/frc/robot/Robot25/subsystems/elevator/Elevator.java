@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Robot25.subsystems.outtake.Outtake;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -52,8 +51,10 @@ public class Elevator extends SubsystemBase {
 
   private enum Level {
 
-    minHeight(MIN_HEIGHT), L1(Inches.of(18 + 14)), L2(Inches.of(31.9 + 7)), L3(
-        Inches.of(47.6 + 7)), L4(Inches.of(72 + 6));
+    // original value during W0 = L4 = 72 + 6
+
+    minHeight(MIN_HEIGHT), L11(Inches.of(16.4 + 4.4)), L1(Inches.of(18 + 14)), L2(
+        Inches.of(31.9 + 7)), L3(Inches.of(47.6 + 7)), L4(Inches.of(72 + 6.5));
 
     private final Distance height;
 
@@ -106,12 +107,15 @@ public class Elevator extends SubsystemBase {
      * When the lower limit is hit, set the Elevator's state (where we believe we're at) to
      * minHeight and set the winch to 0 volts
      */
-    lowerLimitHit().onTrue(Commands.runOnce(() -> {
+    lowerLimitHit.onTrue(Commands.runOnce(() -> {
       System.out.println(
           "[Elevator] Lower limit hit, setting state to minHeight and setting motor volts to 0");
       currentLevel = Level.minHeight;
       io.setWinchOpenLoop(Volts.of(0));
-    }));
+      io.zeroEncoder();
+
+    }).ignoringDisable(true));
+
 
     // currentLevel = Level.minHeight;
     // Distance height = currentLevel.getHeight();
@@ -132,7 +136,7 @@ public class Elevator extends SubsystemBase {
     Logger.recordOutput("Elevator/CurrentLevel", currentLevel);
     Logger.recordOutput("Elevator/CurrentLevelHeight", currentLevel.getHeight());
     Logger.recordOutput("Elevator/isAtGoal", isAtGoal());
-    Logger.recordOutput("Elevator/lowerLimitHIt", lowerLimitHit());
+    Logger.recordOutput("Elevator/lowerLimitHIt", lowerLimitHit);
   }
 
   private Angle inchesToRadians(Distance d) {
@@ -155,9 +159,29 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command minHeight() {
-    return goToLevel(Level.minHeight)
+    return this.runOnce(() -> {
+      currentLevel = Level.minHeight;
+      Distance height = Level.minHeight.getHeight();
+      Angle r = inchesToRadians(height);
+      io.setWinchPosition(r);
+    })
         // .andThen(Commands.runOnce(() -> io.setWinchOpenLoop(Volts.of(-9))))
-        .andThen(Commands.waitUntil(lowerLimitHit())).andThen(Commands.runOnce(() -> {
+        .andThen(Commands.waitUntil(lowerLimitHit)).andThen(Commands.runOnce(() -> {
+          io.zeroEncoder();
+          io.setWinchOpenLoop(Volts.of(0));
+        }));
+  }
+
+  public Command miniHeight() {
+    return this.runOnce(() -> {
+      currentLevel = Level.minHeight;
+      Distance height = Level.minHeight.getHeight();
+      Angle r = inchesToRadians(height);
+      io.setWinchPosition(r);
+
+    }).andThen(Commands.waitUntil(isAtGoal()))
+        // .andThen(Commands.runOnce(() -> io.setWinchOpenLoop(Volts.of(-9))))
+        .andThen(Commands.waitUntil(lowerLimitHit)).andThen(Commands.runOnce(() -> {
           io.zeroEncoder();
           io.setWinchOpenLoop(Volts.of(0));
         }));
@@ -168,6 +192,14 @@ public class Elevator extends SubsystemBase {
   // .andThen(Commands.runOnce(() -> io.setWinchOpenLoop(Volts.of(-10))));
 
   // }
+
+  public Command L0() {
+    return goToLevel(Level.L11);
+  }
+
+  public Command L11() {
+    return goToLevel(Level.L11);
+  }
 
   public Command L1() {
     return goToLevel(Level.L1);
@@ -208,8 +240,10 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command openLoop(DoubleSupplier speed) {
-    return this.run(() -> {
-      io.setWinchOpenLoop(Volts.of(speed.getAsDouble() * 8));
+    return this.runEnd(() -> {
+      io.setWinchOpenLoop(Volts.of(speed.getAsDouble() * -4));
+    }, () -> {
+      io.setWinchPosition(inputs.winchPosition);
     });
   }
 
@@ -251,17 +285,18 @@ public class Elevator extends SubsystemBase {
   }
 
   public Trigger elevatorAtMinHeight() {
-    return new Trigger(() -> currentLevel == Level.minHeight);
+    return new Trigger(() -> currentLevel == Level.L11);
   }
 
-  public Trigger lowerLimitHit() {
-    return new Trigger(() -> inputs.lowerLimit || inputs.winchCurrent.lt(Amps.of(-50)));
-  }
+  public final Trigger lowerLimitHit =
+      new Trigger(() -> inputs.lowerLimit || Math.abs(inputs.winchCurrent.in(Amps)) > 80);
 
+
+  // todo CHECK VALID TOLERANCE
   public Trigger isAtGoal() {
     return new Trigger(() -> {
       return Math.abs((inputs.winchPosition.in(Radians)
-          - inchesToRadians(currentLevel.getHeight()).in(Radians))) < 5;
+          - inchesToRadians(currentLevel.getHeight()).in(Radians))) < 1.5;
 
     });
   }
