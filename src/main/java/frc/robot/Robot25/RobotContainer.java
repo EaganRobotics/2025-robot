@@ -223,16 +223,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
   }
 
   public Command getTestCommand() {
-    var elevatorTalonFX = new TalonFXWrapper(20, "Elevator", false, NeutralModeValue.Brake, 5, 0, 0,
-        0, RotationsPerSecondPerSecond.of(0), RotationsPerSecond.of(0), false, false,
-        Rotations.of(120.0 / 360.0), Rotations.of(0), new FollowerConfig(21, true),
-        Units.Seconds.of(3), Units.Amps.of(75), Units.RotationsPerSecond.of(1));
-
-    return Commands.runEnd(() -> {
-      elevatorTalonFX.set(.1);
-    }, () -> {
-      elevatorTalonFX.set(0);
-    }).withTimeout(10);
+    return Commands.none();
   }
 
   @Override
