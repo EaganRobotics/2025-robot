@@ -14,13 +14,9 @@
 package frc.robot.Robot25.commands;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.GoalEndState;
-import com.pathplanner.lib.path.PathConstraints;
-import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.path.Waypoint;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -31,44 +27,98 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.lib.ShuffleBoardTabWrapper;
-import frc.lib.tunables.TunableDouble;
 import frc.robot.Robot25.subsystems.drive.Drive;
 import frc.robot.Robot25.subsystems.drive.DriveConstants;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class DriveCommands {
-  private static final double SLOW_MODE_MULTIPLIER = 0.5;
+  // private static final double SLOW_MODE_MULTIPLIER = 0.5;
   private static final double DEADBAND = 0.1;
   // private static final double ANGLE_KP = 7.0;
   // private static final double ANGLE_KI = 0.0;
   // private static final double ANGLE_KD = 0.4;
   private static final double ANGLE_MAX_VELOCITY = 8.0;
   private static final double ANGLE_MAX_ACCELERATION = 20.0;
-  private static final double ANGLE_TOLERANCE = Degrees.of(0.05).in(Radians);
+  private static final double ANGLE_TOLERANCE = Degrees.of(1).in(Radians);
   private static final double POSITION_MAX_VELOCITY = 3.0;
   private static final double POSITION_MAX_ACCELERATION = 3.0;
-  private static final double POSITION_TOLERANCE = Meters.of(0.0127).in(Meters);
+  private static final double POSITION_TOLERANCE = Inches.of(1).in(Meters);
   private static final double FF_START_DELAY = 2.0; // Secs
   private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
   private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
   private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
 
+  /// Auto snap to position distance
+  private static final Distance SNAPPY_RADIUS = Inches.of(12);
 
-  // public static final TunableDouble ANGLE_KP =
+  private static final double INCHES_FROM_REEF = 16.75 + 11.757361;
+  private static final double REEF_CENTER_X_INCHES = 176.745545;
+  private static final double REEF_CENTER_Y_INCHES = 158.500907;
+
+  private static final double Left_Loading_Station_X = 43.3071;
+  private static final double Left_Loading_Station_Y = 275.591;
+
+  private static final double Right_Loading_Station_X = 43.3071;
+  private static final double Right_Loading_Station_Y = 29.52756;
+
+  private static final Translation2d Left_Loading_Station =
+      new Translation2d(Inches.of(Left_Loading_Station_X), Inches.of(Left_Loading_Station_Y));
+
+  private static final Translation2d Right_Loading_Station =
+      new Translation2d(Inches.of(Right_Loading_Station_X), Inches.of(Right_Loading_Station_Y));
+
+  private static final Translation2d REEF_CENTER =
+      new Translation2d(Inches.of(REEF_CENTER_X_INCHES), Inches.of(REEF_CENTER_Y_INCHES));
+  private static final Transform2d REEF_BRANCH_TO_ROBOT =
+      new Transform2d(Inches.of(-INCHES_FROM_REEF), Inches.zero(), Rotation2d.kZero);
+
+  private static final Pose2d[] REEF_POSITIONS = new Pose2d[] {
+      new Pose2d(REEF_CENTER.plus(new Translation2d(Inches.of(-20.738000), Inches.of(6.482000))),
+          Rotation2d.kZero).transformBy(REEF_BRANCH_TO_ROBOT),
+      new Pose2d(REEF_CENTER.plus(new Translation2d(Inches.of(-20.738000), Inches.of(-6.482000))),
+          Rotation2d.kZero).transformBy(REEF_BRANCH_TO_ROBOT),
+      new Pose2d(REEF_CENTER.plus(new Translation2d(Inches.of(-15.982577), Inches.of(-14.718635))),
+          Rotation2d.fromDegrees(60)).transformBy(REEF_BRANCH_TO_ROBOT),
+      new Pose2d(REEF_CENTER.plus(new Translation2d(Inches.of(-4.755423), Inches.of(-21.200635))),
+          Rotation2d.fromDegrees(60)).transformBy(REEF_BRANCH_TO_ROBOT),
+      new Pose2d(REEF_CENTER.plus(new Translation2d(Inches.of(4.755423), Inches.of(-21.200635))),
+          Rotation2d.fromDegrees(120)).transformBy(REEF_BRANCH_TO_ROBOT),
+      new Pose2d(REEF_CENTER.plus(new Translation2d(Inches.of(15.982577), Inches.of(-14.718635))),
+          Rotation2d.fromDegrees(120)).transformBy(REEF_BRANCH_TO_ROBOT),
+      new Pose2d(REEF_CENTER.plus(new Translation2d(Inches.of(20.738000), Inches.of(-6.482000))),
+          Rotation2d.fromDegrees(180)).transformBy(REEF_BRANCH_TO_ROBOT),
+      new Pose2d(REEF_CENTER.plus(new Translation2d(Inches.of(20.738000), Inches.of(6.482000))),
+          Rotation2d.fromDegrees(180)).transformBy(REEF_BRANCH_TO_ROBOT),
+      new Pose2d(REEF_CENTER.plus(new Translation2d(Inches.of(15.982577), Inches.of(14.718635))),
+          Rotation2d.fromDegrees(240)).transformBy(REEF_BRANCH_TO_ROBOT),
+      new Pose2d(REEF_CENTER.plus(new Translation2d(Inches.of(4.755423), Inches.of(21.200635))),
+          Rotation2d.fromDegrees(240)).transformBy(REEF_BRANCH_TO_ROBOT),
+      new Pose2d(REEF_CENTER.plus(new Translation2d(Inches.of(-4.755423), Inches.of(21.200635))),
+          Rotation2d.fromDegrees(300)).transformBy(REEF_BRANCH_TO_ROBOT),
+      new Pose2d(REEF_CENTER.plus(new Translation2d(Inches.of(-15.982577), Inches.of(14.718635))),
+          Rotation2d.fromDegrees(300)).transformBy(REEF_BRANCH_TO_ROBOT),
+
+      new Pose2d(Left_Loading_Station.plus(new Translation2d(Inches.of(0), Inches.of(0))),
+          Rotation2d.fromDegrees(-50 + 180 + 180)).transformBy(REEF_BRANCH_TO_ROBOT),
+      new Pose2d(Right_Loading_Station.plus(new Translation2d(Inches.of(0), Inches.of(0))),
+          Rotation2d.fromDegrees(130 + 90 + 180)).transformBy(REEF_BRANCH_TO_ROBOT),};
+
+
+  // public static final TunableDouble ANGLE_KP =/
   // new TunableDouble("ANGLE_KP", 7.0, "driver").setSpot(0, 0);
   // public static final TunableDouble ANGLE_KI =
   // new TunableDouble("ANGLE_KI", 0.0, "driver").setSpot(1, 0);
@@ -83,11 +133,11 @@ public class DriveCommands {
       new LoggedNetworkNumber("/Tuning/angleKD", 0.4);
 
   public static final LoggedNetworkNumber POSITION_KP =
-      new LoggedNetworkNumber("/Tuning/positionKP", 0.001);
+      new LoggedNetworkNumber("/Tuning/positionKP", 4);
   public static final LoggedNetworkNumber POSITION_KI =
-      new LoggedNetworkNumber("/Tuning/positionKI", 0);
+      new LoggedNetworkNumber("/Tuning/positionKI", 0); // 1
   public static final LoggedNetworkNumber POSITION_KD =
-      new LoggedNetworkNumber("/Tuning/positionKD", 0);
+      new LoggedNetworkNumber("/Tuning/positionKD", 0); // 1
 
 
   private DriveCommands() {}
@@ -134,7 +184,7 @@ public class DriveCommands {
       omega = Math.copySign(omega * omega, omega);
 
       // final double slowModeMultiplier =
-      //     (slowModeSupplier.getAsBoolean() ? SLOW_MODE_MULTIPLIER : 1.0);
+      // (slowModeSupplier.getAsBoolean() ? SLOW_MODE_MULTIPLIER : 1.0);
 
       // No rotation
       if (Math.abs(omega) > 1E-6) {
@@ -221,6 +271,33 @@ public class DriveCommands {
       }
     });
   }
+
+  public static Command Snapper(Drive drive) {
+
+    return Commands.defer(() -> {
+      Pose2d desiredPose = getClosestPosition(drive, Meters.of(1000)).orElse(Pose2d.kZero);
+      Logger.recordOutput("SnapperPose", desiredPose);
+      return snapToPosition(drive, desiredPose);
+    }, Set.of(drive));
+
+  }
+
+  private static Optional<Pose2d> getClosestPosition(Drive drive, Distance radius) {
+    Optional<Pose2d> desiredPose = Optional.empty();
+    Distance minDistance = Meters.of(1000000);
+    for (Pose2d pose : REEF_POSITIONS) {
+      double distance = drive.getPose().getTranslation().getDistance(pose.getTranslation());
+      Distance distanceMeasure = Meters.of(distance);
+      if (distanceMeasure.lte(radius) && distanceMeasure.lte(minDistance)) {
+        minDistance = distanceMeasure;
+        desiredPose = Optional.of(pose);
+      }
+    }
+
+    return desiredPose;
+  };
+
+
 
   /**
    * Measures the velocity feedforward constants for the drive motors.
@@ -364,6 +441,7 @@ public class DriveCommands {
     yController.setTolerance(POSITION_TOLERANCE);
 
     return Commands.run(() -> {
+
       angleController.setP(ANGLE_KP.get());
       angleController.setI(ANGLE_KI.get());
       angleController.setD(ANGLE_KD.get());
@@ -384,23 +462,124 @@ public class DriveCommands {
           desiredPosition.getRotation().getRadians());
 
       Logger.recordOutput("Snap/omega", omega);
-      Logger.recordOutput("Snap/x/xPos", x);
+      Logger.recordOutput("Snap/x/xDiff", x);
       Logger.recordOutput("Snap/x/desiredXPos", desiredPosition.getX());
       Logger.recordOutput("Snap/x/currentXPos", drive.getPose().getX());
-      Logger.recordOutput("Snap/y/yPos", y);
+      Logger.recordOutput("Snap/y/yDiff", y);
       Logger.recordOutput("Snap/y/desiredYPos", desiredPosition.getY());
       Logger.recordOutput("Snap/y/currentYPos", drive.getPose().getY());
+      Logger.recordOutput("Snap/desiredPos", desiredPosition);
 
       // Convert to field relative speeds & send command
-      ChassisSpeeds speeds = new ChassisSpeeds(-x, -y, omega);
-      drive.runVelocity(speeds);
+      ChassisSpeeds speeds = new ChassisSpeeds(x, y, omega);
+      drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
+
     }, drive)
 
         // Reset PID controller when command starts
         .beforeStarting(() -> {
           angleController.reset(drive.getRotation().getRadians());
-          // xController.reset(drive.getPose().getX());
-          // yController.reset(drive.getPose().getY());
+          xController.reset(drive.getPose().getX());
+          yController.reset(drive.getPose().getY());
+        }).until(() -> angleController.atGoal() && xController.atGoal() && yController.atGoal());
+  }
+
+  public static Command joystickDriveAssist(Drive drive, DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier, DoubleSupplier omegaSupplier, BooleanSupplier snapSupplier) {
+
+    // Create PID controller
+    ProfiledPIDController angleController =
+        new ProfiledPIDController(ANGLE_KP.get(), ANGLE_KI.get(), ANGLE_KD.get(),
+            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+    angleController.enableContinuousInput(-Math.PI, Math.PI);
+    angleController.setTolerance(ANGLE_TOLERANCE);
+
+    ProfiledPIDController xController =
+        new ProfiledPIDController(POSITION_KP.get(), POSITION_KI.get(), POSITION_KD.get(),
+            new TrapezoidProfile.Constraints(POSITION_MAX_VELOCITY, POSITION_MAX_ACCELERATION));
+    xController.setTolerance(POSITION_TOLERANCE);
+
+    ProfiledPIDController yController =
+        new ProfiledPIDController(POSITION_KP.get(), POSITION_KI.get(), POSITION_KD.get(),
+            new TrapezoidProfile.Constraints(POSITION_MAX_VELOCITY, POSITION_MAX_ACCELERATION));
+    yController.setTolerance(POSITION_TOLERANCE);
+
+    return Commands.run(() -> {
+
+      angleController.setP(ANGLE_KP.get());
+      angleController.setI(ANGLE_KI.get());
+      angleController.setD(ANGLE_KD.get());
+
+      xController.setP(POSITION_KP.get());
+      xController.setI(POSITION_KI.get());
+      xController.setD(POSITION_KD.get());
+
+      yController.setP(POSITION_KP.get());
+      yController.setI(POSITION_KI.get());
+      yController.setD(POSITION_KD.get());
+
+      Logger.recordOutput("ReefPositions", DriveCommands.REEF_POSITIONS);
+
+      // final double slowModeMultiplier =
+      // (slowModeSupplier.getAsBoolean() ? SLOW_MODE_MULTIPLIER : 1.0);
+
+      // Get linear velocity
+      Translation2d linearVelocity =
+          getLinearVelocityFromJoysticks(-xSupplier.getAsDouble(), -ySupplier.getAsDouble());
+
+      // Apply rotation deadband
+      double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
+
+      final double maxSpeed = drive.getMaxLinearSpeedMetersPerSec();
+
+      double x = linearVelocity.getX() * maxSpeed;
+      double y = linearVelocity.getY() * maxSpeed;
+
+      // Square rotation value for more precise control
+      omega = Math.copySign(omega * omega, omega);
+
+      omega *= drive.getMaxAngularSpeedRadPerSec();
+      if ((Math.abs(omega) > 1E-6) || (Math.abs(x) > 1E-6) || (Math.abs(y) > 1E-6)) {
+        Logger.recordOutput("DriveState", "Driver");
+        Logger.recordOutput("Snap/desiredPos", new Pose2d(-50, -50, Rotation2d.kZero));
+      } else if (!snapSupplier.getAsBoolean()) {
+        Optional<Pose2d> closestOptionalPose = getClosestPosition(drive, SNAPPY_RADIUS);
+
+        if (closestOptionalPose.isPresent()) {
+          Pose2d closestPose = closestOptionalPose.orElse(Pose2d.kZero);
+          Logger.recordOutput("DriveState", "Robot");
+          Logger.recordOutput("Snap/desiredPos", closestPose);
+
+          x = xController.calculate(drive.getPose().getX(), closestPose.getX());
+
+          y = yController.calculate(drive.getPose().getY(), closestPose.getY());
+
+          omega = angleController.calculate(drive.getRotation().getRadians(),
+              closestPose.getRotation().getRadians());
+
+
+        }
+      }
+
+      Logger.recordOutput("Snap/omega", omega);
+      Logger.recordOutput("Snap/x/xDiff", x);
+      Logger.recordOutput("Snap/x/currentXPos", drive.getPose().getX());
+      Logger.recordOutput("Snap/y/yDiff", y);
+      Logger.recordOutput("Snap/y/currentYPos", drive.getPose().getY());
+
+      // Convert to field relative speeds & send command
+      ChassisSpeeds speeds = new ChassisSpeeds(x, y, omega);
+      drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
+
+    }, drive)
+
+        // Reset PID controller when command starts
+        .beforeStarting(() ->
+
+        {
+          angleController.reset(drive.getRotation().getRadians());
+          xController.reset(drive.getPose().getX());
+          yController.reset(drive.getPose().getY());
         });
   }
 }
