@@ -192,6 +192,9 @@ public class Elevator extends SubsystemBase {
   // .andThen(Commands.runOnce(() -> io.setWinchOpenLoop(Volts.of(-10))));
 
   // }
+  public Command zeroElevator() {
+    return Commands.runOnce(() -> io.zeroEncoder());
+  }
 
   public Command L0() {
     return goToLevel(Level.Intake);

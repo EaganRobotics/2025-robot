@@ -221,7 +221,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
     // Default command, normal field-relative drive
     drive.setDefaultCommand(DriveCommands.joystickDriveAssist(drive, ySupplier, xSupplier,
         omegaSupplier, driverController.rightTrigger()));
-    operatorController.leftBumper().toggleOnTrue(outtake.autoQueueCoralOveride());
+    operatorController.leftTrigger().whileTrue(outtake.autoQueueCoralOveride());
     outtake.setDefaultCommand(outtake.autoQueueCoral().onlyWhile(elevator.elevatorAtMinHeight()));
 
     // POV snap to angles
@@ -259,11 +259,14 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
     operatorController.povDown().onTrue(elevator.downLevel());
     operatorController.povUp().onTrue(elevator.upLevel());
-    operatorController.rightTrigger().onTrue(outtake.depositCoral());
+    operatorController.start().onTrue(elevator.zeroElevator());
+    operatorController.back().onTrue(elevator.zeroElevator());
+    // operatorController.rightTrigger().onTrue(outtake.depositCoral());
+    operatorController.leftBumper().onTrue(outtake.depositCoral());
     operatorController.leftTrigger().onTrue(outtake.reverseCoral());
-    operatorController.rightBumper().onTrue(elevator.L1());
-    // operatorController.a().onTrue(elevator.L11());
+    operatorController.rightBumper().onTrue(elevator.L11());
     operatorController.a().onTrue(elevator.L2());
+    operatorController.x().onTrue(elevator.L1());
     operatorController.b().onTrue(elevator.L3());
     operatorController.y().onTrue(elevator.L4());
     // elevator.setDefaultCommand(elevator.openLoop(OperatorController::getLeftY));
