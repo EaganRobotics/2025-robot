@@ -46,7 +46,7 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class DriveCommands {
-  // private static final double SLOW_MODE_MULTIPLIER = 0.5;
+  private static final double SLOW_MODE_MULTIPLIER = 0.5;
   private static final double DEADBAND = 0.1;
   // private static final double ANGLE_KP = 7.0;
   // private static final double ANGLE_KI = 0.0;
@@ -475,7 +475,8 @@ public class DriveCommands {
   }
 
   public static Command joystickDriveAssist(Drive drive, DoubleSupplier xSupplier,
-      DoubleSupplier ySupplier, DoubleSupplier omegaSupplier, BooleanSupplier snapSupplier) {
+      DoubleSupplier ySupplier, DoubleSupplier omegaSupplier, BooleanSupplier snapSupplier,
+      BooleanSupplier slowModeSupplier) {
 
     // Create PID controller
     ProfiledPIDController angleController = new ProfiledPIDController(ANGLE_KP.get(), ANGLE_KI.get(), ANGLE_KD.get(),
@@ -509,8 +510,7 @@ public class DriveCommands {
 
       Logger.recordOutput("ReefPositions", DriveCommands.REEF_POSITIONS);
 
-      // final double slowModeMultiplier =
-      // (slowModeSupplier.getAsBoolean() ? SLOW_MODE_MULTIPLIER : 1.0);
+      final double slowModeMultiplier = (slowModeSupplier.getAsBoolean() ? SLOW_MODE_MULTIPLIER : 1.0);
 
       // Get linear velocity
       Translation2d linearVelocity = getLinearVelocityFromJoysticks(-xSupplier.getAsDouble(), -ySupplier.getAsDouble());
@@ -520,8 +520,8 @@ public class DriveCommands {
 
       final double maxSpeed = drive.getMaxLinearSpeedMetersPerSec();
 
-      double x = linearVelocity.getX() * maxSpeed;
-      double y = linearVelocity.getY() * maxSpeed;
+      double x = linearVelocity.getX() * maxSpeed * slowModeMultiplier;
+      double y = linearVelocity.getY() * maxSpeed * slowModeMultiplier;
 
       // Square rotation value for more precise control
       omega = Math.copySign(omega * omega, omega);
