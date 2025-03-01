@@ -203,7 +203,7 @@ public class Elevator extends SubsystemBase {
     return goToLevel(Level.Intake);
   }
 
-  public Command intake() {
+  public Command intakeHeight() {
     return goToLevel(Level.Intake);
   }
 
