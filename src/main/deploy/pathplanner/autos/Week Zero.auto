@@ -23,12 +23,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "MinHeight"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "Coral to Source"

@@ -35,12 +35,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "minHeight"
-          }
-        },
-        {
           "type": "wait",
           "data": {
             "waitTime": 1.0
