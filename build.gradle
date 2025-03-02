@@ -163,9 +163,9 @@ task(eventDeploy) {
 }
 createVersionFile.dependsOn(eventDeploy)
 
-spotless {
-  java {
-    eclipse().configFile('config/eclipse-java-google-style.xml')
-    targetExclude('build/**', 'src/main/java/frc/robot/BuildConstants.java')
-  }
-}
+// spotless {
+//   java {
+//     eclipse().configFile('config/eclipse-java-google-style.xml')
+//     targetExclude('build/**', 'src/main/java/frc/robot/BuildConstants.java')
+//   }
+// }
