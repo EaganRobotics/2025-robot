@@ -171,20 +171,18 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
   private void configureButtonBindings() {
 
-    // Due to field orientation, joystick Y (forward) controls X direction and vice
-    // versa
-    drive.setDefaultCommand(DriveCommands.joystickDriveAssist(drive,
-        () -> driverController.getLeftY(), () -> driverController.getLeftX(),
-        () -> -driverController.getRightX(), driverController.rightTrigger()));
+    // Due to field orientation, joystick Y (forward) controls X direction and vice versa
+    drive.setDefaultCommand(
+        DriveCommands.joystickDriveAssist(drive, () -> driverController.getLeftY(),
+            () -> driverController.getLeftX(), () -> -driverController.getRightX() * .85,
+            driverController.leftTrigger(), driverController.rightTrigger()));
     outtake
         .setDefaultCommand(outtake.autoQueueCoral().onlyWhile(elevator.isAtHeight(Level.Intake)));
     driverController.povUpRight()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-45)));
     driverController.povRight()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-90)));
-    //
     driverController.povDownRight()
-        //
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-135)));
     driverController.povDownLeft()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(135)));
@@ -199,6 +197,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
     driverController.y().whileTrue(DriveCommands.Snapper(drive));
 
     operatorController.leftTrigger().whileTrue(outtake.autoQueueCoralOveride());
+    operatorController.rightTrigger().whileTrue(outtake.reverseCoral());
     operatorController.povDown().onTrue(elevator.downLevel());
     operatorController.povUp().onTrue(elevator.upLevel());
     operatorController.start().onTrue(elevator.zeroElevator());
@@ -251,5 +250,3 @@ public class RobotContainer extends frc.lib.RobotContainer {
   @Override
   public void simulationPeriodic() {}
 }
-
-

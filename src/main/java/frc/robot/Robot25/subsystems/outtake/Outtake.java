@@ -94,8 +94,6 @@ public class Outtake extends SubsystemBase {
         .withTimeout(1);
   }
 
-
-
   public final Trigger seesAtOutputTrigger = new Trigger(() -> inputs.seesCoralAtOutput);
 
   // public Command specialDepositCoral() {
@@ -103,6 +101,6 @@ public class Outtake extends SubsystemBase {
   // }
 
   public Command reverseCoral() {
-    return setRopenLoop(Volts.of(-5)).withTimeout(1);
+    return setRopenLoop(Volts.of(-5)).withTimeout(1.25);
   }
 }
