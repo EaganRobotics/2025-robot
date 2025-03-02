@@ -53,7 +53,7 @@ public class DriveCommands {
   /// Auto snap to position distance
   private static final Distance SNAPPY_RADIUS = Inches.of(12);
 
-  private static final double INCHES_FROM_REEF = 16.75 + 11.757361 - 2;
+  private static final double INCHES_FROM_REEF = 16.75 + 11.757361;
   private static final double REEF_CENTER_X_INCHES = 176.745545;
   private static final double REEF_CENTER_Y_INCHES = 158.500907;
 
@@ -276,6 +276,27 @@ public class DriveCommands {
       Logger.recordOutput("SnapperPose", desiredPose.outer);
       return snapToPosition(drive, desiredPose.outer)
           .andThen(snapToPosition(drive, desiredPose.inner));
+    }, Set.of(drive));
+
+  }
+
+  public static Command AutoSnapper(Drive drive) {
+
+    return Commands.defer(() -> {
+      Pose2dSequence desiredPose =
+          getClosestPosition(drive, Meters.of(1000)).orElse(Pose2dSequence.kZero);
+      Logger.recordOutput("SnapperPose", desiredPose.outer);
+      return snapToPosition(drive, desiredPose.inner);
+    }, Set.of(drive));
+
+  }
+
+  public static Command AutoSnapperSource(Drive drive) {
+
+    return Commands.defer(() -> {
+      return snapToPosition(drive, new Pose2d(
+          new Translation2d(Inches.of(Right_Loading_Station_X), Inches.of(Right_Loading_Station_Y)),
+          Rotation2d.fromDegrees(55)));
     }, Set.of(drive));
 
   }

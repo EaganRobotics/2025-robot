@@ -145,7 +145,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
     }
 
     NamedCommands.registerCommand("L0", elevator.L0().andThen(outtake.autoQueueCoral2()));
-    NamedCommands.registerCommand("Align", DriveCommands.Snapper(drive));
+    NamedCommands.registerCommand("Align", DriveCommands.AutoSnapper(drive));
+    NamedCommands.registerCommand("Source", DriveCommands.AutoSnapperSource(drive));
 
     NamedCommands.registerCommand("L1", elevator.L1());
     NamedCommands.registerCommand("L2", elevator.L2());
