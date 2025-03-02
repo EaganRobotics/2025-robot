@@ -14,8 +14,7 @@ public class OuttakeIOTalonFX implements OuttakeIO {
   final int outtakeWheelDiameter = 5;
   final int outtakeRollerDiameter = 4;
 
-  // DigitalInputWrapper inputSensor = new DigitalInputWrapper(0,
-  // "LoadSideSensor", true);
+  DigitalInputWrapper inputSensor = new DigitalInputWrapper(5, "LoadSideSensor", true);
   DigitalInputWrapper outputSensor = new DigitalInputWrapper(0, "ScoreSideSensor", true);
 
   public OuttakeIOTalonFX() {
@@ -40,7 +39,7 @@ public class OuttakeIOTalonFX implements OuttakeIO {
     inputs.outtakeVelocity = outtakeTalonFX.getVelocity();
     inputs.outtakeCurrent = outtakeTalonFX.getTorqueCurrent();
     inputs.outtakeAppliedVolts = Volts.of(0);
-    // inputs.seesCoralAtInput = inputSensor.get();
+    inputs.seesCoralAtInput = inputSensor.get();
     inputs.seesCoralAtOutput = outputSensor.get();
   }
 
