@@ -29,7 +29,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/enhanced-ci' }}
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       # Formatting check
       - name: Check code formatting
@@ -51,7 +51,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/enhanced-ci' }}
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Lint with CheckStyle
         # run: ./gradlew checkstyle
@@ -73,7 +73,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/enhanced-ci' }}
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Static Analysis with ErrorProne
         # run: ./gradlew errorprone
@@ -96,7 +96,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/enhanced-ci' }}
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Compile robot code
         run: ./gradlew build
@@ -118,7 +118,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/enhanced-ci' }}
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Run tests on robot code
         # run: ./gradlew test
