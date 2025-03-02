@@ -12,13 +12,11 @@ public interface AlgaeIO {
 
   @AutoLog
   public static class AlgaeIOInputs {
-    public boolean outtakeConnected = false;
-    public AngularVelocity outtakeVelocity = RadiansPerSecond.of(0.0);
-    public Voltage outtakeAppliedVolts = Volts.of(0.0);
-    public Current outtakeCurrent = Amps.of(0.0);
+    public boolean algaeConnected = false;
+    public AngularVelocity algaeVelocity = RadiansPerSecond.of(0.0);
+    public Voltage algaeAppliedVolts = Volts.of(0.0);
+    public Current algaeCurrent = Amps.of(0.0);
 
-    public boolean seesCoralAtInput = false;
-    public boolean seesCoralAtOutput = false;
   }
 
   /** Updates the set of loggable inputs. */
