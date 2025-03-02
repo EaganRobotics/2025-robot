@@ -2,11 +2,11 @@
 
 package frc.robot.Robot25;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
+
+
+import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerMotorArrangement;
@@ -17,20 +17,24 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.lib.devices.DigitalInputWrapper;
-import frc.lib.devices.TalonFXWrapper;
-import frc.lib.devices.TalonFXWrapper.FollowerConfig;
-import frc.robot.Robot;
+import frc.robot.Robot25.commands.DriveCharacterization;
 import frc.robot.Robot25.commands.DriveCommands;
+import frc.robot.Robot25.subsystems.AlgaeEater.Algae;
+import frc.robot.Robot25.subsystems.AlgaeEater.AlgaeIO;
+import frc.robot.Robot25.subsystems.AlgaeEater.AlgaeIOSim;
+import frc.robot.Robot25.subsystems.AlgaeEater.AlgaeIOTalonFX;
 import frc.robot.Robot25.subsystems.drive.Drive;
 import frc.robot.Robot25.subsystems.drive.DriveConstants;
 import frc.robot.Robot25.subsystems.drive.ModuleIO;
@@ -40,7 +44,6 @@ import frc.robot.Robot25.subsystems.elevator.Elevator;
 import frc.robot.Robot25.subsystems.elevator.Elevator.Level;
 import frc.robot.Robot25.subsystems.elevator.ElevatorIO;
 import frc.robot.Robot25.subsystems.elevator.ElevatorIOSim;
-import frc.robot.Robot25.subsystems.elevator.ElevatorIOTalonFX;
 import frc.robot.Robot25.subsystems.elevator.ElevatorIOTalonFXNew;
 import frc.robot.Robot25.subsystems.gyro.GyroIO;
 import frc.robot.Robot25.subsystems.gyro.GyroIOPigeon2;
@@ -55,7 +58,6 @@ import frc.robot.Robot25.subsystems.vision.VisionIO;
 import frc.robot.Robot25.subsystems.vision.VisionIOLimelight;
 import frc.robot.Robot25.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.SimConstants;
-import java.util.function.DoubleSupplier;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -69,6 +71,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
   private final Outtake outtake;
   @SuppressWarnings("unused")
   private final Vision vision;
+  private final Algae algae;
 
   // Drive simulation
   private static final SwerveDriveSimulation driveSimulation =
@@ -108,6 +111,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
         vision = new Vision(drive,
             new VisionIOLimelight("limelight-front", () -> drive.getPose().getRotation()),
             new VisionIOLimelight("limelight-back", () -> drive.getPose().getRotation()));
+        algae = new Algae(new AlgaeIOTalonFX());
         break;
       case SIM:
         drive = new Drive(new GyroIOSim(driveSimulation.getGyroSimulation()),
@@ -124,6 +128,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
                 VisionConstants.limelightBackTransform, () -> drive.getPose()),
             new VisionIOPhotonVisionSim(VisionConstants.limelightFrontName,
                 VisionConstants.limelightFrontTransform, () -> drive.getPose()));
+        algae = new Algae(new AlgaeIOSim());
         break;
       default:
         // Replayed robot, disable IO implementations
@@ -135,6 +140,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
         outtake = new Outtake(new OuttakeIO() {});
 
         vision = new Vision(drive, new VisionIO() {});
+        algae = new Algae(new AlgaeIO() {});
         break;
     }
 
@@ -156,9 +162,9 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
     // Set up SysId routines
     autoChooser.addOption("Drive Wheel Radius Characterization",
-        DriveCommands.wheelRadiusCharacterization(drive));
+        DriveCharacterization.wheelRadiusCharacterization(drive));
     autoChooser.addOption("Drive Simple FF Characterization",
-        DriveCommands.feedforwardCharacterization(drive));
+        DriveCharacterization.feedforwardCharacterization(drive));
     autoChooser.addOption("Drive SysId (Quasistatic Forward)",
         drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption("Drive SysId (Quasistatic Reverse)",
@@ -211,6 +217,11 @@ public class RobotContainer extends frc.lib.RobotContainer {
     operatorController.x().onTrue(elevator.L1());
     operatorController.b().onTrue(elevator.L3());
     operatorController.y().onTrue(elevator.L4());
+    operatorController.povRight().whileTrue(algae.setOpenLoop(Volts.of(4)));
+    operatorController.povLeft().whileTrue(algae.setOpenLoop(Volts.of(-4)));
+
+    operatorController.axisMagnitudeGreaterThan(5, 0.1)
+        .whileTrue(outtake.openLoop(operatorController::getRightY));
 
     operatorController.axisMagnitudeGreaterThan(1, 0.1)
         .whileTrue(elevator.openLoop(operatorController::getLeftY));

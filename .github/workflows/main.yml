@@ -32,16 +32,19 @@ jobs:
 
       # Grant execute permission for gradlew
       - name: Grant execute permission for gradlew
+        if: steps.filter.outputs.java == 'true'
         run: chmod +x gradlew
 
       # Setup Gradle and restore cache
       - name: Setup Gradle
+        if: steps.filter.outputs.java == 'true'
         uses: gradle/actions/setup-gradle@v4
         with:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       # Formatting check
       - name: Check code formatting
+        if: steps.filter.outputs.java == 'true'
         run: ./gradlew spotlessCheck
 
   build:
@@ -64,17 +67,21 @@ jobs:
               - 'build.gradle'
 
       - name: Grant execute permission for gradlew
+        if: steps.filter.outputs.java == 'true'
         run: chmod +x gradlew
 
       - name: Setup Gradle
+        if: steps.filter.outputs.java == 'true'
         uses: gradle/actions/setup-gradle@v4
         with:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Compile robot code
+        if: steps.filter.outputs.java == 'true'
         run: ./gradlew build --no-daemon
 
       - name: Upload build artifacts
+        if: steps.filter.outputs.java == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
@@ -101,18 +108,22 @@ jobs:
               - 'build.gradle'
 
       - name: Grant execute permission for gradlew
+        if: steps.filter.outputs.java == 'true'
         run: chmod +x gradlew
 
       - name: Download build artifacts
+        if: steps.filter.outputs.java == 'true'
         uses: actions/download-artifact@v4
         with:
           name: build-artifacts
           path: build/
 
       - name: Setup Gradle
+        if: steps.filter.outputs.java == 'true'
         uses: gradle/actions/setup-gradle@v4
         with:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Run tests on robot code
+        if: steps.filter.outputs.java == 'true'
         run: ./gradlew test --no-daemon
