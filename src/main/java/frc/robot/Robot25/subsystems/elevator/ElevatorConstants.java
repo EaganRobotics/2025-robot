@@ -31,9 +31,8 @@ public class ElevatorConstants {
   public static final Distance INITIAL_HEIGHT = Inches.of(16.3);
   public static final Distance MAX_EXTENSION = Inches.of(80);
   public static final Mass CARRIAGE_MASS = Pounds.of(19.147);
-  public static final LinearVelocity MAX_VELOCITY = InchesPerSecond.of(178.63);
-  public static final AngularAcceleration MAX_ACCELERATION =
-      RadiansPerSecondPerSecond.of(90 / DRUM_RADIUS.in(Inches));
+  public static final LinearVelocity MAX_VELOCITY = InchesPerSecond.of(360);
+  public static final AngularAcceleration MAX_ACCELERATION = RadiansPerSecondPerSecond.of(270 / DRUM_RADIUS.in(Inches));
   public static final Current CURRENT_LIMIT = Amps.of(40);
 
   public static final class Real {
