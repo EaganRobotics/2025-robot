@@ -66,7 +66,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Elevator elevator;
-  private final Outtake outtake;
+    private final Outtake outtake;
   @SuppressWarnings("unused")
   private final Vision vision;
 
