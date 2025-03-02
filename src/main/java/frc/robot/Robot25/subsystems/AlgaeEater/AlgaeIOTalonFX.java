@@ -7,7 +7,7 @@ import frc.lib.devices.TalonFXWrapper;
 
 public class AlgaeIOTalonFX implements AlgaeIO {
   private final TalonFXWrapper algaeTalonFX;
-  private final int motorID = 22;
+  private final int motorID = 25;
 
   public AlgaeIOTalonFX() {
     algaeTalonFX = new TalonFXWrapper(motorID, "Algae", true, NeutralModeValue.Brake);
@@ -20,7 +20,6 @@ public class AlgaeIOTalonFX implements AlgaeIO {
 
   @Override
   public void updateInputs(AlgaeIOInputs inputs) {
-    inputs.algaeConnected = false;
     inputs.algaeVelocity = algaeTalonFX.getVelocity();
     inputs.algaeCurrent = algaeTalonFX.getTorqueCurrent();
     inputs.algaeAppliedVolts = Volts.of(0);
