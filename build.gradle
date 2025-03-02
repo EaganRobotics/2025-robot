@@ -7,12 +7,6 @@ plugins {
 
     // Spotless for format checking
     id "com.diffplug.spotless" version "7.0.2"
-
-    // Checkstyle for additional format checking
-    id "checkstyle"
-
-    // Error Prone for additional error checking
-    id "net.ltgt.errorprone" version "4.1.0"
 }
 
 java {
@@ -88,9 +82,6 @@ dependencies {
     // Install AdvantageKit into existing project
     def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
     annotationProcessor "org.littletonrobotics.akit:akit-autolog:$akitJson.version"
-
-    // Google Error Prone dependency
-    errorprone "com.google.errorprone:error_prone_core:latest.release"
 }
 
 test {
@@ -178,24 +169,4 @@ spotless {
     targetExclude('build/**', 'src/main/java/frc/robot/BuildConstants.java')
   }
   enforceCheck = false
-}
-
-checkstyle {
-    toolVersion = "10.21.3"
-    configFile = rootProject.file('config/checkstyle/checkstyle.xml')
-    sourceSets = []
-}
-
-checkstyleMain {
-  exclude '**/frc/lib/**' // exclude lib for now
-  exclude '**/frc/robot/BuildConstants.java'
-}
-
-// Use ErrorProne: ./gradlew build -PenableErrorProne
-def enableErrorProne = project.hasProperty('enableErrorProne');
-tasks {
-    compileJava {
-        options.errorprone.enabled = enableErrorProne
-        options.errorprone.errorproneArgs.add('-XepExcludedPaths:.*/src/main/java/frc/lib/.*|.*/src/main/java/frc/robot/BuildConstants.java') // exclude lib and BuildConstants
-    }
 }

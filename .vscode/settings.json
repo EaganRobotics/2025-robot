@@ -27,6 +27,7 @@
     "**/simgui*.json": true,
     "**/networktables.json": true,
     "vendordeps": true,
+    "config": true
   },
   "java.test.config": [
     {
