@@ -12,6 +12,8 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerMotorArrangement;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -56,6 +58,7 @@ import frc.robot.SimConstants;
 import java.util.function.DoubleSupplier;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer extends frc.lib.RobotContainer {
@@ -169,9 +172,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
   private void configureButtonBindings() {
 
-    // due to how the deild works, we need to have joystick y in the x varable and
-    // joystick x in the
-    // y varible
+    // Due to field orientation, joystick Y (forward) controls X direction and vice
+    // versa
     drive.setDefaultCommand(
         DriveCommands.joystickDriveAssist(drive, () -> driverController.getLeftY(),
             () -> driverController.getLeftX(), () -> -driverController.getRightX() * .85,
@@ -226,6 +228,18 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
   @Override
   public void disabledInit() {}
+
+  @Override
+  public void disabledPeriodic() {
+    var autoCommand = autoChooser.get();
+
+    if (autoCommand instanceof PathPlannerAuto) {
+      var auto = (PathPlannerAuto) autoCommand;
+      Pose2d startPose = auto.getStartingPose();
+      Logger.recordOutput("AutoStartPose", startPose);
+    }
+
+  }
 
   @Override
   public void robotPeriodic() {

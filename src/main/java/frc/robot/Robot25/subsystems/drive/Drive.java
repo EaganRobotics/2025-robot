@@ -341,7 +341,6 @@ public class Drive extends SubsystemBase implements VisionConsumer {
       Matrix<N3, N1> visionMeasurementStdDevs) {
     poseEstimator.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds,
         visionMeasurementStdDevs);
-    // System.out.println("Vision Pose: set");
   }
 
   /** Returns the maximum linear speed in meters per sec. */
