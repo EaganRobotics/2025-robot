@@ -4,7 +4,7 @@ name: CI
 # events but only for the main branch.
 on:
   push:
-    branches: [main]
+    branches: [main, enhanced-ci]
   pull_request:
     branches: [main]
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -19,20 +19,27 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
+
       # Declares the repository safe and not under dubious ownership.
       - name: Add repository to git safe directories
         run: git config --global --add safe.directory $GITHUB_WORKSPACE
+
       # Grant execute permission for gradlew
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+
       # Cache Gradle dependencies
-      - name: Cache Gradle dependencies
-        uses: actions/cache@v3
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          key: gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+            gradle-
+
       # Download the gradlew wrapper
       - name: Setup Gradle
         run: ./gradlew
