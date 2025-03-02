@@ -54,8 +54,7 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Lint with CheckStyle
-        # run: ./gradlew checkstyle
-        run: echo "CheckStyle!"
+        run: ./gradlew checkstyle
 
   static_analysis:
     name: Static Analysis
