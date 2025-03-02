@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Robot25.commands.DriveCharacterization;
 import frc.robot.Robot25.commands.DriveCommands;
 import frc.robot.Robot25.subsystems.drive.Drive;
 import frc.robot.Robot25.subsystems.drive.DriveConstants;
@@ -139,9 +140,9 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
     // Set up SysId routines
     autoChooser.addOption("Drive Wheel Radius Characterization",
-        DriveCommands.wheelRadiusCharacterization(drive));
+        DriveCharacterization.wheelRadiusCharacterization(drive));
     autoChooser.addOption("Drive Simple FF Characterization",
-        DriveCommands.feedforwardCharacterization(drive));
+        DriveCharacterization.feedforwardCharacterization(drive));
     autoChooser.addOption("Drive SysId (Quasistatic Forward)",
         drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption("Drive SysId (Quasistatic Reverse)",
