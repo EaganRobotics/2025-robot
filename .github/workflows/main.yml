@@ -14,7 +14,7 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-22.04
     # This grabs the WPILib docker container
-    container: wpilib/roborio-cross-ubuntu-minimal:2025-22.04
+    container: wpilib/roborio-cross-ubuntu:2025-22.04
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -48,7 +48,7 @@ jobs:
     needs: setup
     name: Format Check
     runs-on: ubuntu-22.04
-    container: wpilib/roborio-cross-ubuntu-minimal:2025-22.04
+    container: wpilib/roborio-cross-ubuntu:2025-22.04
     steps:
       # Formatting check
       - name: Check code formatting
@@ -58,7 +58,7 @@ jobs:
     needs: setup
     name: Lint
     runs-on: ubuntu-22.04
-    container: wpilib/roborio-cross-ubuntu-minimal:2025-22.04
+    container: wpilib/roborio-cross-ubuntu:2025-22.04
     steps:
       - name: Lint with CheckStyle
         run: echo Lint!
@@ -67,7 +67,7 @@ jobs:
     needs: setup
     name: Static Analysis
     runs-on: ubuntu-22.04
-    container: wpilib/roborio-cross-ubuntu-minimal:2025-22.04
+    container: wpilib/roborio-cross-ubuntu:2025-22.04
     steps:
       - name: Static Analysis with ErrorProne
         run: echo Static Analysis!
@@ -76,7 +76,7 @@ jobs:
     needs: setup
     name: Build
     runs-on: ubuntu-22.04
-    container: wpilib/roborio-cross-ubuntu-minimal:2025-22.04
+    container: wpilib/roborio-cross-ubuntu:2025-22.04
     steps:
       - name: Compile robot code
         run: ./gradlew build
@@ -85,7 +85,7 @@ jobs:
     needs: build
     name: Test
     runs-on: ubuntu-22.04
-    container: wpilib/roborio-cross-ubuntu-minimal:2025-22.04
+    container: wpilib/roborio-cross-ubuntu:2025-22.04
     steps:
       - name: Run tests on robot code
         run: echo Test!
