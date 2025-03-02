@@ -10,11 +10,11 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  build:
+  setup:
     # The type of runner that the job will run on
     runs-on: ubuntu-22.04
     # This grabs the WPILib docker container
-    container: wpilib/roborio-cross-ubuntu:2025-22.04
+    container: wpilib/roborio-cross-ubuntu-minimal:2025-22.04
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -25,6 +25,9 @@ jobs:
       # Grant execute permission for gradlew
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+      # Download the gradlew wrapper
+      - name: Setup Gradle
+        run: ./gradlew
       # Cache Gradle dependencies
       - name: Cache Gradle dependencies
         uses: actions/cache@v3
@@ -33,9 +36,49 @@ jobs:
             ~/.gradle/caches
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+
+  format_check:
+    needs: setup
+    name: Format Check
+    runs-on: ubuntu-22.04
+    container: wpilib/roborio-cross-ubuntu-minimal:2025-22.04
+    steps:
       # Formatting check
       - name: Check code formatting
         run: ./gradlew spotlessCheck
-      # Runs a single command using the runners shell
-      - name: Compile and run tests on robot code
+
+  lint:
+    needs: setup
+    name: Lint
+    runs-on: ubuntu-22.04
+    container: wpilib/roborio-cross-ubuntu-minimal:2025-22.04
+    steps:
+      - name: Lint with CheckStyle
+        run: echo Lint!
+
+  static_analysis:
+    needs: setup
+    name: Static Analysis
+    runs-on: ubuntu-22.04
+    container: wpilib/roborio-cross-ubuntu-minimal:2025-22.04
+    steps:
+      - name: Static Analysis with ErrorProne
+        run: echo Static Analysis!
+
+  build:
+    needs: setup
+    name: Build
+    runs-on: ubuntu-22.04
+    container: wpilib/roborio-cross-ubuntu-minimal:2025-22.04
+    steps:
+      - name: Compile robot code
         run: ./gradlew build
+
+  test:
+    needs: build
+    name: Test
+    runs-on: ubuntu-22.04
+    container: wpilib/roborio-cross-ubuntu-minimal:2025-22.04
+    steps:
+      - name: Run tests on robot code
+        run: echo Test!
