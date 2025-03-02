@@ -11,6 +11,7 @@ on:
 jobs:
   # This workflow contains a single job called "build"
   build:
+    name: Build Robot Code
     # The type of runner that the job will run on
     runs-on: ubuntu-22.04
     # This grabs the WPILib docker container
