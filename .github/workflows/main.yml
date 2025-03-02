@@ -25,9 +25,6 @@ jobs:
       # Grant execute permission for gradlew
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-      # Download the gradlew wrapper
-      - name: Setup Gradle
-        run: ./gradlew
       # Cache Gradle dependencies
       - name: Cache Gradle dependencies
         uses: actions/cache@v3
@@ -36,6 +33,9 @@ jobs:
             ~/.gradle/caches
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+      # Download the gradlew wrapper
+      - name: Setup Gradle
+        run: ./gradlew
 
   format_check:
     needs: setup
