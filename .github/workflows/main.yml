@@ -17,6 +17,15 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
 
+      - name: Filter changes for relevant files
+        id: filter
+        uses: dorny/paths-filter@v2
+        with:
+          filters: |
+            java:
+              - 'src/main/java/**'
+              - 'build.gradle'
+
       # Declares the repository safe and not under dubious ownership.
       - name: Add repository to git safe directories
         run: git config --global --add safe.directory $GITHUB_WORKSPACE
@@ -41,6 +50,15 @@ jobs:
     container: wpilib/roborio-cross-ubuntu:2025-22.04
     steps:
       - uses: actions/checkout@v4
+
+      - name: Filter changes for relevant files
+        id: filter
+        uses: dorny/paths-filter@v2
+        with:
+          filters: |
+            java:
+              - 'src/main/java/**'
+              - 'build.gradle'
 
       - name: Add repository to git safe directories
         run: git config --global --add safe.directory $GITHUB_WORKSPACE
@@ -69,6 +87,15 @@ jobs:
     container: wpilib/roborio-cross-ubuntu:2025-22.04
     steps:
       - uses: actions/checkout@v4
+
+      - name: Filter changes for relevant files
+        id: filter
+        uses: dorny/paths-filter@v2
+        with:
+          filters: |
+            java:
+              - 'src/main/java/**'
+              - 'build.gradle'
 
       - name: Add repository to git safe directories
         run: git config --global --add safe.directory $GITHUB_WORKSPACE
