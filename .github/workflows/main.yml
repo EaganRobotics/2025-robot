@@ -56,6 +56,12 @@ jobs:
       - name: Compile robot code
         run: ./gradlew build
 
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: build/
+
   test:
     needs: build
     name: Test
@@ -69,6 +75,12 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: build/
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
