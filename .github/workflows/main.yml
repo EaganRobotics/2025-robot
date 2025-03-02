@@ -9,33 +9,7 @@ on:
     branches: [main]
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  setup:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-22.04
-    # This grabs the WPILib docker container
-    container: gradle:jdk17
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
-
-      # Declares the repository safe and not under dubious ownership.
-      - name: Add repository to git safe directories
-        run: git config --global --add safe.directory $GITHUB_WORKSPACE
-
-      # Grant execute permission for gradlew
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      # Setup Gradle
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/enhanced-ci' }}
-
   format_check:
-    needs: setup
     name: Format Check
     runs-on: ubuntu-22.04
     container: gradle:jdk17
@@ -62,7 +36,6 @@ jobs:
         run: ./gradlew spotlessCheck
 
   lint:
-    needs: setup
     name: Lint
     runs-on: ubuntu-22.04
     container: gradle:jdk17
@@ -85,7 +58,6 @@ jobs:
         run: echo "CheckStyle!"
 
   static_analysis:
-    needs: setup
     name: Static Analysis
     runs-on: ubuntu-22.04
     container: gradle:jdk17
@@ -108,7 +80,7 @@ jobs:
         run: echo "ErrorProne!"
 
   build:
-    needs: setup
+    needs: format_check
     name: Build
     runs-on: ubuntu-22.04
     container: wpilib/roborio-cross-ubuntu:2025-22.04
