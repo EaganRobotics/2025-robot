@@ -211,6 +211,9 @@ public class RobotContainer extends frc.lib.RobotContainer {
     operatorController.b().onTrue(elevator.L3());
     operatorController.y().onTrue(elevator.L4());
 
+    operatorController.axisMagnitudeGreaterThan(5, 0.1)
+        .whileTrue(outtake.openLoop(operatorController::getRightY));
+
     operatorController.axisMagnitudeGreaterThan(1, 0.1)
         .whileTrue(elevator.openLoop(operatorController::getLeftY));
     // ##########################################################################################################
