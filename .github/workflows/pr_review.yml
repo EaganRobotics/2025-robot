@@ -1,0 +1,206 @@
+name: AI PR Review
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, edited, reopened, synchronize]
+
+jobs:
+  fetch_pr_details:
+    runs-on: ubuntu-22.04
+    outputs:
+      pr_title: ${{ steps.pr-details.outputs.pr_title }}
+      pr_body: ${{ steps.pr-details.outputs.pr_body }}
+      pr_author: ${{ steps.pr-details.outputs.pr_author }}
+    steps:
+      # -----------------------------
+      # Fetch PR Title & Body
+      # -----------------------------
+      - name: Fetch PR Title and Body
+        uses: actions/github-script@v6
+        id: pr-details
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            console.log("PR Title:", pr.title);
+            console.log("PR Body:", pr.body);
+            console.log("PR Author:", pr.user.login);
+
+            // Return title and body for later use
+            core.setOutput('pr_title', pr.title);
+            core.setOutput('pr_body', pr.body);
+            core.setOutput('pr_author', pr.user.login);
+
+  fetch_pr_commits:
+    runs-on: ubuntu-22.04
+    outputs:
+      formatted_commits: ${{ steps.pr-commits.outputs.formatted_commits }}
+    steps:
+      # -----------------------------
+      # Fetch PR Commits with File Details
+      # -----------------------------
+      - name: Fetch PR Commits
+        uses: actions/github-script@v6
+        id: pr-commits
+        with:
+          script: |
+            // Get all commits for the PR
+            const { data: commits } = await github.rest.pulls.listCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+            });
+
+            // For each commit, fetch the commit details (which include file changes)
+            let formattedCommits = await Promise.all(commits.map(async (commit, index) => {
+              const { data: commitDetails } = await github.rest.repos.getCommit({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: commit.sha,
+              });
+
+              const files = commitDetails.files || [];
+              const fileNames = files.map(file => file.filename).join(', ');
+              const additions = files.reduce((sum, file) => sum + file.additions, 0);
+              const deletions = files.reduce((sum, file) => sum + file.deletions, 0);
+
+              return `Commit ${index + 1}: "${commit.commit.message}"\n- Files changed: ${fileNames}\n- Diff summary: +${additions}/-${deletions}`;
+            }));
+
+            // Return the commits array for reference (if needed downstream)
+            formattedCommits = formattedCommits.join('\n').split('\n').map(line => "\t" + line).join('\n');
+            console.log(formattedCommits);
+            core.setOutput('formatted_commits', formattedCommits);
+
+  fetch_pr_unified_diff:
+    runs-on: ubuntu-22.04
+    outputs:
+      formatted_diffs: ${{ steps.pr-unified-diff.outputs.formatted_diffs }}
+    steps:
+      # -----------------------------
+      # Fetch PR Unified Diff per file
+      # -----------------------------
+      - name: Fetch PR Unified Diff per file
+        uses: actions/github-script@v6
+        id: pr-unified-diff
+        with:
+          script: |
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+            });
+
+            let formattedDiffs = await Promise.all(files.map(async (file) => {
+              console.log(`Processing diff for: ${file.filename}`);
+              // const response = await github.request(file.contents_url);
+              // Get the patch (unified diff) from the file data
+              const diff = file.patch || '';
+              console.log(`Diff for ${file.filename}:\n${diff}`);
+
+              return file.filename + ":\n" + diff;
+            }));
+
+            formattedDiffs = formattedDiffs.join('\n').split('\n').map(line => "\t" + line).join('\n');
+            console.log(formattedDiffs);
+            core.setOutput('formatted_diffs', formattedDiffs);
+
+  fetch_pr_all_comments:
+    runs-on: ubuntu-22.04
+    outputs:
+      formatted_comments: ${{ steps.pr-all-comments.outputs.formatted_comments }}
+    steps:
+      # -----------------------------
+      # Fetch and Format All PR Comments and Reviews
+      # -----------------------------
+      - name: Fetch All PR Comments and Reviews
+        uses: actions/github-script@v6
+        id: pr-all-comments
+        with:
+          script: |
+            // Fetch issue comments (general discussion)
+            const { data: issueComments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+            });
+
+            // Fetch inline review comments (line-by-line feedback)
+            const { data: reviewComments } = await github.rest.pulls.listReviewComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+            });
+
+            // Fetch overall reviews (with review state like APPROVED or CHANGES_REQUESTED)
+            const { data: reviews } = await github.rest.pulls.listReviews({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+            });
+
+            let combined = [];
+
+            // Add issue comments
+            issueComments.forEach(comment => {
+              combined.push({
+                time: comment.created_at,
+                text: `Commented by ${comment.user.login}: "${comment.body}"`
+              });
+            });
+
+            // Add inline review comments with file:line:position formatting
+            reviewComments.forEach(comment => {
+              // Use 'position' as a proxy for column
+              combined.push({
+                time: comment.created_at,
+                text: `Review commented by ${comment.user.login} at ${comment.path}:${comment.line}:${comment.position}: "${comment.body}"`
+              });
+            });
+
+            // Add overall reviews
+            reviews.forEach(review => {
+              const reviewText = review.body ? review.body.trim() : '';
+              let formatted = "";
+              if (review.state === "APPROVED") {
+                formatted = `Accepted by ${review.user.login}: "${reviewText}"`;
+              } else if (review.state === "CHANGES_REQUESTED") {
+                formatted = `Changes requested by ${review.user.login}: "${reviewText}"`;
+              } else {
+                formatted = `Commented by ${review.user.login}: "${reviewText}"`;
+              }
+              combined.push({
+                time: review.submitted_at,
+                text: formatted
+              });
+            });
+
+            // Sort all combined entries by timestamp (oldest first)
+            combined.sort((a, b) => new Date(a.time) - new Date(b.time));
+
+            // Format each entry with an indent
+            const formattedComments = combined.map(item => item.text).join('\n').split('\n').map(line => "\t" + line).join('\n');
+            console.log(formattedComments);
+            core.setOutput('formatted_comments', formattedComments);
+
+  ai_analysis:
+    runs-on: ubuntu-22.04
+    needs:
+      - fetch_pr_details
+      - fetch_pr_commits
+      - fetch_pr_unified_diff
+      - fetch_pr_all_comments
+    steps:
+      - name: Use Outputs
+        run: |
+          echo "PR Title:"
+          echo "${{ needs.fetch_pr_details.outputs.pr_title }}"
+          echo "PR Body:"
+          echo "${{ needs.fetch_pr_details.outputs.pr_body }}"
+          echo "PR Author:"
+          echo "${{ needs.fetch_pr_details.outputs.pr_author }}"
+          echo "Formatted Commits:"
+          echo "${{ needs.fetch_pr_commits.outputs.formatted_commits }}"
+          # echo "Formatted Comments:"
+          # echo "${{ needs.fetch_pr_all_comments.outputs.formatted_comments }}"
+          # echo "Formatted Diffs:"
+          # echo "${{ needs.fetch_pr_unified_diff.outputs.formatted_diffs }}"
