@@ -190,17 +190,60 @@ jobs:
       - fetch_pr_unified_diff
       - fetch_pr_all_comments
     steps:
-      - name: Use Outputs
-        run: |
-          echo "PR Title:"
-          echo "${{ needs.fetch_pr_details.outputs.pr_title }}"
-          echo "PR Body:"
-          echo "${{ needs.fetch_pr_details.outputs.pr_body }}"
-          echo "PR Author:"
-          echo "${{ needs.fetch_pr_details.outputs.pr_author }}"
-          echo "Formatted Commits:"
-          echo "${{ needs.fetch_pr_commits.outputs.formatted_commits }}"
-          # echo "Formatted Comments:"
-          # echo "${{ needs.fetch_pr_all_comments.outputs.formatted_comments }}"
-          # echo "Formatted Diffs:"
-          # echo "${{ needs.fetch_pr_unified_diff.outputs.formatted_diffs }}"
+      - name: Call Groq with JS
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const payload = {
+              messages: [
+                {
+                  role: "system",
+                  content: "# Task:\nYou are reviewing a pull request ...\n# Response Format:\nPR: ACCEPT | REJECT\nREASON: ..."
+                },
+                {
+                  role: "user",
+                  content: `<title>${process.env.PR_TITLE}</title>\n<author>${process.env.PR_AUTHOR}</author>\n<body>${process.env.PR_BODY}</body>\n<commits>${process.env.FORMATTED_COMMITS}</commits>\n<files>${process.env.FORMATTED_DIFFS}</files>\n<comments>${process.env.FORMATTED_COMMENTS}</comments>`
+                }
+              ],
+              model: "deepseek-r1-distill-llama-70b",
+              temperature: 0.5,
+              max_completion_tokens: 4096,
+              top_p: 0.95,
+              stream: false,
+              stop: null
+            };
+
+            const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${process.env.GROQ_API_KEY}`
+              },
+              body: JSON.stringify(payload)
+            });
+
+            const json = await response.json();
+            const message = json.choices[0].message.content;
+            console.log(message);
+
+            // Remove <think> ... </think>
+            message = message.replace(/<think>.*?<\/think>/g, '');
+            accepted = message.includes("PR: ACCEPT");
+            reason = message.match(/REASON: (.*)/)?.[1] || '';
+            comments = message.match(/<comments>(.*?)<\/comments>/)?.[1] || '';
+
+            console.log(`Accepted: ${accepted}`);
+            console.log(`Reason: ${reason}`);
+            console.log(`Comments: ${comments}`);
+            core.setOutput('accepted', accepted);
+            core.setOutput('reason', reason);
+            core.setOutput('comments', comments);
+
+        env:
+          PR_TITLE: ${{ needs.fetch_pr_details.outputs.pr_title }}
+          PR_AUTHOR: ${{ needs.fetch_pr_details.outputs.pr_author }}
+          PR_BODY: ${{ needs.fetch_pr_details.outputs.pr_body }}
+          FORMATTED_COMMITS: ${{ needs.fetch_pr_commits.outputs.formatted_commits }}
+          FORMATTED_DIFFS: ${{ needs.fetch_pr_unified_diff.outputs.formatted_diffs }}
+          FORMATTED_COMMENTS: ${{ needs.fetch_pr_all_comments.outputs.formatted_comments }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
