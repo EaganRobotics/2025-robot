@@ -4,8 +4,38 @@ on:
     branches: [main]
     types: [opened, edited, reopened, synchronize]
 
+permissions:
+  pull-requests: write # Ensure the token can write PR comments
+
 jobs:
+  check_review_needed:
+    runs-on: ubuntu-22.04
+    outputs:
+      review_needed: ${{ steps.review_needed.outputs.review_needed }}
+    steps:
+      - name: Check if review is needed
+        id: review_needed
+        run: |
+          if [[ "${{ github.event.action }}" == "opened" || "${{ github.event.action }}" == "reopened" ]]; then
+            echo "review=true" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event.action }}" == "synchronize" ]]; then
+            if [[ "${{ steps.changes.outputs.changed_files }}" -gt 3 || "${{ steps.changes.outputs.changed_lines }}" -gt 50 ]]; then #Adjust these numbers as needed.
+              echo "review=true" >> $GITHUB_OUTPUT
+            else
+              echo "review=false" >> $GITHUB_OUTPUT
+            fi
+          elif [[ "${{ github.event.action }}" == "edited" ]]; then
+            # Example: check if description changed significantly
+            # You'd need a way to store the previous description and compare it.
+            # For simplicity, we'll just review on edit.
+            echo "review=true" >> $GITHUB_OUTPUT
+          else
+            echo "review=false" >> $GITHUB_OUTPUT
+          fi
+
   fetch_pr_details:
+    needs: check_review_needed
+    if: ${{ needs.check_review_needed.outputs.review == 'true' }}
     runs-on: ubuntu-22.04
     outputs:
       pr_title: ${{ steps.pr-details.outputs.pr_title }}
@@ -31,6 +61,8 @@ jobs:
             core.setOutput('pr_author', pr.user.login);
 
   fetch_pr_commits:
+    needs: check_review_needed
+    if: ${{ needs.check_review_needed.outputs.review == 'true' }}
     runs-on: ubuntu-22.04
     outputs:
       formatted_commits: ${{ steps.pr-commits.outputs.formatted_commits }}
@@ -72,6 +104,8 @@ jobs:
             core.setOutput('formatted_commits', formattedCommits);
 
   fetch_pr_unified_diff:
+    needs: check_review_needed
+    if: ${{ needs.check_review_needed.outputs.review == 'true' }}
     runs-on: ubuntu-22.04
     outputs:
       formatted_diffs: ${{ steps.pr-unified-diff.outputs.formatted_diffs }}
@@ -105,6 +139,8 @@ jobs:
             core.setOutput('formatted_diffs', formattedDiffs);
 
   fetch_pr_all_comments:
+    needs: check_review_needed
+    if: ${{ needs.check_review_needed.outputs.review == 'true' }}
     runs-on: ubuntu-22.04
     outputs:
       formatted_comments: ${{ steps.pr-all-comments.outputs.formatted_comments }}
@@ -117,31 +153,31 @@ jobs:
         id: pr-all-comments
         with:
           script: |
-            // Fetch issue comments (general discussion)
-            const { data: issueComments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.payload.pull_request.number,
-            });
-
-            // Fetch inline review comments (line-by-line feedback)
-            const { data: reviewComments } = await github.rest.pulls.listReviewComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.payload.pull_request.number,
-            });
-
-            // Fetch overall reviews (with review state like APPROVED or CHANGES_REQUESTED)
-            const { data: reviews } = await github.rest.pulls.listReviews({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.payload.pull_request.number,
-            });
+            const [issueComments, reviewComments, reviews] = await Promise.all([
+              // Fetch issue comments (general discussion)
+              github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+              }),
+              // Fetch inline review comments (line-by-line feedback)
+              github.rest.pulls.listReviewComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.payload.pull_request.number,
+              }),
+              // Fetch overall reviews (with review state like APPROVED or CHANGES_REQUESTED)
+              github.rest.pulls.listReviews({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.payload.pull_request.number,
+              })
+            ]);
 
             let combined = [];
 
             // Add issue comments
-            issueComments.forEach(comment => {
+            issueComments.data.forEach(comment => {
               combined.push({
                 time: comment.created_at,
                 text: `Commented by ${comment.user.login}: "${comment.body}"`
@@ -149,16 +185,16 @@ jobs:
             });
 
             // Add inline review comments with file:line:position formatting
-            reviewComments.forEach(comment => {
+            reviewComments.data.forEach(comment => {
               // Use 'position' as a proxy for column
               combined.push({
                 time: comment.created_at,
-                text: `Review commented by ${comment.user.login} at ${comment.path}:${comment.line}:${comment.position}: "${comment.body}"`
+                text: `Review commented by ${comment.user.login} at ${comment.path}:${comment.line}: "${comment.body}"`
               });
             });
 
             // Add overall reviews
-            reviews.forEach(review => {
+            reviews.data.forEach(review => {
               const reviewText = review.body ? review.body.trim() : '';
               let formatted = "";
               if (review.state === "APPROVED") {
@@ -189,20 +225,21 @@ jobs:
       - fetch_pr_commits
       - fetch_pr_unified_diff
       - fetch_pr_all_comments
+    outputs:
+      accepted: ${{ steps.ai_analysis.outputs.accepted }}
+      reason: ${{ steps.ai_analysis.outputs.reason }}
+      comments: ${{ steps.ai_analysis.outputs.comments }}
     steps:
       - name: Call Groq with JS
+        id: ai_analysis
         uses: actions/github-script@v7
         with:
           script: |
             const payload = {
               messages: [
                 {
-                  role: "system",
-                  content: "# Task:\nYou are reviewing a pull request ...\n# Response Format:\nPR: ACCEPT | REJECT\nREASON: ..."
-                },
-                {
                   role: "user",
-                  content: `<title>${process.env.PR_TITLE}</title>\n<author>${process.env.PR_AUTHOR}</author>\n<body>${process.env.PR_BODY}</body>\n<commits>${process.env.FORMATTED_COMMITS}</commits>\n<files>${process.env.FORMATTED_DIFFS}</files>\n<comments>${process.env.FORMATTED_COMMENTS}</comments>`
+                  content: `You are an experienced software engineer tasked with reviewing pull requests (PRs) for student FRC WPILib Java code. Your goal is to provide constructive feedback and make a decision to either accept or reject the PR. Remember, you're working with students in 8-12th grade who are learning to become software engineers, so tailor your language and feedback appropriately.\n\nFirst, carefully review the following PR details:\n\n\n<formatted_diffs>\n${process.env.FORMATTED_DIFFS}\n</formatted_diffs>\n\n<formatted_commits>\n${process.env.FORMATTED_COMMITS}\n</formatted_commits>\n\n<pr_title>\n${process.env.PR_TITLE}\n</pr_title>\n\n<pr_author>\n${process.env.PR_AUTHOR}\n</pr_author>\n\n<pr_body>\n${process.env.PR_BODY}\n</pr_body>\n\n<formatted_comments>\n${process.env.FORMATTED_COMMENTS}\n</formatted_comments>\n\nNow, follow these steps to review the pull request:\n\n1. Analyze the PR thoroughly. In <pr_review_thinking> tags inside your thinking block:\n   a. Summarize the main changes in the PR.\n   b. Quote relevant parts of the code changes.\n   c. List pros and cons of the changes.\n   d. Evaluate code quality, readability, and potential impact.\n   e. Consider how well the changes align with FRC WPILib Java best practices.\n   f. Assess whether each change is comprehensible and adequate (it doesn't need to be perfect).\n   g. Consider any existing comments and their relevance.\n\n2. Based on your analysis, decide whether to ACCEPT or REJECT the PR.\n\n3. Provide a brief REASON for your decision (maximum 2 sentences).\n   - For ACCEPT decisions, briefly explain why you accepted and note the positive aspects of the PR.\n   - For REJECT decisions, briefly explain why you rejected and note the main areas that need improvement.\n\n4. Draft 2-6 constructive comments that will help the student learn and improve their coding skills. Be specific about the code, commits, and overall PR quality.\n\nFormat your response as follows:\n\nPR: ACCEPT | REJECT\nREASON: [Your 1-2 sentence explanation]\n\n<comments>\n[Your 2-6 constructive comments, formatted with markdown for GitHub compatibility]\n</comments>\n\nRemember:\n- Keep your REASON brief and clear, never exceeding 2 sentences.\n- Comments should be constructive, specific, and focused on learning.\n- Use markdown in your comments for better formatting in GitHub.\n- PRs don't need to be perfect to be accepted, but they should be adequate and comprehensible.\n- If you can't understand the PR or its purpose, lean towards rejecting it.\n\nExample output structure (do not copy the content, only the format):\n\nPR: ACCEPT\nREASON: The changes improve code readability and implement the requested feature efficiently.\n\n<comments>\n1. **Great job on modularity**: Breaking down the \`autonomousPeriodic()\` method into smaller, focused functions enhances code maintainability.\n\n2. **Consider using constants**: Instead of hardcoding values like \`0.5\` in \`setMotorSpeed()\`, define constants at the class level for better readability and easier future adjustments.\n\n3. **Improve commit messages**: Your commits are well-sized, but try to make the messages more descriptive. For example, instead of "Fix bug", use "Fix motor speed calculation in autonomous mode".\n\n4. **Add comments to complex logic**: The PID controller implementation could benefit from a brief comment explaining the chosen P, I, and D values.\n</comments>\n\nNow, please review the pull request and provide your analysis and decision. Your final output should consist only of the PR decision, reason, and comments, and should not duplicate or rehash any of the work you did in the thinking block.\n`
                 }
               ],
               model: "deepseek-r1-distill-llama-70b",
@@ -223,14 +260,14 @@ jobs:
             });
 
             const json = await response.json();
-            const message = json.choices[0].message.content;
+            let message = json.choices[0].message.content;
             console.log(message);
 
             // Remove <think> ... </think>
             message = message.replace(/<think>.*?<\/think>/g, '');
-            accepted = message.includes("PR: ACCEPT");
-            reason = message.match(/REASON: (.*)/)?.[1] || '';
-            comments = message.match(/<comments>(.*?)<\/comments>/)?.[1] || '';
+            const accepted = message.includes("PR: ACCEPT");
+            const reason = message.match(/REASON: (.*)/)?.[1] || '';
+            const comments = message.match(/<comments>(.*?)<\/comments>/s)?.[1] || '';
 
             console.log(`Accepted: ${accepted}`);
             console.log(`Reason: ${reason}`);
@@ -247,3 +284,28 @@ jobs:
           FORMATTED_DIFFS: ${{ needs.fetch_pr_unified_diff.outputs.formatted_diffs }}
           FORMATTED_COMMENTS: ${{ needs.fetch_pr_all_comments.outputs.formatted_comments }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+
+  post_pr_comment:
+    needs: ai_analysis
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Leave PR Comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Get the PR number from the event payload
+            const prNumber = context.payload.pull_request.number;
+            const commentBody = `### Mentor Bot Review\n**${process.env.ACCEPTED ? 'Approved :+1:' : 'Changes Requested :-1:'}**\n${process.env.REASON}\n\n${process.env.COMMENTS}`;
+
+            // Create a comment on the PR
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: commentBody,
+            });
+            console.log(`Comment posted on PR #${prNumber}`);
+        env:
+          ACCEPTED: ${{ needs.ai_analysis.outputs.accepted }}
+          REASON: ${{ needs.ai_analysis.outputs.reason }}
+          COMMENTS: ${{ needs.ai_analysis.outputs.comments }}
