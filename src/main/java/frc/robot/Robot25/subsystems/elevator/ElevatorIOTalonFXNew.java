@@ -77,16 +77,37 @@ public class ElevatorIOTalonFXNew implements ElevatorIO {
 
     leadConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    currentPids.kP = Real.kP.get();
-    currentPids.kI = Real.kI.get();
-    currentPids.kD = Real.kD.get();
-    currentPids.kS = Real.kS.get();
-    currentPids.kG = Real.kG.get();
-    currentPids.kV = Real.kV.get();
-    currentPids.kA = Real.kA.get();
     leadConfig.Slot0 = currentPids;
+    Real.kP.addListener(kP -> {
+      currentPids.kP = kP;
+      lead.getConfigurator().apply(currentPids);
+    });
+    Real.kI.addListener(kI -> {
+      currentPids.kI = kI;
+      lead.getConfigurator().apply(currentPids);
+    });
+    Real.kD.addListener(kD -> {
+      currentPids.kD = kD;
+      lead.getConfigurator().apply(currentPids);
+    });
+    Real.kS.addListener(kS -> {
+      currentPids.kS = kS;
+      lead.getConfigurator().apply(currentPids);
+    });
+    Real.kG.addListener(kG -> {
+      currentPids.kG = kG;
+      lead.getConfigurator().apply(currentPids);
+    });
+    Real.kV.addListener(kV -> {
+      currentPids.kV = kV;
+      lead.getConfigurator().apply(currentPids);
+    });
+    Real.kA.addListener(kA -> {
+      currentPids.kA = kA;
+      lead.getConfigurator().apply(currentPids);
+    });
 
-    lead.getConfigurator().apply(leadConfig, .25);
+    lead.getConfigurator().apply(leadConfig, 0.25);
     lead.setPosition(0);
     follower.setControl(new Follower(rightMotorID, true));
 
@@ -110,38 +131,17 @@ public class ElevatorIOTalonFXNew implements ElevatorIO {
   @Override
   public void zeroEncoder() {
     lead.setPosition(0);
-
   }
 
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
-
-    Logger.recordOutput("MatchType", DriverStation.getMatchType());
-
-    // if not in a comp match and tuner values have changed; not supposed to
-    // periodically apply configs
-    if (DriverStation.getMatchType() == MatchType.None) {
-      if (currentPids.kP != Real.kP.get() || currentPids.kI != Real.kI.get() || currentPids.kD != Real.kD.get()
-          || currentPids.kS != Real.kS.get() || currentPids.kG != Real.kG.get() || currentPids.kV != Real.kV.get()
-          || currentPids.kA != Real.kA.get()) {
-        currentPids.kP = Real.kP.get();
-        currentPids.kI = Real.kI.get();
-        currentPids.kD = Real.kD.get();
-        currentPids.kS = Real.kS.get();
-        currentPids.kG = Real.kG.get();
-        currentPids.kV = Real.kV.get();
-        currentPids.kA = Real.kA.get();
-        lead.getConfigurator().apply(currentPids);
-      }
-    }
-
     var connectedStatus = BaseStatusSignal.refreshAll(leadCurrent, leadVoltage, leadPosition, leadVelocity);
+
     inputs.winchPosition = leadPosition.getValue();
     inputs.lowerLimit = lowerLimitSwitch.get();
     inputs.winchConnected = leadConnectedDebouncer.calculate(connectedStatus.isOK());
     inputs.winchVelocity = leadVelocity.getValue();
     inputs.winchCurrent = leadCurrent.getValue();
     inputs.winchAppliedVolts = leadVoltage.getValue();
-    // System.out.println(lowerLimitSwitch.get());
   }
 }

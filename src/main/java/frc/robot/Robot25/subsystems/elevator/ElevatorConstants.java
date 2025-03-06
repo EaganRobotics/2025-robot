@@ -9,8 +9,6 @@ import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
-import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
-
 import com.ctre.phoenix6.CANBus;
 
 import edu.wpi.first.units.measure.AngularAcceleration;
@@ -20,6 +18,7 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Voltage;
+import frc.lib.tunables.LoggedTunableNumber;
 
 /**
  *
@@ -40,14 +39,14 @@ public class ElevatorConstants {
   public static final Current CURRENT_LIMIT = Amps.of(40);
 
   public static final class Real {
-    public static final LoggedNetworkNumber kP = new LoggedNetworkNumber("Tuning/Elevator/kP", 6.0);
-    public static final LoggedNetworkNumber kI = new LoggedNetworkNumber("Tuning/Elevator/kI", 0.2);
-    public static final LoggedNetworkNumber kD = new LoggedNetworkNumber("Tuning/Elevator/kD", 0.1);
-    public static final LoggedNetworkNumber kS = new LoggedNetworkNumber("Tuning/Elevator/kS", 0.0);
-    public static final LoggedNetworkNumber kG = new LoggedNetworkNumber("Tuning/Elevator/kG", 0.31); // From recalc
-    public static final LoggedNetworkNumber kV = new LoggedNetworkNumber("Tuning/Elevator/kV",
+    public static final LoggedTunableNumber kP = new LoggedTunableNumber("Tuning/Elevator/kP", 6.0);
+    public static final LoggedTunableNumber kI = new LoggedTunableNumber("Tuning/Elevator/kI", 0.2);
+    public static final LoggedTunableNumber kD = new LoggedTunableNumber("Tuning/Elevator/kD", 0.1);
+    public static final LoggedTunableNumber kS = new LoggedTunableNumber("Tuning/Elevator/kS", 0.0);
+    public static final LoggedTunableNumber kG = new LoggedTunableNumber("Tuning/Elevator/kG", 0.31); // From recalc
+    public static final LoggedTunableNumber kV = new LoggedTunableNumber("Tuning/Elevator/kV",
         0.1 * DRUM_RADIUS.in(Inches)); // 0.10 Vs/in from Recalc
-    public static final LoggedNetworkNumber kA = new LoggedNetworkNumber("Tuning/Elevator/kA",
+    public static final LoggedTunableNumber kA = new LoggedTunableNumber("Tuning/Elevator/kA",
         0.004 * DRUM_RADIUS.in(Meters)); // 0.04Vs^2/m from Recalc
 
     public static final double ODOMETRY_FREQUENCY = new CANBus().isNetworkFD() ? 250.0 : 100.0;
