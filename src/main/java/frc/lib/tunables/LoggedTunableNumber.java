@@ -24,7 +24,7 @@ public class LoggedTunableNumber extends LoggedNetworkNumber implements LoggedTu
   }
 
   public Double getValue() {
-    return entry.get();
+    return get();
   }
 
   public List<WeakReference<Consumer<Double>>> getListeners() {

@@ -24,7 +24,7 @@ public class LoggedTunableString extends LoggedNetworkString implements LoggedTu
   }
 
   public String getValue() {
-    return entry.get();
+    return get();
   }
 
   public List<WeakReference<Consumer<String>>> getListeners() {

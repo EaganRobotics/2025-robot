@@ -24,7 +24,7 @@ public class LoggedTunableBoolean extends LoggedNetworkBoolean implements Logged
   }
 
   public Boolean getValue() {
-    return entry.get();
+    return get();
   }
 
   public List<WeakReference<Consumer<Boolean>>> getListeners() {
