@@ -14,11 +14,11 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import frc.lib.tunables.LoggedTunableBoolean;
 import frc.robot.Robot25.subsystems.outtake.OuttakeConstants.Sim;
 import org.ironmaple.simulation.motorsims.MapleMotorSim;
 import org.ironmaple.simulation.motorsims.SimMotorConfigs;
 import org.ironmaple.simulation.motorsims.SimulatedMotorController;
-import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
 public class OuttakeIOSim implements OuttakeIO {
   private static final DCMotor outtakeGearbox = DCMotor.getKrakenX60(1);
@@ -26,24 +26,19 @@ public class OuttakeIOSim implements OuttakeIO {
   private final MapleMotorSim outtakeMotor;
   private boolean isClosedLoop = false;
   private Voltage outtakeAppliedVoltage = Volts.of(0);
-  private final SimpleMotorFeedforward feedForwardController =
-      new SimpleMotorFeedforward(Sim.kS, Sim.kV, Sim.kA);
+  private final SimpleMotorFeedforward feedForwardController = new SimpleMotorFeedforward(Sim.kS, Sim.kV, Sim.kA);
 
-  private final FlywheelSim outtakeSim =
-      new FlywheelSim(LinearSystemId.createFlywheelSystem(outtakeGearbox, 0.1, // To Do: Estimate
-                                                                               // this value
-          GEARING), outtakeGearbox, 0.000015);
+  private final FlywheelSim outtakeSim = new FlywheelSim(
+      LinearSystemId.createFlywheelSystem(outtakeGearbox, 0.1, GEARING), outtakeGearbox, 0.000015);
 
-  LoggedNetworkBoolean LoadSideSensor = new LoggedNetworkBoolean("/Tuning/LoadSideSensor", false);
-  LoggedNetworkBoolean ScoreSideSensor = new LoggedNetworkBoolean("/Tuning/ScoreSideSensor", false);
+  LoggedTunableBoolean LoadSideSensor = new LoggedTunableBoolean("Tuning/Outtake/LoadSideSensor", false);
+  LoggedTunableBoolean ScoreSideSensor = new LoggedTunableBoolean("Tuning/Outtake/ScoreSideSensor", false);
 
   public OuttakeIOSim() {
     outtakeMotor = new MapleMotorSim(
         new SimMotorConfigs(outtakeGearbox, GEARING, Sim.MOTOR_LOAD_MOI, Sim.FRICTION_VOLTAGE));
-    outtakeMotorController =
-        outtakeMotor.useSimpleDCMotorController().withCurrentLimit(CURRENT_LIMIT);
+    outtakeMotorController = outtakeMotor.useSimpleDCMotorController().withCurrentLimit(CURRENT_LIMIT);
   }
-
 
   @Override
   public void setOpenLoop(Voltage output) {
