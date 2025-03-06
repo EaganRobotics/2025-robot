@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.InchesPerSecond;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Volts;
@@ -33,18 +34,21 @@ public class ElevatorConstants {
   public static final Distance INITIAL_HEIGHT = Inches.of(16.4);
   public static final Distance MAX_EXTENSION = Inches.of(80);
   public static final Mass CARRIAGE_MASS = Pounds.of(19.147);
-  public static final LinearVelocity MAX_VELOCITY = InchesPerSecond.of(178.63);
-  public static final AngularAcceleration MAX_ACCELERATION = RadiansPerSecondPerSecond.of(270 / DRUM_RADIUS.in(Inches));
-  public static final Current CURRENT_LIMIT = Amps.of(30);
+  public static final LinearVelocity MAX_VELOCITY = InchesPerSecond.of(121.36); // From recalc
+  public static final AngularAcceleration MAX_ACCELERATION = RadiansPerSecondPerSecond
+      .of(626.72 / DRUM_RADIUS.in(Inches)); // From recalc
+  public static final Current CURRENT_LIMIT = Amps.of(40);
 
   public static final class Real {
-    public static final LoggedNetworkNumber kP = new LoggedNetworkNumber("Tuning/Elevator/kP", 2.0);
-    public static final LoggedNetworkNumber kI = new LoggedNetworkNumber("Tuning/Elevator/kI", 0.0);
+    public static final LoggedNetworkNumber kP = new LoggedNetworkNumber("Tuning/Elevator/kP", 6.0);
+    public static final LoggedNetworkNumber kI = new LoggedNetworkNumber("Tuning/Elevator/kI", 0.2);
     public static final LoggedNetworkNumber kD = new LoggedNetworkNumber("Tuning/Elevator/kD", 0.1);
     public static final LoggedNetworkNumber kS = new LoggedNetworkNumber("Tuning/Elevator/kS", 0.0);
-    public static final LoggedNetworkNumber kG = new LoggedNetworkNumber("Tuning/Elevator/kG", 0.0);
-    public static final LoggedNetworkNumber kV = new LoggedNetworkNumber("Tuning/Elevator/kV", 0.0);
-    public static final LoggedNetworkNumber kA = new LoggedNetworkNumber("Tuning/Elevator/kA", 0.0);
+    public static final LoggedNetworkNumber kG = new LoggedNetworkNumber("Tuning/Elevator/kG", 0.31); // From recalc
+    public static final LoggedNetworkNumber kV = new LoggedNetworkNumber("Tuning/Elevator/kV",
+        0.1 * DRUM_RADIUS.in(Inches)); // 0.10 Vs/in from Recalc
+    public static final LoggedNetworkNumber kA = new LoggedNetworkNumber("Tuning/Elevator/kA",
+        0.004 * DRUM_RADIUS.in(Meters)); // 0.04Vs^2/m from Recalc
 
     public static final double ODOMETRY_FREQUENCY = new CANBus().isNetworkFD() ? 250.0 : 100.0;
   }
