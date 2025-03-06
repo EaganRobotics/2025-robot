@@ -26,18 +26,22 @@ public class OuttakeIOSim implements OuttakeIO {
   private final MapleMotorSim outtakeMotor;
   private boolean isClosedLoop = false;
   private Voltage outtakeAppliedVoltage = Volts.of(0);
-  private final SimpleMotorFeedforward feedForwardController = new SimpleMotorFeedforward(Sim.kS, Sim.kV, Sim.kA);
+  private final SimpleMotorFeedforward feedForwardController =
+      new SimpleMotorFeedforward(Sim.kS, Sim.kV, Sim.kA);
 
   private final FlywheelSim outtakeSim = new FlywheelSim(
       LinearSystemId.createFlywheelSystem(outtakeGearbox, 0.1, GEARING), outtakeGearbox, 0.000015);
 
-  LoggedTunableBoolean LoadSideSensor = new LoggedTunableBoolean("Tuning/Outtake/LoadSideSensor", false);
-  LoggedTunableBoolean ScoreSideSensor = new LoggedTunableBoolean("Tuning/Outtake/ScoreSideSensor", false);
+  LoggedTunableBoolean LoadSideSensor =
+      new LoggedTunableBoolean("Tuning/Outtake/LoadSideSensor", false);
+  LoggedTunableBoolean ScoreSideSensor =
+      new LoggedTunableBoolean("Tuning/Outtake/ScoreSideSensor", false);
 
   public OuttakeIOSim() {
     outtakeMotor = new MapleMotorSim(
         new SimMotorConfigs(outtakeGearbox, GEARING, Sim.MOTOR_LOAD_MOI, Sim.FRICTION_VOLTAGE));
-    outtakeMotorController = outtakeMotor.useSimpleDCMotorController().withCurrentLimit(CURRENT_LIMIT);
+    outtakeMotorController =
+        outtakeMotor.useSimpleDCMotorController().withCurrentLimit(CURRENT_LIMIT);
   }
 
   @Override

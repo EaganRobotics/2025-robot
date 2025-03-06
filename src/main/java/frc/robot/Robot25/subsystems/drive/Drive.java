@@ -63,15 +63,18 @@ import org.littletonrobotics.junction.Logger;
 public class Drive extends SubsystemBase implements VisionConsumer {
 
   // Configure path planner
-  private static final RobotConfig PP_CONFIG = new RobotConfig(DriveConstants.ROBOT_MASS_KG,
-      DriveConstants.ROBOT_MOI, new ModuleConfig(0.046, 4, 1.524,
-          DCMotor.getKrakenX60(1).withReduction(6.122), DriveConstants.FrontLeft.SlipCurrent, 1),
-      getModuleTranslations());
+  private static final RobotConfig PP_CONFIG =
+      new RobotConfig(DriveConstants.ROBOT_MASS_KG, DriveConstants.ROBOT_MOI,
+          new ModuleConfig(DriveConstants.kWheelRadius.in(Meters),
+              DriveConstants.kSpeedAt12Volts.in(MetersPerSecond), DriveConstants.WHEEL_COF,
+              DCMotor.getKrakenX60(1).withReduction(DriveConstants.kDriveGearRatio),
+              DriveConstants.FrontLeft.SlipCurrent, 1),
+          getModuleTranslations());
 
   // Maple Sim config constants
   public static final DriveTrainSimulationConfig MAPLE_SIM_CONFIG =
       DriveTrainSimulationConfig.Default().withRobotMass(Kilograms.of(DriveConstants.ROBOT_MASS_KG))
-          .withCustomModuleTranslations(getModuleTranslations()).withGyro(COTS.ofNav2X())
+          .withCustomModuleTranslations(getModuleTranslations()).withGyro(COTS.ofPigeon2())
           .withSwerveModule(new SwerveModuleSimulationConfig(DCMotor.getKrakenX60(1),
               DCMotor.getFalcon500(1), DriveConstants.FrontLeft.DriveMotorGearRatio,
               DriveConstants.FrontLeft.SteerMotorGearRatio,
@@ -90,7 +93,7 @@ public class Drive extends SubsystemBase implements VisionConsumer {
       new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
-  private Rotation2d rawGyroRotation = new Rotation2d();
+  private Rotation2d rawGyroRotation = Rotation2d.kZero;
   private SwerveModulePosition[] lastModulePositions = // For delta tracking
       new SwerveModulePosition[] {new SwerveModulePosition(), new SwerveModulePosition(),
           new SwerveModulePosition(), new SwerveModulePosition()};
@@ -335,9 +338,7 @@ public class Drive extends SubsystemBase implements VisionConsumer {
 
   /** Adds a new timestamped vision measurement. */
   @Override
-  public void accept(
-
-      Pose2d visionRobotPoseMeters, double timestampSeconds,
+  public void accept(Pose2d visionRobotPoseMeters, double timestampSeconds,
       Matrix<N3, N1> visionMeasurementStdDevs) {
     poseEstimator.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds,
         visionMeasurementStdDevs);
@@ -350,7 +351,7 @@ public class Drive extends SubsystemBase implements VisionConsumer {
 
   /** Returns the maximum angular speed in radians per sec. */
   public double getMaxAngularSpeedRadPerSec() {
-    return getMaxLinearSpeedMetersPerSec() / DriveConstants.DRIVE_BASE_RADIUS;
+    return DriveConstants.MAX_ANGULAR_VELOCITY.in(RadiansPerSecond);
   }
 
   /** Returns an array of module translations. */

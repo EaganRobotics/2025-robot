@@ -122,17 +122,15 @@ public class DriveConstants {
   // This may need to be tuned to your individual robot
   private static final double kCoupleRatio = 3.8181818181818183;
 
-  private static final double kDriveGearRatio = 6.122; // Source: MK4i swerve module page; L3
-                                                       // gearing
+  public static final double kDriveGearRatio = 6.122; // Source: MK4i swerve module page; L3
+                                                      // gearing
   private static final double kSteerGearRatio = 150.0 / 7.0; // Source: MK4i swerve module page
-  private static final Distance kWheelRadius = Inches.of(2); // TODO measure
+  public static final Distance kWheelRadius = Inches.of(2); // TODO measure
 
   // Theoretical free speed (m/s) at 12 V applied output;
   // This needs to be tuned to your individual robot
   public static final double kMaxDriveMotorRPM = 6000.0;
-  public static final LinearVelocity kSpeedAt12Volts = MetersPerSecond
-      .of(Math.PI * kWheelRadius.in(Meters) * 2 * kMaxDriveMotorRPM / 60 / kDriveGearRatio); // 5.22
-                                                                                             // m/s
+  public static final LinearVelocity kSpeedAt12Volts = MetersPerSecond.of(5.22);
 
   private static final boolean kInvertLeftSide = false;
   private static final boolean kInvertRightSide = true;
@@ -216,11 +214,14 @@ public class DriveConstants {
           kInvertRightSide, kBackRightSteerMotorInverted, kBackRightEncoderInverted);
 
   // For max angular velocity calculations
-  public static final double DRIVE_BASE_RADIUS = Math.max(
+  public static final Distance DRIVE_BASE_RADIUS = Meters.of(Math.max(
       Math.max(Math.hypot(DriveConstants.FrontLeft.LocationX, DriveConstants.FrontRight.LocationY),
           Math.hypot(DriveConstants.FrontRight.LocationX, DriveConstants.FrontRight.LocationY)),
       Math.max(Math.hypot(DriveConstants.BackLeft.LocationX, DriveConstants.BackLeft.LocationY),
-          Math.hypot(DriveConstants.BackRight.LocationX, DriveConstants.BackRight.LocationY)));
+          Math.hypot(DriveConstants.BackRight.LocationX, DriveConstants.BackRight.LocationY))));
+
+  public static final AngularVelocity MAX_ANGULAR_VELOCITY =
+      RadiansPerSecond.of(kSpeedAt12Volts.in(MetersPerSecond) / DRIVE_BASE_RADIUS.in(Meters));
 
   public static final double ODOMETRY_FREQUENCY =
       new CANBus(DriveConstants.DrivetrainConstants.CANBusName).isNetworkFD() ? 250.0 : 100.0;
