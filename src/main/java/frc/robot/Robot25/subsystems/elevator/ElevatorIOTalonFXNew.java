@@ -36,7 +36,8 @@ import org.littletonrobotics.junction.Logger;
 
 public class ElevatorIOTalonFXNew implements ElevatorIO {
 
-  private final DigitalInputWrapper lowerLimitSwitch = new DigitalInputWrapper(3, "lowerLimit", true);
+  private final DigitalInputWrapper lowerLimitSwitch =
+      new DigitalInputWrapper(3, "lowerLimit", true);
   private final TalonFX lead, follower;
   private final StatusSignal<Angle> leadPosition;
   private final StatusSignal<AngularVelocity> leadVelocity;
@@ -71,7 +72,8 @@ public class ElevatorIOTalonFXNew implements ElevatorIO {
     leadConfig.Voltage.PeakForwardVoltage = 10;
     leadConfig.Voltage.PeakReverseVoltage = -10;
 
-    leadConfig.MotionMagic.MotionMagicAcceleration = MAX_ACCELERATION.in(RotationsPerSecondPerSecond);
+    leadConfig.MotionMagic.MotionMagicAcceleration =
+        MAX_ACCELERATION.in(RotationsPerSecondPerSecond);
     leadConfig.MotionMagic.MotionMagicCruiseVelocity = RadiansPerSecond
         .of(MAX_VELOCITY.in(MetersPerSecond) / DRUM_RADIUS.in(Meters)).in(RotationsPerSecond);
 
@@ -135,7 +137,8 @@ public class ElevatorIOTalonFXNew implements ElevatorIO {
 
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
-    var connectedStatus = BaseStatusSignal.refreshAll(leadCurrent, leadVoltage, leadPosition, leadVelocity);
+    var connectedStatus =
+        BaseStatusSignal.refreshAll(leadCurrent, leadVoltage, leadPosition, leadVelocity);
 
     inputs.winchPosition = leadPosition.getValue();
     inputs.lowerLimit = lowerLimitSwitch.get();
