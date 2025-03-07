@@ -64,14 +64,14 @@ public class Drive extends SubsystemBase implements VisionConsumer {
 
   // Configure path planner
   private static final RobotConfig PP_CONFIG = new RobotConfig(DriveConstants.ROBOT_MASS_KG,
-      DriveConstants.ROBOT_MOI, new ModuleConfig(0.046, 4, 1.524,
+      DriveConstants.ROBOT_MOI, new ModuleConfig(0.046, 5, 1.524,
           DCMotor.getKrakenX60(1).withReduction(6.122), DriveConstants.FrontLeft.SlipCurrent, 1),
       getModuleTranslations());
 
   // Maple Sim config constants
   public static final DriveTrainSimulationConfig MAPLE_SIM_CONFIG =
       DriveTrainSimulationConfig.Default().withRobotMass(Kilograms.of(DriveConstants.ROBOT_MASS_KG))
-          .withCustomModuleTranslations(getModuleTranslations()).withGyro(COTS.ofNav2X())
+          .withCustomModuleTranslations(getModuleTranslations()).withGyro(COTS.ofPigeon2())
           .withSwerveModule(new SwerveModuleSimulationConfig(DCMotor.getKrakenX60(1),
               DCMotor.getFalcon500(1), DriveConstants.FrontLeft.DriveMotorGearRatio,
               DriveConstants.FrontLeft.SteerMotorGearRatio,
