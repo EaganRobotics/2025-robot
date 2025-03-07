@@ -10,7 +10,6 @@ package frc.lib;
  */
 
 import edu.wpi.first.wpilibj.RobotBase;
-import frc.lib.faults.Fault;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.function.Function;
@@ -21,7 +20,6 @@ public enum RobotInstance {
 
   private String address;
   private static RobotInstance current = getMacAddress();
-  private static Fault fault;
 
   RobotInstance(String text) {
     this.address = text;

@@ -93,7 +93,6 @@ public class Drive extends SubsystemBase /* implements Vision.VisionConsumer */ 
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, Pose2d.kZero);
 
-  private boolean coastModeOn = false;
   private boolean snapToRotationEnabled = false;
   private Rotation2d desiredRotation = new Rotation2d();
 
