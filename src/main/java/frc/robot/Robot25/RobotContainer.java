@@ -3,8 +3,6 @@
 package frc.robot.Robot25;
 
 import static edu.wpi.first.units.Units.*;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerMotorArrangement;
@@ -15,13 +13,6 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.XboxController;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -201,7 +192,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
         .onTrue(Commands.runOnce(
             () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
             drive).ignoringDisable(true));
-    driverController.y().whileTrue(DriveCommands.Snapper(drive));
+    driverController.rightBumper().whileTrue(DriveCommands.Snapper(drive));
+    driverController.leftBumper().whileTrue(DriveCommands.AutoSnapperSource(drive));
 
     operatorController.leftTrigger().whileTrue(outtake.autoQueueCoralOveride());
     operatorController.rightTrigger().whileTrue(outtake.reverseCoral());
@@ -218,11 +210,11 @@ public class RobotContainer extends frc.lib.RobotContainer {
     operatorController.povRight().whileTrue(algae.setOpenLoop(Volts.of(4)));
     operatorController.povLeft().whileTrue(algae.setOpenLoop(Volts.of(-4)));
 
-    operatorController.axisMagnitudeGreaterThan(5, 0.1)
-        .whileTrue(outtake.openLoop(operatorController::getRightY));
-
     operatorController.axisMagnitudeGreaterThan(1, 0.1)
-        .whileTrue(elevator.openLoop(operatorController::getLeftY));
+        .whileTrue(outtake.openLoop(operatorController::getLeftY));
+
+    operatorController.axisMagnitudeGreaterThan(5, 0.1)
+        .whileTrue(elevator.openLoop(operatorController::getRightY));
     // ##########################################################################################################
   }
 

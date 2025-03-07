@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 public class GraphWrapper {
   private String name;
   private GenericEntry graph;
-  private String tab;
 
   public GraphWrapper(String name, String tab) {
     this.name = name;

@@ -28,8 +28,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.MatchType;
 import frc.lib.devices.DigitalInputWrapper;
 import frc.robot.Robot25.subsystems.elevator.ElevatorConstants.Real;
 import org.littletonrobotics.junction.Logger;

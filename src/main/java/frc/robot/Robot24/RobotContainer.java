@@ -38,7 +38,6 @@ import frc.robot.Robot24.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.SimConstants;
 import frc.robot.SimConstants.Mode;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
