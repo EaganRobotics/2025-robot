@@ -53,7 +53,7 @@ public class DriveCommands {
   /// Auto snap to position distance
   private static final Distance SNAPPY_RADIUS = Inches.of(12);
 
-  private static final double INCHES_FROM_REEF = 16.75 + 11.757361;
+  private static final double INCHES_FROM_REEF = 16.75 + 11.757361 - 1;
   private static final double REEF_CENTER_X_INCHES = 176.745545;
   private static final double REEF_CENTER_Y_INCHES = 158.500907;
 
