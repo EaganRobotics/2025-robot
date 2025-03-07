@@ -6,3 +6,4 @@
 # /docs/                               # gives PR approval access to the docs folder to all repo writers
 # /protected/      @TimHendricksen     # gives PR approval access to the protected folder only to Tim
 # *.java           @scuyul             # gives PR approval access to all Java files only to Griffin (don't do this)
+#*.java           @scuyul 
