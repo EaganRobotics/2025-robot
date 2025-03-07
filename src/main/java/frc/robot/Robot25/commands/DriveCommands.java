@@ -42,9 +42,6 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 public class DriveCommands {
   private static final double SLOW_MODE_MULTIPLIER = 0.5;
   private static final double DEADBAND = 0.1;
-  // private static final double ANGLE_KP = 7.0;
-  // private static final double ANGLE_KI = 0.0;
-  // private static final double ANGLE_KD = 0.4;
   private static final double ANGLE_MAX_VELOCITY = 8.0;
   private static final double ANGLE_MAX_ACCELERATION = 20.0;
   private static final double ANGLE_TOLERANCE = Degrees.of(1).in(Radians);
@@ -340,7 +337,6 @@ public class DriveCommands {
   };
 
   public static Command snapToPosition(Drive drive, Pose2d desiredPosition) {
-
     return Commands.run(() -> {
 
       var x = xController.calculate(drive.getPose().getX(), desiredPosition.getX());
@@ -367,9 +363,11 @@ public class DriveCommands {
 
         // Reset PID controller when command starts
         .beforeStarting(() -> {
-          angleController.reset(drive.getRotation().getRadians());
-          xController.reset(drive.getPose().getX());
-          yController.reset(drive.getPose().getY());
+          var fieldRelativeSpeeds = drive.getFieldRelativeSpeeds();
+          angleController.reset(drive.getRotation().getRadians(),
+              fieldRelativeSpeeds.omegaRadiansPerSecond);
+          xController.reset(drive.getPose().getX(), fieldRelativeSpeeds.vxMetersPerSecond);
+          yController.reset(drive.getPose().getY(), fieldRelativeSpeeds.vyMetersPerSecond);
         }).until(() -> angleController.atGoal() && xController.atGoal() && yController.atGoal());
   }
 
@@ -442,9 +440,11 @@ public class DriveCommands {
 
         // Reset PID controller when command starts
         .beforeStarting(() -> {
-          angleController.reset(drive.getRotation().getRadians());
-          xController.reset(drive.getPose().getX());
-          yController.reset(drive.getPose().getY());
+          var fieldRelativeSpeeds = drive.getFieldRelativeSpeeds();
+          angleController.reset(drive.getRotation().getRadians(),
+              fieldRelativeSpeeds.omegaRadiansPerSecond);
+          xController.reset(drive.getPose().getX(), fieldRelativeSpeeds.vxMetersPerSecond);
+          yController.reset(drive.getPose().getY(), fieldRelativeSpeeds.vyMetersPerSecond);
         });
   }
 }

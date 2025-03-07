@@ -62,20 +62,10 @@ public class VisionIOLimelight implements VisionIO {
         limelightTable.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[] {});
     megatag2Subscriber =
         limelightTable.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[] {});
-
-
-
   }
-
-
 
   @Override
   public void updateInputs(VisionIOInputs inputs) {
-    // if (alliance != DriverStation.getAlliance().orElse(Alliance.Blue)) {
-    // setUpMegaTags();
-    // alliance = DriverStation.getAlliance().get();
-    // }
-
     // Update connection status based on whether an update has been seen in the last
     // 250ms
     inputs.connected =
