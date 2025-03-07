@@ -1,10 +1,17 @@
 package frc.robot.Robot25.subsystems.outtake;
 
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Volts;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import frc.lib.devices.DigitalInputWrapper;
 import frc.lib.devices.TalonFXWrapper;
+import org.littletonrobotics.junction.Logger;
 
 public class OuttakeIOTalonFX implements OuttakeIO {
   TalonFXWrapper outtakeTalonFX;
@@ -18,7 +25,11 @@ public class OuttakeIOTalonFX implements OuttakeIO {
   DigitalInputWrapper outputSensor = new DigitalInputWrapper(0, "ScoreSideSensor", true);
 
   public OuttakeIOTalonFX() {
-    outtakeTalonFX = new TalonFXWrapper(motorID, "Outtake", true, NeutralModeValue.Brake);
+    outtakeTalonFX = new TalonFXWrapper(motorID, "Outtake", true, NeutralModeValue.Brake, 1, 1, 0,
+        1, RotationsPerSecondPerSecond.of(1), RotationsPerSecond.of(1),
+        // RotationsPerSecCubed.of(0),
+        false, false, Rotations.of(0), Rotations.of(0), null, Units.Seconds.of(1),
+        Units.Amps.of(75), Units.RotationsPerSecond.of(1));
     outtakeRollerFX = new TalonFXWrapper(rollerID, "Outtake Roller", true, NeutralModeValue.Brake);
   }
 
@@ -42,5 +53,17 @@ public class OuttakeIOTalonFX implements OuttakeIO {
     inputs.seesCoralAtInput = inputSensor.get();
     inputs.seesCoralAtOutput = outputSensor.get();
   }
+
+  @Override
+  public void zeroMotor() {
+    outtakeTalonFX.setPosition(0);
+  }
+
+  @Override
+  public void setPosition(Angle angle) {
+    Logger.recordOutput("outtakeAngle", angle);
+    outtakeTalonFX.setMotionMagicVoltage(angle);
+  }
+
 
 }
