@@ -2,8 +2,6 @@
 
 package frc.robot.Robot25;
 
-
-
 import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
@@ -194,7 +192,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
         .onTrue(Commands.runOnce(
             () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
             drive).ignoringDisable(true));
-    driverController.y().whileTrue(DriveCommands.Snapper(drive));
+    driverController.rightBumper().whileTrue(DriveCommands.Snapper(drive));
+    driverController.leftBumper().whileTrue(DriveCommands.AutoSnapperSource(drive));
 
     operatorController.leftTrigger().whileTrue(outtake.autoQueueCoralOveride());
     operatorController.rightTrigger().whileTrue(outtake.reverseCoral());
@@ -211,11 +210,11 @@ public class RobotContainer extends frc.lib.RobotContainer {
     operatorController.povRight().whileTrue(algae.setOpenLoop(Volts.of(4)));
     operatorController.povLeft().whileTrue(algae.setOpenLoop(Volts.of(-4)));
 
-    operatorController.axisMagnitudeGreaterThan(5, 0.1)
-        .whileTrue(outtake.openLoop(operatorController::getRightY));
-
     operatorController.axisMagnitudeGreaterThan(1, 0.1)
-        .whileTrue(elevator.openLoop(operatorController::getLeftY));
+        .whileTrue(outtake.openLoop(operatorController::getLeftY));
+
+    operatorController.axisMagnitudeGreaterThan(5, 0.1)
+        .whileTrue(elevator.openLoop(operatorController::getRightY));
     // ##########################################################################################################
   }
 
