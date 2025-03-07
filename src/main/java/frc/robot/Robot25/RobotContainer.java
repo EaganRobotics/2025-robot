@@ -210,11 +210,11 @@ public class RobotContainer extends frc.lib.RobotContainer {
     operatorController.povRight().whileTrue(algae.setOpenLoop(Volts.of(4)));
     operatorController.povLeft().whileTrue(algae.setOpenLoop(Volts.of(-4)));
 
-    operatorController.axisMagnitudeGreaterThan(5, 0.1)
-        .whileTrue(outtake.openLoop(operatorController::getRightY));
-
     operatorController.axisMagnitudeGreaterThan(1, 0.1)
-        .whileTrue(elevator.openLoop(operatorController::getLeftY));
+        .whileTrue(outtake.openLoop(operatorController::getLeftY));
+
+    operatorController.axisMagnitudeGreaterThan(5, 0.1)
+        .whileTrue(elevator.openLoop(operatorController::getRightY));
     // ##########################################################################################################
   }
 
