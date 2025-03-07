@@ -95,7 +95,6 @@ public class Outtake extends SubsystemBase {
         .withTimeout(1);
   }
 
-
   public Command openLoop(DoubleSupplier speed) {
     return this.runEnd(() -> {
       io.setRollerOpenLoop(Volts.of(speed.getAsDouble() * Math.PI));
@@ -104,8 +103,6 @@ public class Outtake extends SubsystemBase {
       io.setRollerOpenLoop(Volts.of(0));
     });
   }
-
-
 
   public final Trigger seesAtOutputTrigger = new Trigger(() -> inputs.seesCoralAtOutput);
   public final Trigger seesAtInputTrigger = new Trigger(() -> inputs.seesCoralAtInput);
