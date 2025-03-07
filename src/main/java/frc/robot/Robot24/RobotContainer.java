@@ -41,12 +41,9 @@ import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
- * This class is where the bulk of the robot should be declared. Since
- * Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in
- * the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of
- * the robot (including
+ * This class is where the bulk of the robot should be declared. Since Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer extends frc.lib.RobotContainer {
@@ -54,8 +51,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
   private final Drive drive;
 
   // Drive simulation
-  private static final SwerveDriveSimulation driveSimulation = new SwerveDriveSimulation(Drive.MAPLE_SIM_CONFIG,
-      SimConstants.SIM_INITIAL_FIELD_POSE);
+  private static final SwerveDriveSimulation driveSimulation =
+      new SwerveDriveSimulation(Drive.MAPLE_SIM_CONFIG, SimConstants.SIM_INITIAL_FIELD_POSE);
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -71,8 +68,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
     super(driveSimulation);
 
     // Check for valid swerve config
-    var modules = new SwerveModuleConstants[] { DriveConstants.FrontLeft, DriveConstants.FrontRight,
-        DriveConstants.BackLeft, DriveConstants.BackRight };
+    var modules = new SwerveModuleConstants[] {DriveConstants.FrontLeft, DriveConstants.FrontRight,
+        DriveConstants.BackLeft, DriveConstants.BackRight};
     for (var constants : modules) {
       if (constants.DriveMotorType != DriveMotorArrangement.TalonFX_Integrated
           || constants.SteerMotorType != SteerMotorArrangement.TalonFX_Integrated) {
@@ -101,13 +98,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
       default:
         // Replayed robot, disable IO implementations
-        drive = new Drive(new GyroIO() {
-        }, new ModuleIO() {
-        }, new ModuleIO() {
-        }, new ModuleIO() {
-        },
-            new ModuleIO() {
-            });
+        drive = new Drive(new GyroIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {},
+            new ModuleIO() {});
         break;
     }
 
@@ -133,11 +125,9 @@ public class RobotContainer extends frc.lib.RobotContainer {
   }
 
   /**
-   * Use this method to define your button->command mappings. Buttons can be
-   * created by
+   * Use this method to define your button->command mappings. Buttons can be created by
    * instantiating a {@link GenericHID} or one of its subclasses
-   * ({@link edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then
-   * passing it to a
+   * ({@link edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
