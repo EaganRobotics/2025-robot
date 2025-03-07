@@ -7,14 +7,37 @@ import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import com.ctre.phoenix6.swerve.*;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.*;
+import com.pathplanner.lib.config.PIDConstants;
+
 import edu.wpi.first.units.measure.*;
 
 public class DriveConstants {
 
-  /* These constants only affect real hardware */
-  public static class Real {
+  // Stator current limits
+  public static final Current DRIVE_CURRENT_LIMIT = Amps.of(60); // TODO consider raising to 70 or
+                                                                 // 80 amps
+  public static final Current TURN_CURRENT_LIMIT = Amps.of(60); // TODO consider lowering to about
+                                                                // 40 amps
 
-    /* TODO Both sets of gains need to be tuned to your individual robot */
+  // The stator current at which the wheels start to slip;
+  private static final Current kSlipCurrent = Amps.of(120.0); // TODO measure this
+
+  // PathPlanner and Maple Sim config constants
+  public static final Distance kWheelRadius = Inches.of(2); // TODO measure often
+  public static final double ROBOT_MASS_KG = 54.431;
+  public static final double ROBOT_MOI = 5.98;
+  public static final double WHEEL_COF = 1.542;
+  public static final double kDriveGearRatio = 6.122; // Source: MK4i swerve module page; L3 gearing
+  private static final double kSteerGearRatio = 150.0 / 7.0; // Source: MK4i swerve module page
+  public static final double kMaxDriveMotorRPM = 6000.0;
+  public static final LinearVelocity kSpeedAt12Volts = MetersPerSecond.of(5.22);
+
+  // PID Gains for PathPlanner
+  public static final PIDConstants PP_TRANSLATION_GAINS = new PIDConstants(0.001, 0.0, 0.0);
+  public static final PIDConstants PP_ROTATION_GAINS = new PIDConstants(2.0, 0.0, 0.3);
+
+  /* These Gains constants only affect real hardware */
+  public static class Real {
 
     // The steer motor uses any SwerveModule.SteerRequestType control request with
     // the output type specified by SwerveModuleConstants.SteerMotorClosedLoopOutput
@@ -29,16 +52,10 @@ public class DriveConstants {
             .withKD(0 * METERS_TO_ROTATIONS).withKS(0.065599).withKV(2.2267 * METERS_TO_ROTATIONS)
             .withKA(0.058183 * METERS_TO_ROTATIONS);
 
-    // Curint limits
-    public static final double MaxDriveAmps = 45;
-
   }
 
-  /* These constants only affect simulation */
+  /* These Gains constants only affect simulation */
   public static class Sim {
-
-    // TODO Both sets of gains need to be tuned to your individual robot; practice
-    // tuning in simulation
 
     /* Steer gains */
     public static final double STEER_KS = 0.1;
@@ -61,13 +78,8 @@ public class DriveConstants {
     private static final MomentOfInertia kDriveInertia = KilogramSquareMeters.of(0.01);
 
     private static final Voltage kSteerFrictionVoltage = Volts.of(0.4); // suggested range 0.3 - 0.5
-    private static final Voltage kDriveFrictionVoltage = Volts.of(0.7); // suggested range 0.6 - 0.8
+    private static final Voltage kDriveFrictionVoltage = Volts.of(0.4); // suggested range 0.6 - 0.8
   }
-
-  // PathPlanner and Maple Sim config constants
-  public static final double ROBOT_MASS_KG = 16.21;
-  public static final double ROBOT_MOI = 3.805;
-  public static final double WHEEL_COF = 1.542;
 
   // The closed-loop output type to use for the steer motors;
   // This affects the PID/FF gains for the steer motors
@@ -88,26 +100,19 @@ public class DriveConstants {
   // irrelevant
   private static final SteerFeedbackType kSteerFeedbackType = SteerFeedbackType.RemoteCANcoder;
 
-  // TODO The stator current at which the wheels start to slip;
-  // This needs to be tuned to your individual robot
-  private static final Current kSlipCurrent = Amps.of(120.0);
-
   // Initial configs for the drive and steer motors and the azimuth encoder; these
   // cannot be null.
   // Some configs will be overwritten; check the `with*InitialConfigs()` API
   // documentation.
   private static final TalonFXConfiguration driveInitialConfigs =
       new TalonFXConfiguration().withCurrentLimits(new CurrentLimitsConfigs()
-          .withStatorCurrentLimit(Amps.of(60)).withStatorCurrentLimitEnable(true));
+          .withStatorCurrentLimit(DRIVE_CURRENT_LIMIT).withStatorCurrentLimitEnable(true));
+  // Swerve azimuth does not require much torque output, so we can set a
+  // relatively low stator current limit to help avoid brownouts without impacting
+  // performance.
   private static final TalonFXConfiguration steerInitialConfigs =
       new TalonFXConfiguration().withCurrentLimits(new CurrentLimitsConfigs()
-          // Swerve azimuth does not require much torque output, so we can
-          // set a
-          // relatively
-          // low
-          // stator current limit to help avoid brownouts without
-          // impacting performance.
-          .withStatorCurrentLimit(Amps.of(60)).withStatorCurrentLimitEnable(true));
+          .withStatorCurrentLimit(TURN_CURRENT_LIMIT).withStatorCurrentLimitEnable(true));
 
   // Configs for the Pigeon 2; leave this null to skip applying Pigeon 2 configs
   private static final Pigeon2Configuration pigeonConfigs = new Pigeon2Configuration();
@@ -121,18 +126,6 @@ public class DriveConstants {
   // Every 1 rotation of the azimuth results in kCoupleRatio drive motor turns;
   // This may need to be tuned to your individual robot
   private static final double kCoupleRatio = 3.8181818181818183;
-
-  private static final double kDriveGearRatio = 6.122; // Source: MK4i swerve module page; L3
-                                                       // gearing
-  private static final double kSteerGearRatio = 150.0 / 7.0; // Source: MK4i swerve module page
-  private static final Distance kWheelRadius = Inches.of(2); // TODO measure
-
-  // Theoretical free speed (m/s) at 12 V applied output;
-  // This needs to be tuned to your individual robot
-  public static final double kMaxDriveMotorRPM = 6000.0;
-  public static final LinearVelocity kSpeedAt12Volts = MetersPerSecond
-      .of(Math.PI * kWheelRadius.in(Meters) * 2 * kMaxDriveMotorRPM / 60 / kDriveGearRatio); // 5.22
-                                                                                             // m/s
 
   private static final boolean kInvertLeftSide = false;
   private static final boolean kInvertRightSide = true;
@@ -216,11 +209,14 @@ public class DriveConstants {
           kInvertRightSide, kBackRightSteerMotorInverted, kBackRightEncoderInverted);
 
   // For max angular velocity calculations
-  public static final double DRIVE_BASE_RADIUS = Math.max(
+  public static final Distance DRIVE_BASE_RADIUS = Meters.of(Math.max(
       Math.max(Math.hypot(DriveConstants.FrontLeft.LocationX, DriveConstants.FrontRight.LocationY),
           Math.hypot(DriveConstants.FrontRight.LocationX, DriveConstants.FrontRight.LocationY)),
       Math.max(Math.hypot(DriveConstants.BackLeft.LocationX, DriveConstants.BackLeft.LocationY),
-          Math.hypot(DriveConstants.BackRight.LocationX, DriveConstants.BackRight.LocationY)));
+          Math.hypot(DriveConstants.BackRight.LocationX, DriveConstants.BackRight.LocationY))));
+
+  public static final AngularVelocity MAX_ANGULAR_VELOCITY =
+      RadiansPerSecond.of(kSpeedAt12Volts.in(MetersPerSecond) / DRIVE_BASE_RADIUS.in(Meters));
 
   public static final double ODOMETRY_FREQUENCY =
       new CANBus(DriveConstants.DrivetrainConstants.CANBusName).isNetworkFD() ? 250.0 : 100.0;
