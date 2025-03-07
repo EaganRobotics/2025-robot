@@ -120,8 +120,8 @@ public class Drive extends SubsystemBase implements VisionConsumer {
 
     // Configure AutoBuilder for PathPlanner
     AutoBuilder.configure(this::getPose, this::setPose, this::getChassisSpeeds, this::runVelocity,
-        new PPHolonomicDriveController(new PIDConstants(0.001, 0.0, 0.0),
-            new PIDConstants(2.0, 0.0, 0.3)),
+        new PPHolonomicDriveController(DriveConstants.PP_TRANSLATION_GAINS,
+            DriveConstants.PP_ROTATION_GAINS),
         PP_CONFIG, () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red, this);
     Pathfinding.setPathfinder(new LocalADStarAK());
     PathPlannerLogging.setLogActivePathCallback((activePath) -> {
