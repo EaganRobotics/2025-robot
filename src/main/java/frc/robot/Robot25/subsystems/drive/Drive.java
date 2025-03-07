@@ -17,7 +17,6 @@ import static edu.wpi.first.units.Units.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.ModuleConfig;
-import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.pathfinding.Pathfinding;
@@ -54,6 +53,8 @@ import frc.robot.SimConstants;
 import frc.robot.SimConstants.Mode;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Consumer;
+
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
@@ -63,15 +64,18 @@ import org.littletonrobotics.junction.Logger;
 public class Drive extends SubsystemBase implements VisionConsumer {
 
   // Configure path planner
-  private static final RobotConfig PP_CONFIG = new RobotConfig(DriveConstants.ROBOT_MASS_KG,
-      DriveConstants.ROBOT_MOI, new ModuleConfig(0.046, 4, 1.524,
-          DCMotor.getKrakenX60(1).withReduction(6.122), DriveConstants.FrontLeft.SlipCurrent, 1),
-      getModuleTranslations());
+  private static final RobotConfig PP_CONFIG =
+      new RobotConfig(DriveConstants.ROBOT_MASS_KG, DriveConstants.ROBOT_MOI,
+          new ModuleConfig(DriveConstants.kWheelRadius.in(Meters),
+              DriveConstants.kSpeedAt12Volts.in(MetersPerSecond), DriveConstants.WHEEL_COF,
+              DCMotor.getKrakenX60(1).withReduction(DriveConstants.kDriveGearRatio),
+              DriveConstants.FrontLeft.SlipCurrent, 1),
+          getModuleTranslations());
 
   // Maple Sim config constants
   public static final DriveTrainSimulationConfig MAPLE_SIM_CONFIG =
       DriveTrainSimulationConfig.Default().withRobotMass(Kilograms.of(DriveConstants.ROBOT_MASS_KG))
-          .withCustomModuleTranslations(getModuleTranslations()).withGyro(COTS.ofNav2X())
+          .withCustomModuleTranslations(getModuleTranslations()).withGyro(COTS.ofPigeon2())
           .withSwerveModule(new SwerveModuleSimulationConfig(DCMotor.getKrakenX60(1),
               DCMotor.getFalcon500(1), DriveConstants.FrontLeft.DriveMotorGearRatio,
               DriveConstants.FrontLeft.SteerMotorGearRatio,
@@ -90,7 +94,7 @@ public class Drive extends SubsystemBase implements VisionConsumer {
       new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
-  private Rotation2d rawGyroRotation = new Rotation2d();
+  private Rotation2d rawGyroRotation = Rotation2d.kZero;
   private SwerveModulePosition[] lastModulePositions = // For delta tracking
       new SwerveModulePosition[] {new SwerveModulePosition(), new SwerveModulePosition(),
           new SwerveModulePosition(), new SwerveModulePosition()};
@@ -101,13 +105,17 @@ public class Drive extends SubsystemBase implements VisionConsumer {
   private boolean snapToRotationEnabled = false;
   private Rotation2d desiredRotation = new Rotation2d();
 
+  private final Consumer<Pose2d> setSimulatedPoseCallback;
+
   public Drive(GyroIO gyroIO, ModuleIO flModuleIO, ModuleIO frModuleIO, ModuleIO blModuleIO,
-      ModuleIO brModuleIO) {
+      ModuleIO brModuleIO, Consumer<Pose2d> setSimulatedPoseCallback) {
     this.gyroIO = gyroIO;
     modules[0] = new Module(flModuleIO, 0, DriveConstants.FrontLeft);
     modules[1] = new Module(frModuleIO, 1, DriveConstants.FrontRight);
     modules[2] = new Module(blModuleIO, 2, DriveConstants.BackLeft);
     modules[3] = new Module(brModuleIO, 3, DriveConstants.BackRight);
+
+    this.setSimulatedPoseCallback = setSimulatedPoseCallback;
 
     // Usage reporting for swerve template
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_AdvantageKit);
@@ -117,8 +125,8 @@ public class Drive extends SubsystemBase implements VisionConsumer {
 
     // Configure AutoBuilder for PathPlanner
     AutoBuilder.configure(this::getPose, this::setPose, this::getChassisSpeeds, this::runVelocity,
-        new PPHolonomicDriveController(new PIDConstants(0.001, 0.0, 0.0),
-            new PIDConstants(2.0, 0.0, 0.3)),
+        new PPHolonomicDriveController(DriveConstants.PP_TRANSLATION_GAINS,
+            DriveConstants.PP_ROTATION_GAINS),
         PP_CONFIG, () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red, this);
     Pathfinding.setPathfinder(new LocalADStarAK());
     PathPlannerLogging.setLogActivePathCallback((activePath) -> {
@@ -227,6 +235,11 @@ public class Drive extends SubsystemBase implements VisionConsumer {
     runVelocity(new ChassisSpeeds());
   }
 
+  public ChassisSpeeds getFieldRelativeSpeeds() {
+    var robotRelativeSpeeds = kinematics.toChassisSpeeds(getModuleStates());
+    return ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeSpeeds, getPose().getRotation());
+  }
+
   /**
    * Stops the drive and turns the modules to an X arrangement to resist movement. The modules will
    * return to their normal orientations the next time a nonzero velocity is requested.
@@ -330,14 +343,13 @@ public class Drive extends SubsystemBase implements VisionConsumer {
 
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
+    this.setSimulatedPoseCallback.accept(pose);
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
   }
 
   /** Adds a new timestamped vision measurement. */
   @Override
-  public void accept(
-
-      Pose2d visionRobotPoseMeters, double timestampSeconds,
+  public void accept(Pose2d visionRobotPoseMeters, double timestampSeconds,
       Matrix<N3, N1> visionMeasurementStdDevs) {
     poseEstimator.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds,
         visionMeasurementStdDevs);
@@ -350,7 +362,7 @@ public class Drive extends SubsystemBase implements VisionConsumer {
 
   /** Returns the maximum angular speed in radians per sec. */
   public double getMaxAngularSpeedRadPerSec() {
-    return getMaxLinearSpeedMetersPerSec() / DriveConstants.DRIVE_BASE_RADIUS;
+    return DriveConstants.MAX_ANGULAR_VELOCITY.in(RadiansPerSecond);
   }
 
   /** Returns an array of module translations. */

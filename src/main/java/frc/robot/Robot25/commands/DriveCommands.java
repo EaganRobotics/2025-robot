@@ -28,6 +28,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ProfiledPIDCommand;
+import frc.lib.tunables.LoggedTunableNumber;
 import frc.robot.Robot25.subsystems.drive.Drive;
 import java.util.Optional;
 import java.util.Set;
@@ -40,9 +42,6 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 public class DriveCommands {
   private static final double SLOW_MODE_MULTIPLIER = 0.5;
   private static final double DEADBAND = 0.1;
-  // private static final double ANGLE_KP = 7.0;
-  // private static final double ANGLE_KI = 0.0;
-  // private static final double ANGLE_KD = 0.4;
   private static final double ANGLE_MAX_VELOCITY = 8.0;
   private static final double ANGLE_MAX_ACCELERATION = 20.0;
   private static final double ANGLE_TOLERANCE = Degrees.of(1).in(Radians);
@@ -53,7 +52,7 @@ public class DriveCommands {
   /// Auto snap to position distance
   private static final Distance SNAPPY_RADIUS = Inches.of(12);
 
-  private static final double INCHES_FROM_REEF = 16.75 + 11.757361;
+  private static final double INCHES_FROM_REEF = 16.75 + 11.757361 - 1;
   private static final double REEF_CENTER_X_INCHES = 176.745545;
   private static final double REEF_CENTER_Y_INCHES = 158.500907;
 
@@ -115,26 +114,50 @@ public class DriveCommands {
   private static final Pose2d[] OUTER_REEF_POSITIONS = makeReefPositions(Inches.of(12));
   private static final Pose2d[] INNER_REEF_POSITIONS = makeReefPositions(Inches.of(0));
 
-  // public static final TunableDouble ANGLE_KP =/
-  // new TunableDouble("ANGLE_KP", 7.0, "driver").setSpot(0, 0);
-  // public static final TunableDouble ANGLE_KI =
-  // new TunableDouble("ANGLE_KI", 0.0, "driver").setSpot(1, 0);
-  // public static final TunableDouble ANGLE_KD =
-  // new TunableDouble("ANGLE_KD", 0.4, "driver").setSpot(2, 0);
+  private static final LoggedTunableNumber ANGLE_KP =
+      new LoggedTunableNumber("Tuning/SnapToPosition/Angle_kP", 7.0);
+  private static final LoggedTunableNumber ANGLE_KI =
+      new LoggedTunableNumber("Tuning/SnapToPosition/Angle_kI", 0.0);
+  private static final LoggedTunableNumber ANGLE_KD =
+      new LoggedTunableNumber("Tuning/SnapToPosition/Angle_kD", 0.4);
 
-  public static final LoggedNetworkNumber ANGLE_KP =
-      new LoggedNetworkNumber("/Tuning/angleKP", 7.0);
-  public static final LoggedNetworkNumber ANGLE_KI =
-      new LoggedNetworkNumber("/Tuning/angleKI", 0.0);
-  public static final LoggedNetworkNumber ANGLE_KD =
-      new LoggedNetworkNumber("/Tuning/angleKD", 0.4);
+  private static final LoggedTunableNumber POSITION_KP =
+      new LoggedTunableNumber("Tuning/SnapToPosition/Position_kP", 4);
+  private static final LoggedTunableNumber POSITION_KI =
+      new LoggedTunableNumber("Tuning/SnapToPosition/Position_kI", 0); // 1
+  private static final LoggedTunableNumber POSITION_KD =
+      new LoggedTunableNumber("Tuning/SnapToPosition/Position_kD", 0); // 1
 
-  public static final LoggedNetworkNumber POSITION_KP =
-      new LoggedNetworkNumber("/Tuning/positionKP", 4);
-  public static final LoggedNetworkNumber POSITION_KI =
-      new LoggedNetworkNumber("/Tuning/positionKI", 0); // 1
-  public static final LoggedNetworkNumber POSITION_KD =
-      new LoggedNetworkNumber("/Tuning/positionKD", 0); // 1
+  // Create X Position PID controller
+  private static final ProfiledPIDController xController = new ProfiledPIDController(0, 0, 0,
+      new TrapezoidProfile.Constraints(POSITION_MAX_VELOCITY, POSITION_MAX_ACCELERATION));
+
+  // Create Y Position PID controller
+  private static final ProfiledPIDController yController = new ProfiledPIDController(0, 0, 0,
+      new TrapezoidProfile.Constraints(POSITION_MAX_VELOCITY, POSITION_MAX_ACCELERATION));
+
+  // Create Angle PID controller
+  private static final ProfiledPIDController angleController = new ProfiledPIDController(0, 0, 0,
+      new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+
+  static {
+    // Setup PID controllers
+    xController.setTolerance(POSITION_TOLERANCE);
+    yController.setTolerance(POSITION_TOLERANCE);
+    angleController.enableContinuousInput(-Math.PI, Math.PI);
+    angleController.setTolerance(ANGLE_TOLERANCE);
+
+    // This also sets the PID gains immediately
+    POSITION_KP.addListener(xController::setP);
+    POSITION_KI.addListener(xController::setI);
+    POSITION_KD.addListener(xController::setD);
+    POSITION_KP.addListener(yController::setP);
+    POSITION_KI.addListener(yController::setI);
+    POSITION_KD.addListener(yController::setD);
+    ANGLE_KP.addListener(angleController::setP);
+    ANGLE_KI.addListener(angleController::setI);
+    ANGLE_KD.addListener(angleController::setD);
+  }
 
   private DriveCommands() {}
 
@@ -157,18 +180,7 @@ public class DriveCommands {
   public static Command joystickDrive(Drive drive, DoubleSupplier xSupplier,
       DoubleSupplier ySupplier, DoubleSupplier omegaSupplier) {
 
-    // Create PID controller
-    ProfiledPIDController angleController =
-        new ProfiledPIDController(ANGLE_KP.get(), ANGLE_KI.get(), ANGLE_KD.get(),
-            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
-    angleController.enableContinuousInput(-Math.PI, Math.PI);
-    angleController.setTolerance(ANGLE_TOLERANCE);
-
     return Commands.run(() -> {
-      angleController.setP(ANGLE_KP.get());
-      angleController.setI(ANGLE_KI.get());
-      angleController.setD(ANGLE_KD.get());
-
       // Get linear velocity
       Translation2d linearVelocity =
           getLinearVelocityFromJoysticks(-xSupplier.getAsDouble(), -ySupplier.getAsDouble());
@@ -207,8 +219,8 @@ public class DriveCommands {
       drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
     }, drive)
 
-        // Reset PID controller when command starts
-        .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
+        // Reset PID controller command starts
+        .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians())); // when
   }
 
   /**
@@ -218,12 +230,6 @@ public class DriveCommands {
    */
   public static Command joystickDriveAtAngle(Drive drive, DoubleSupplier xSupplier,
       DoubleSupplier ySupplier, Supplier<Rotation2d> rotationSupplier) {
-
-    // Create PID controller
-    ProfiledPIDController angleController =
-        new ProfiledPIDController(ANGLE_KP.get(), ANGLE_KI.get(), ANGLE_KD.get(),
-            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
-    angleController.enableContinuousInput(-Math.PI, Math.PI);
 
     // Construct command
     return Commands.run(() -> {
@@ -241,7 +247,6 @@ public class DriveCommands {
               linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(), omega);
       drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
     }, drive)
-
         // Reset PID controller when command starts
         .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
   }
@@ -332,37 +337,7 @@ public class DriveCommands {
   };
 
   public static Command snapToPosition(Drive drive, Pose2d desiredPosition) {
-
-    // Create PID controller
-    ProfiledPIDController angleController =
-        new ProfiledPIDController(ANGLE_KP.get(), ANGLE_KI.get(), ANGLE_KD.get(),
-            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
-    angleController.enableContinuousInput(-Math.PI, Math.PI);
-    angleController.setTolerance(ANGLE_TOLERANCE);
-
-    ProfiledPIDController xController =
-        new ProfiledPIDController(POSITION_KP.get(), POSITION_KI.get(), POSITION_KD.get(),
-            new TrapezoidProfile.Constraints(POSITION_MAX_VELOCITY, POSITION_MAX_ACCELERATION));
-    xController.setTolerance(POSITION_TOLERANCE);
-
-    ProfiledPIDController yController =
-        new ProfiledPIDController(POSITION_KP.get(), POSITION_KI.get(), POSITION_KD.get(),
-            new TrapezoidProfile.Constraints(POSITION_MAX_VELOCITY, POSITION_MAX_ACCELERATION));
-    yController.setTolerance(POSITION_TOLERANCE);
-
     return Commands.run(() -> {
-
-      angleController.setP(ANGLE_KP.get());
-      angleController.setI(ANGLE_KI.get());
-      angleController.setD(ANGLE_KD.get());
-
-      xController.setP(POSITION_KP.get());
-      xController.setI(POSITION_KI.get());
-      xController.setD(POSITION_KD.get());
-
-      yController.setP(POSITION_KP.get());
-      yController.setI(POSITION_KI.get());
-      yController.setD(POSITION_KD.get());
 
       var x = xController.calculate(drive.getPose().getX(), desiredPosition.getX());
 
@@ -388,9 +363,11 @@ public class DriveCommands {
 
         // Reset PID controller when command starts
         .beforeStarting(() -> {
-          angleController.reset(drive.getRotation().getRadians());
-          xController.reset(drive.getPose().getX());
-          yController.reset(drive.getPose().getY());
+          var fieldRelativeSpeeds = drive.getFieldRelativeSpeeds();
+          angleController.reset(drive.getRotation().getRadians(),
+              fieldRelativeSpeeds.omegaRadiansPerSecond);
+          xController.reset(drive.getPose().getX(), fieldRelativeSpeeds.vxMetersPerSecond);
+          yController.reset(drive.getPose().getY(), fieldRelativeSpeeds.vyMetersPerSecond);
         }).until(() -> angleController.atGoal() && xController.atGoal() && yController.atGoal());
   }
 
@@ -398,36 +375,7 @@ public class DriveCommands {
       DoubleSupplier ySupplier, DoubleSupplier omegaSupplier, BooleanSupplier snapSupplier,
       BooleanSupplier slowModeSupplier) {
 
-    // Create PID controller
-    ProfiledPIDController angleController =
-        new ProfiledPIDController(ANGLE_KP.get(), ANGLE_KI.get(), ANGLE_KD.get(),
-            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
-    angleController.enableContinuousInput(-Math.PI, Math.PI);
-    angleController.setTolerance(ANGLE_TOLERANCE);
-
-    ProfiledPIDController xController =
-        new ProfiledPIDController(POSITION_KP.get(), POSITION_KI.get(), POSITION_KD.get(),
-            new TrapezoidProfile.Constraints(POSITION_MAX_VELOCITY, POSITION_MAX_ACCELERATION));
-    xController.setTolerance(POSITION_TOLERANCE);
-
-    ProfiledPIDController yController =
-        new ProfiledPIDController(POSITION_KP.get(), POSITION_KI.get(), POSITION_KD.get(),
-            new TrapezoidProfile.Constraints(POSITION_MAX_VELOCITY, POSITION_MAX_ACCELERATION));
-    yController.setTolerance(POSITION_TOLERANCE);
-
     return Commands.run(() -> {
-
-      angleController.setP(ANGLE_KP.get());
-      angleController.setI(ANGLE_KI.get());
-      angleController.setD(ANGLE_KD.get());
-
-      xController.setP(POSITION_KP.get());
-      xController.setI(POSITION_KI.get());
-      xController.setD(POSITION_KD.get());
-
-      yController.setP(POSITION_KP.get());
-      yController.setI(POSITION_KI.get());
-      yController.setD(POSITION_KD.get());
 
       Logger.recordOutput("InnerReefPositions", DriveCommands.INNER_REEF_POSITIONS);
       Logger.recordOutput("OuterReefPositions", DriveCommands.OUTER_REEF_POSITIONS);
@@ -491,12 +439,12 @@ public class DriveCommands {
     }, drive)
 
         // Reset PID controller when command starts
-        .beforeStarting(() ->
-
-        {
-          angleController.reset(drive.getRotation().getRadians());
-          xController.reset(drive.getPose().getX());
-          yController.reset(drive.getPose().getY());
+        .beforeStarting(() -> {
+          var fieldRelativeSpeeds = drive.getFieldRelativeSpeeds();
+          angleController.reset(drive.getRotation().getRadians(),
+              fieldRelativeSpeeds.omegaRadiansPerSecond);
+          xController.reset(drive.getPose().getX(), fieldRelativeSpeeds.vxMetersPerSecond);
+          yController.reset(drive.getPose().getY(), fieldRelativeSpeeds.vyMetersPerSecond);
         });
   }
 }

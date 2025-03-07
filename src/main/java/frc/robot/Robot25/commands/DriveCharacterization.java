@@ -9,6 +9,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Robot25.subsystems.drive.Drive;
 import frc.robot.Robot25.subsystems.drive.DriveConstants;
+
+import static edu.wpi.first.units.Units.Meters;
+
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
@@ -126,7 +129,7 @@ public class DriveCharacterization {
                     wheelDelta += Math.abs(positions[i] - state.positions[i]) / 4.0;
                   }
                   double wheelRadius =
-                      (state.gyroDelta * DriveConstants.DRIVE_BASE_RADIUS) / wheelDelta;
+                      (state.gyroDelta * DriveConstants.DRIVE_BASE_RADIUS.in(Meters)) / wheelDelta;
 
                   NumberFormat formatter = new DecimalFormat("#0.000");
                   System.out.println("********** Wheel Radius Characterization Results **********");
