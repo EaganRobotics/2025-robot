@@ -58,9 +58,9 @@ public class Outtake extends SubsystemBase {
     return this.runEnd(() -> {
       Logger.recordOutput("Outtake/AutoQueuing", true);
       if (inputs.seesCoralAtOutput && inputs.seesCoralAtInput) {
-        io.setRollerOpenLoop(Volts.of(3));
-      } else if (!inputs.seesCoralAtOutput && inputs.seesCoralAtInput) {
         io.setRollerOpenLoop(Volts.of(5));
+      } else if (!inputs.seesCoralAtOutput && inputs.seesCoralAtInput) {
+        io.setRollerOpenLoop(Volts.of(7));
       } else if (inputs.seesCoralAtOutput && !inputs.seesCoralAtInput) {
         io.setRollerOpenLoop(Volts.of(0));
       } else { // !!
@@ -97,7 +97,6 @@ public class Outtake extends SubsystemBase {
         .withTimeout(1);
   }
 
-
   public Command openLoop(DoubleSupplier speed) {
     return this.runEnd(() -> {
       io.setRollerOpenLoop(Volts.of(speed.getAsDouble() * Math.PI));
@@ -106,8 +105,6 @@ public class Outtake extends SubsystemBase {
       io.setRollerOpenLoop(Volts.of(0));
     });
   }
-
-
 
   public final Trigger seesAtOutputTrigger = new Trigger(() -> inputs.seesCoralAtOutput);
   public final Trigger seesAtInputTrigger = new Trigger(() -> inputs.seesCoralAtInput);
