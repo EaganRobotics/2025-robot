@@ -146,7 +146,7 @@ public class DriveConstants {
   private static final int kFrontRightDriveMotorId = 14;
   private static final int kFrontRightSteerMotorId = 13;
   private static final int kFrontRightEncoderId = 2;
-  private static final Angle kFrontRightEncoderOffset = Rotations.of(.772);
+  private static final Angle kFrontRightEncoderOffset = Rotations.of(.993);
   private static final boolean kFrontRightSteerMotorInverted = true;
   private static final boolean kFrontRightEncoderInverted = false;
   private static final Distance kFrontRightXPos = Inches.of(10.375);
