@@ -296,12 +296,22 @@ public class DriveCommands {
 
   }
 
-  public static Command AutoSnapperSource(Drive drive) {
+  public static Command AutoSourceRight(Drive drive) {
 
     return Commands.defer(() -> {
-      return snapToPosition(drive, new Pose2d(
-          new Translation2d(Inches.of(Right_Loading_Station_X), Inches.of(Right_Loading_Station_Y)),
-          Rotation2d.fromDegrees(55)));
+      return snapToPosition(drive,
+          new Pose2d(new Translation2d(Inches.of(Right_Loading_Station_X + 5),
+              Inches.of(Right_Loading_Station_Y + 5)), Rotation2d.fromDegrees(55)));
+    }, Set.of(drive));
+
+  }
+
+  public static Command AutoSourceLeft(Drive drive) {
+
+    return Commands.defer(() -> {
+      return snapToPosition(drive,
+          new Pose2d(new Translation2d(Inches.of(Left_Loading_Station_X + 5),
+              Inches.of(Left_Loading_Station_Y - 5)), Rotation2d.fromDegrees(55)));
     }, Set.of(drive));
 
   }

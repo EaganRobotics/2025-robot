@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "set 1"
+            "pathName": "AL.2C.L.Path"
           }
         },
         {
@@ -17,7 +17,51 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Align"
+                  "name": "Align1"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L4"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Exhaust"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "LeftSource"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L0"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Align2"
                 }
               },
               {
@@ -48,41 +92,16 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Source"
+                  "name": "LeftSour"
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Align"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "L2"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Exhaust"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "AL.2C.Autos",
   "choreoAuto": false
 }
