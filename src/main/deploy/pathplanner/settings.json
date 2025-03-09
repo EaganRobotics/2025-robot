@@ -2,11 +2,7 @@
   "robotWidth": 0.838,
   "robotLength": 0.838,
   "holonomicMode": true,
-  "pathFolders": [
-    "Score Coral",
-    "Score Coral and get Algae",
-    "Score Coral, Score Alage"
-  ],
+  "pathFolders": [],
   "autoFolders": [],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 2.0,
