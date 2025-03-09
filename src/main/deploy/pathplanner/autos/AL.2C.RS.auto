@@ -102,6 +102,6 @@
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "ALABAMA_AUTOS",
   "choreoAuto": false
 }

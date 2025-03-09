@@ -2,8 +2,14 @@
   "robotWidth": 0.838,
   "robotLength": 0.838,
   "holonomicMode": true,
-  "pathFolders": [],
-  "autoFolders": [],
+  "pathFolders": [
+    "ALABAMA_PATHS",
+    "Calibrate Paths"
+  ],
+  "autoFolders": [
+    "ALABAMA_AUTOS",
+    "Calibration"
+  ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 2.0,
   "defaultMaxAngVel": 360.0,

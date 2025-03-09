@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Copy of Forward 1M"
+            "pathName": "1M"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "ALABAMA_AUTOS",
   "choreoAuto": false
 }
