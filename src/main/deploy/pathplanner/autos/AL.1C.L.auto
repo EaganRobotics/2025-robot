@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "1M"
+            "pathName": "AL.2C.L.Path"
           }
         },
         {
@@ -17,13 +17,13 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "L4"
+                  "name": "Align1"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "Align2"
+                  "name": "L4"
                 }
               }
             ]
