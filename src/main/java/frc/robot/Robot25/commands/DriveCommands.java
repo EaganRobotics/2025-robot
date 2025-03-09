@@ -62,14 +62,14 @@ public class DriveCommands {
   private static final double Right_Loading_Station_X = 43.3071;
   private static final double Right_Loading_Station_Y = 29.52756;
 
-  private static final Translation2d Left_Loading_Station = new Translation2d(Inches.of(Left_Loading_Station_X),
-      Inches.of(Left_Loading_Station_Y));
+  private static final Translation2d Left_Loading_Station =
+      new Translation2d(Inches.of(Left_Loading_Station_X), Inches.of(Left_Loading_Station_Y));
 
-  private static final Translation2d Right_Loading_Station = new Translation2d(Inches.of(Right_Loading_Station_X),
-      Inches.of(Right_Loading_Station_Y));
+  private static final Translation2d Right_Loading_Station =
+      new Translation2d(Inches.of(Right_Loading_Station_X), Inches.of(Right_Loading_Station_Y));
 
-  private static final Translation2d REEF_CENTER = new Translation2d(Inches.of(REEF_CENTER_X_INCHES),
-      Inches.of(REEF_CENTER_Y_INCHES));
+  private static final Translation2d REEF_CENTER =
+      new Translation2d(Inches.of(REEF_CENTER_X_INCHES), Inches.of(REEF_CENTER_Y_INCHES));
 
   public static Pose2d[] makeReefPositions(Distance reefOffset) {
     Transform2d REEF_BRANCH_TO_ROBOT = new Transform2d(
@@ -114,16 +114,19 @@ public class DriveCommands {
   private static final Pose2d[] OUTER_REEF_POSITIONS = makeReefPositions(Inches.of(12));
   private static final Pose2d[] INNER_REEF_POSITIONS = makeReefPositions(Inches.of(0));
 
-  private static final LoggedTunableNumber ANGLE_KP = new LoggedTunableNumber("Tuning/SnapToPosition/Angle_kP", 7.0);
-  private static final LoggedTunableNumber ANGLE_KI = new LoggedTunableNumber("Tuning/SnapToPosition/Angle_kI", 0.0);
-  private static final LoggedTunableNumber ANGLE_KD = new LoggedTunableNumber("Tuning/SnapToPosition/Angle_kD", 0.4);
+  private static final LoggedTunableNumber ANGLE_KP =
+      new LoggedTunableNumber("Tuning/SnapToPosition/Angle_kP", 7.0);
+  private static final LoggedTunableNumber ANGLE_KI =
+      new LoggedTunableNumber("Tuning/SnapToPosition/Angle_kI", 0.0);
+  private static final LoggedTunableNumber ANGLE_KD =
+      new LoggedTunableNumber("Tuning/SnapToPosition/Angle_kD", 0.4);
 
-  private static final LoggedTunableNumber POSITION_KP = new LoggedTunableNumber("Tuning/SnapToPosition/Position_kP",
-      4);
-  private static final LoggedTunableNumber POSITION_KI = new LoggedTunableNumber("Tuning/SnapToPosition/Position_kI",
-      0); // 1
-  private static final LoggedTunableNumber POSITION_KD = new LoggedTunableNumber("Tuning/SnapToPosition/Position_kD",
-      0); // 1
+  private static final LoggedTunableNumber POSITION_KP =
+      new LoggedTunableNumber("Tuning/SnapToPosition/Position_kP", 4);
+  private static final LoggedTunableNumber POSITION_KI =
+      new LoggedTunableNumber("Tuning/SnapToPosition/Position_kI", 0); // 1
+  private static final LoggedTunableNumber POSITION_KD =
+      new LoggedTunableNumber("Tuning/SnapToPosition/Position_kD", 0); // 1
 
   // Create X Position PID controller
   private static final ProfiledPIDController xController = new ProfiledPIDController(0, 0, 0,
@@ -156,8 +159,7 @@ public class DriveCommands {
     ANGLE_KD.addListener(angleController::setD);
   }
 
-  private DriveCommands() {
-  }
+  private DriveCommands() {}
 
   private static Translation2d getLinearVelocityFromJoysticks(double x, double y) {
     // Apply deadband
@@ -173,15 +175,15 @@ public class DriveCommands {
   }
 
   /**
-   * Field relative drive command using two joysticks (controlling linear and
-   * angular velocities).
+   * Field relative drive command using two joysticks (controlling linear and angular velocities).
    */
   public static Command joystickDrive(Drive drive, DoubleSupplier xSupplier,
       DoubleSupplier ySupplier, DoubleSupplier omegaSupplier) {
 
     return Commands.run(() -> {
       // Get linear velocity
-      Translation2d linearVelocity = getLinearVelocityFromJoysticks(-xSupplier.getAsDouble(), -ySupplier.getAsDouble());
+      Translation2d linearVelocity =
+          getLinearVelocityFromJoysticks(-xSupplier.getAsDouble(), -ySupplier.getAsDouble());
 
       // Apply rotation deadband
       double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
@@ -222,10 +224,8 @@ public class DriveCommands {
   }
 
   /**
-   * Field relative drive command using joystick for linear control and PID for
-   * angular control.
-   * Possible use cases include snapping to an angle, aiming at a vision target,
-   * or controlling
+   * Field relative drive command using joystick for linear control and PID for angular control.
+   * Possible use cases include snapping to an angle, aiming at a vision target, or controlling
    * absolute rotation with a joystick.
    */
   public static Command joystickDriveAtAngle(Drive drive, DoubleSupplier xSupplier,
@@ -234,15 +234,17 @@ public class DriveCommands {
     // Construct command
     return Commands.run(() -> {
       // Get linear velocity
-      Translation2d linearVelocity = getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+      Translation2d linearVelocity =
+          getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
 
       // Calculate angular speed
       double omega = angleController.calculate(drive.getRotation().getRadians(),
           rotationSupplier.get().getRadians());
 
       // Convert to field relative speeds & send command
-      ChassisSpeeds speeds = new ChassisSpeeds(linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-          linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(), omega);
+      ChassisSpeeds speeds =
+          new ChassisSpeeds(linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+              linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(), omega);
       drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
     }, drive)
         // Reset PID controller when command starts
@@ -274,7 +276,8 @@ public class DriveCommands {
   public static Command Snapper(Drive drive) {
 
     return Commands.defer(() -> {
-      Pose2dSequence desiredPose = getClosestPosition(drive, Meters.of(1000)).orElse(Pose2dSequence.kZero);
+      Pose2dSequence desiredPose =
+          getClosestPosition(drive, Meters.of(1000)).orElse(Pose2dSequence.kZero);
       Logger.recordOutput("SnapperPose", desiredPose.outer);
       return snapToPosition(drive, desiredPose.outer)
           .andThen(snapToPosition(drive, desiredPose.inner));
@@ -285,7 +288,8 @@ public class DriveCommands {
   public static Command AutoSnapper(Drive drive) {
 
     return Commands.defer(() -> {
-      Pose2dSequence desiredPose = getClosestPosition(drive, Meters.of(1000)).orElse(Pose2dSequence.kZero);
+      Pose2dSequence desiredPose =
+          getClosestPosition(drive, Meters.of(1000)).orElse(Pose2dSequence.kZero);
       Logger.recordOutput("SnapperPose", desiredPose.outer);
       return snapToPosition(drive, desiredPose.inner);
     }, Set.of(drive));
@@ -295,9 +299,9 @@ public class DriveCommands {
   public static Command AutoSourceRight(Drive drive) {
 
     return Commands.defer(() -> {
-      return snapToPosition(drive, new Pose2d(
-          new Translation2d(Inches.of(Right_Loading_Station_X + 5), Inches.of(Right_Loading_Station_Y + 5)),
-          Rotation2d.fromDegrees(55)));
+      return snapToPosition(drive,
+          new Pose2d(new Translation2d(Inches.of(Right_Loading_Station_X + 5),
+              Inches.of(Right_Loading_Station_Y + 5)), Rotation2d.fromDegrees(55)));
     }, Set.of(drive));
 
   }
@@ -305,9 +309,9 @@ public class DriveCommands {
   public static Command AutoSourceLeft(Drive drive) {
 
     return Commands.defer(() -> {
-      return snapToPosition(drive, new Pose2d(
-          new Translation2d(Inches.of(Left_Loading_Station_X + 5), Inches.of(Left_Loading_Station_Y - 5)),
-          Rotation2d.fromDegrees(55)));
+      return snapToPosition(drive,
+          new Pose2d(new Translation2d(Inches.of(Left_Loading_Station_X + 5),
+              Inches.of(Left_Loading_Station_Y - 5)), Rotation2d.fromDegrees(55)));
     }, Set.of(drive));
 
   }
@@ -334,7 +338,8 @@ public class DriveCommands {
       Distance distanceMeasure = Meters.of(distance);
       if (distanceMeasure.lte(radius) && distanceMeasure.lte(minDistance)) {
         minDistance = distanceMeasure;
-        desiredPose = Optional.of(new Pose2dSequence(INNER_REEF_POSITIONS[i], OUTER_REEF_POSITIONS[i]));
+        desiredPose =
+            Optional.of(new Pose2dSequence(INNER_REEF_POSITIONS[i], OUTER_REEF_POSITIONS[i]));
       }
     }
 
@@ -385,10 +390,12 @@ public class DriveCommands {
       Logger.recordOutput("InnerReefPositions", DriveCommands.INNER_REEF_POSITIONS);
       Logger.recordOutput("OuterReefPositions", DriveCommands.OUTER_REEF_POSITIONS);
 
-      final double slowModeMultiplier = (slowModeSupplier.getAsBoolean() ? SLOW_MODE_MULTIPLIER : 1.0);
+      final double slowModeMultiplier =
+          (slowModeSupplier.getAsBoolean() ? SLOW_MODE_MULTIPLIER : 1.0);
 
       // Get linear velocity
-      Translation2d linearVelocity = getLinearVelocityFromJoysticks(-xSupplier.getAsDouble(), -ySupplier.getAsDouble());
+      Translation2d linearVelocity =
+          getLinearVelocityFromJoysticks(-xSupplier.getAsDouble(), -ySupplier.getAsDouble());
 
       // Apply rotation deadband
       double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
