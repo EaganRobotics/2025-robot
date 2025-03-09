@@ -42,7 +42,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Source"
+                  "name": "RightSource"
                 }
               },
               {
@@ -92,7 +92,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Source"
+                  "name": "RightSource"
                 }
               }
             ]

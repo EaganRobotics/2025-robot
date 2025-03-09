@@ -146,11 +146,13 @@ public class RobotContainer extends frc.lib.RobotContainer {
     // Values are tuned to speed but may be changed
     NamedCommands.registerCommand("Align1", DriveCommands.AutoSnapper(drive).withTimeout(2));
     NamedCommands.registerCommand("Align2", DriveCommands.AutoSnapper(drive).withTimeout(2.5));
-    NamedCommands.registerCommand("Source", DriveCommands.AutoSnapperSource(drive).withTimeout(2));
+    NamedCommands.registerCommand("RightSource", DriveCommands.AutoSourceRight(drive).withTimeout(2));
+    NamedCommands.registerCommand("LeftSource", DriveCommands.AutoSourceLeft(drive).withTimeout(2));
     // Probably dont change or use
     NamedCommands.registerCommand("Align3", DriveCommands.AutoSnapper(drive).withTimeout(1));
     NamedCommands.registerCommand("Align4", DriveCommands.AutoSnapper(drive).withTimeout(1.5));
-    NamedCommands.registerCommand("Source2", DriveCommands.AutoSnapperSource(drive).withTimeout(1));
+    NamedCommands.registerCommand("RightSource2", DriveCommands.AutoSourceRight(drive).withTimeout(1));
+    NamedCommands.registerCommand("LeftSource2", DriveCommands.AutoSourceLeft(drive).withTimeout(1));
 
     NamedCommands.registerCommand("L1", elevator.L1());
     NamedCommands.registerCommand("L2", elevator.L2());
@@ -208,7 +210,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
             () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
             drive).ignoringDisable(true));
     driverController.rightBumper().whileTrue(DriveCommands.Snapper(drive));
-    driverController.leftBumper().whileTrue(DriveCommands.AutoSnapperSource(drive));
+    driverController.leftBumper().whileTrue(DriveCommands.AutoSourceRight(drive));
 
     operatorController.leftTrigger().whileTrue(outtake.autoQueueCoralOveride());
     operatorController.rightTrigger().whileTrue(outtake.reverseCoral());
