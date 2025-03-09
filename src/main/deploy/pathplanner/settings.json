@@ -7,10 +7,11 @@
     "Calibrate Paths"
   ],
   "autoFolders": [
+    "AL.0C.Autos",
     "AL.1C.Autos",
     "AL.2C.Autos",
     "Calibration",
-    "AL.0C.Autos"
+    "AL.3C.Autos"
   ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 2.0,
