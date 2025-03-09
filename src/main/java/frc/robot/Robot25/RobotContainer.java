@@ -142,7 +142,6 @@ public class RobotContainer extends frc.lib.RobotContainer {
         break;
     }
 
-    NamedCommands.registerCommand("L0", elevator.L0().andThen(outtake.autoQueueCoral2()));
     // Values are tuned to speed but may be changed
     NamedCommands.registerCommand("Align1", DriveCommands.AutoSnapper(drive).withTimeout(2));
     NamedCommands.registerCommand("Align2", DriveCommands.AutoSnapper(drive).withTimeout(2.5));
@@ -154,10 +153,12 @@ public class RobotContainer extends frc.lib.RobotContainer {
     NamedCommands.registerCommand("RightSource2", DriveCommands.AutoSourceRight(drive).withTimeout(1));
     NamedCommands.registerCommand("LeftSource2", DriveCommands.AutoSourceLeft(drive).withTimeout(1));
 
+    NamedCommands.registerCommand("L0", elevator.L0().andThen(outtake.autoQueueCoral2()));
     NamedCommands.registerCommand("L1", elevator.L1());
     NamedCommands.registerCommand("L2", elevator.L2());
     NamedCommands.registerCommand("L3", elevator.L3());
     NamedCommands.registerCommand("L4", elevator.L4());
+
     NamedCommands.registerCommand("Exhaust", outtake.depositCoral());
 
     // Set up auto routines
