@@ -52,7 +52,7 @@ public class DriveCommands {
   /// Auto snap to position distance
   private static final Distance SNAPPY_RADIUS = Inches.of(12);
 
-  private static final double INCHES_FROM_REEF = 16.75 + 11.757361 - 1;
+  private static final double INCHES_FROM_REEF = 16.75 + 11.757361 - 0.5;
   private static final double REEF_CENTER_X_INCHES = 176.745545;
   private static final double REEF_CENTER_Y_INCHES = 158.500907;
 
@@ -111,8 +111,19 @@ public class DriveCommands {
     };
   }
 
+  public static Pose2d[] makeSourcePositions() {
+    return new Pose2d[] {
+
+        new Pose2d(Inches.of(Right_Loading_Station_X + 5.5),
+            Inches.of(Right_Loading_Station_Y + 5.5), Rotation2d.fromDegrees(55)),
+
+        new Pose2d(Inches.of(Left_Loading_Station_X - 1.5), Inches.of(Left_Loading_Station_Y + 1.5),
+            Rotation2d.fromDegrees(-55))};
+  }
+
   private static final Pose2d[] OUTER_REEF_POSITIONS = makeReefPositions(Inches.of(12));
   private static final Pose2d[] INNER_REEF_POSITIONS = makeReefPositions(Inches.of(0));
+  private static final Pose2d[] SOURCE_POSITIONS = makeSourcePositions();
 
   private static final LoggedTunableNumber ANGLE_KP =
       new LoggedTunableNumber("Tuning/SnapToPosition/Angle_kP", 7.0);
@@ -285,6 +296,16 @@ public class DriveCommands {
 
   }
 
+  public static Command SourceSnapper(Drive drive) {
+
+    return Commands.defer(() -> {
+      Pose2d desiredPose = getClosestSource(drive, Meters.of(1000)).orElse(Pose2d.kZero);
+      Logger.recordOutput("SnapperPose", desiredPose);
+      return snapToPosition(drive, desiredPose);
+    }, Set.of(drive));
+
+  }
+
   public static Command AutoSnapper(Drive drive) {
 
     return Commands.defer(() -> {
@@ -345,6 +366,37 @@ public class DriveCommands {
 
     return desiredPose;
   };
+
+  private static Optional<Pose2d> getClosestSource(Drive drive, Distance radius) {
+    Optional<Pose2d> desiredPose = Optional.empty();
+    Distance minDistance = Meters.of(1000000);
+    for (Pose2d pose : SOURCE_POSITIONS) {
+      double distance = drive.getPose().getTranslation().getDistance(pose.getTranslation());
+      Distance distanceMeasure = Meters.of(distance);
+      if (distanceMeasure.lte(radius) && distanceMeasure.lte(minDistance)) {
+        minDistance = distanceMeasure;
+        desiredPose = Optional.of(pose);
+      }
+    }
+
+    return desiredPose;
+  };
+
+  // private static Optional<Pose2d> getClosestSource(Drive drive, Distance radius) {
+  // Optional<Pose2dSequence> desiredPose = Optional.empty();
+  // Distance minDistance = Meters.of(1000000);
+  // for (int i = 0; i < SOURCE_POSITIONS.length; i++) {
+  // Pose2d pose = SOURCE_POSITIONS[i];
+  // double distance = drive.getPose().getTranslation().getDistance(pose.getTranslation());
+  // Distance distanceMeasure = Meters.of(distance);
+  // if (distanceMeasure.lte(radius) && distanceMeasure.lte(minDistance)) {
+  // minDistance = distanceMeasure;
+  // desiredPose = Optional.of(new Pose2d(SOURCE_POSITIONS[i]));
+  // }
+  // }
+
+  // return desiredPose;
+  // };
 
   public static Command snapToPosition(Drive drive, Pose2d desiredPosition) {
     return Commands.run(() -> {
