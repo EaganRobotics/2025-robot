@@ -134,13 +134,14 @@ public class RobotContainer extends frc.lib.RobotContainer {
     }
 
     // Values are tuned to speed but may be changed
+    NamedCommands.registerCommand("Auto1", DriveCommands.FirstSnapper(drive).withTimeout(2));
     NamedCommands.registerCommand("Align1", DriveCommands.AutoSnapper(drive).withTimeout(2));
     NamedCommands.registerCommand("Align2", DriveCommands.AutoSnapper(drive).withTimeout(2.5));
     NamedCommands.registerCommand("RightSource", DriveCommands.SourceSnapper(drive).withTimeout(2));
     NamedCommands.registerCommand("LeftSource", DriveCommands.SourceSnapper(drive).withTimeout(2));
     // Probably dont change or use
-    NamedCommands.registerCommand("Align3", DriveCommands.SourceSnapper(drive).withTimeout(1));
-    NamedCommands.registerCommand("Align4", DriveCommands.SourceSnapper(drive).withTimeout(1.5));
+    NamedCommands.registerCommand("Align3", DriveCommands.FirstSnapper(drive).withTimeout(1));
+    NamedCommands.registerCommand("Align4", DriveCommands.AutoSnapper(drive).withTimeout(1.5));
     NamedCommands.registerCommand("RightSource2",
         DriveCommands.AutoSourceRight(drive).withTimeout(1));
     NamedCommands.registerCommand("LeftSource2",
