@@ -27,7 +27,7 @@ Start /max "" "C:\Program Files (x86)\FRC Driver Station\DriverStation.exe"
 ::cd "C:\Users\User\Documents\GitHub\2023-robot\TwighlightDash"
 ::npm run start
 
-"C:\Users\Blue Twilight\Desktop\chooseauto.txt"
+@REM "C:\Users\Blue Twilight\Desktop\chooseauto.txt"
 
 timeout /t 30
 taskkill "notepad.exe"
