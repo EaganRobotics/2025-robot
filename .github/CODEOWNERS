@@ -1,6 +1,5 @@
 # Mentors are the default code owners of the repo
 *                  @EaganRobotics/mentors
-/DSScripts/       @SeanCh7
 
 # Examples: active if uncommented
 # The most restrictive matching pattern to a changeset is used to determine the code owners for PR reviews
