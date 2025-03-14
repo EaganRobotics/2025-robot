@@ -71,7 +71,7 @@ public class Outtake extends SubsystemBase {
   }
 
   public Command autoQueueCoralOveride() {
-    return Commands.run(() -> io.setRollerOpenLoop(Volts.of(0)));
+    return Commands.run(() -> io.setRollerOpenLoop(Volts.of(0))).withName("Outtake.autoQueueCoralOveride");
   }
 
   public Command autoQueueCoral2() {
@@ -101,7 +101,7 @@ public class Outtake extends SubsystemBase {
       // we are not convirting to raidans we just wanted pi (:
     }, () -> {
       io.setRollerOpenLoop(Volts.of(0));
-    });
+    }).withName("Outtake.openLoop");
   }
 
   public final Trigger seesAtOutputTrigger = new Trigger(() -> inputs.seesCoralAtOutput);
@@ -112,6 +112,6 @@ public class Outtake extends SubsystemBase {
   // }
 
   public Command reverseCoral() {
-    return setRopenLoop(Volts.of(-5)).withTimeout(1.25);
+    return setRopenLoop(Volts.of(-5)).withTimeout(1.25).withName("Outtake.reverseCoral");
   }
 }
