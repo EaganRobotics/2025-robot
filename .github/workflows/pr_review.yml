@@ -11,15 +11,27 @@ jobs:
   check_review_needed:
     runs-on: ubuntu-22.04
     outputs:
-      review_needed: ${{ steps.review_needed.outputs.review_needed }}
+      review_needed: ${{ steps.review_needed.outputs.review }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Required for comparing changes
+
+      - name: Get changed files and lines
+        id: changes
+        run: |
+          echo "changed_files=$(git diff --name-only HEAD~1 HEAD | wc -l)" >> $GITHUB_OUTPUT
+          echo "changed_lines=$(git diff HEAD~1 HEAD --stat | awk '{lines+=$1 + $3} END {print lines}')" >> $GITHUB_OUTPUT
+          echo "changed_files_list=$(git diff --name-only HEAD~1 HEAD)" >> $GITHUB_OUTPUT
+
       - name: Check if review is needed
         id: review_needed
         run: |
           if [[ "${{ github.event.action }}" == "opened" || "${{ github.event.action }}" == "reopened" ]]; then
             echo "review=true" >> $GITHUB_OUTPUT
           elif [[ "${{ github.event.action }}" == "synchronize" ]]; then
-            if [[ "${{ steps.changes.outputs.changed_files }}" -gt 3 || "${{ steps.changes.outputs.changed_lines }}" -gt 50 ]]; then #Adjust these numbers as needed.
+            if [[ "${{ steps.changes.outputs.changed_files }}" -ge 3 || "${{ steps.changes.outputs.changed_lines }}" -ge 50 ]]; then #Adjust these numbers as needed.
               echo "review=true" >> $GITHUB_OUTPUT
             else
               echo "review=false" >> $GITHUB_OUTPUT
