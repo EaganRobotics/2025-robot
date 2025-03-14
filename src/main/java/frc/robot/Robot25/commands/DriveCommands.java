@@ -108,7 +108,6 @@ public class DriveCommands {
             BLUE_REEF_CENTER.plus(new Translation2d(Inches.of(-15.982577), Inches.of(14.718635))),
             Rotation2d.fromDegrees(300)).transformBy(REEF_BRANCH_TO_ROBOT),
 
-
         new Pose2d(
             RED_REEF_CENTER.plus(new Translation2d(Inches.of(-20.738000), Inches.of(6.482000))),
             Rotation2d.kZero).transformBy(REEF_BRANCH_TO_ROBOT),
@@ -161,7 +160,6 @@ public class DriveCommands {
         new Pose2d(Inches.of(Left_Loading_Station_X - 1.5 + 623.825 - 10),
             Inches.of(Left_Loading_Station_Y + 1.5 - 4.5), Rotation2d.fromDegrees(-125))};
 
-
   }
 
   public static Pose2d[] makeAutoPositions(Distance autoOffset) {
@@ -182,7 +180,6 @@ public class DriveCommands {
             RED_REEF_CENTER.plus(new Translation2d(Inches.of(4.755423), Inches.of(21.200635))),
             Rotation2d.fromDegrees(240)).transformBy(REEF_BRANCH_TO_ROBOT),};
   }
-
 
   private static final Pose2d[] OUTER_REEF_POSITIONS = makeReefPositions(Inches.of(12));
   private static final Pose2d[] INNER_REEF_POSITIONS = makeReefPositions(Inches.of(0));
@@ -296,7 +293,8 @@ public class DriveCommands {
     }, drive)
 
         // Reset PID controller command starts
-        .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians())); // when
+        .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()))
+        .withName("DriveCommands.joyStickDrive`"); // when
   }
 
   /**
@@ -324,14 +322,15 @@ public class DriveCommands {
       drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
     }, drive)
         // Reset PID controller when command starts
-        .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
+        .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()))
+        .withName("DriveCommands.joystickDriveAtAngle");
   }
 
   public static Command snapToRotation(Drive drive, Rotation2d rotation) {
     return Commands.runOnce(() -> {
       Logger.recordOutput("Rotation", "snap to rotation");
       drive.setDesiredRotation(rotation);
-    });
+    }).withName("DriveCommands.snapToRotation");
   }
 
   public static Command keepRotationForward(Drive drive, DoubleSupplier xSupplier,
@@ -346,7 +345,7 @@ public class DriveCommands {
         Logger.recordOutput("Rotation", "robot forward");
         drive.setDesiredRotation(Rotation2d.fromRadians(Math.atan2(y, x)));
       }
-    });
+    }).withName("DriveCommands.keepRotationForward");
   }
 
   public static Command Snapper(Drive drive) {
@@ -357,7 +356,7 @@ public class DriveCommands {
       Logger.recordOutput("SnapperPose", desiredPose.outer);
       return snapToPosition(drive, desiredPose.outer)
           .andThen(snapToPosition(drive, desiredPose.inner));
-    }, Set.of(drive));
+    }, Set.of(drive)).withName("DriveCommands.Snapper");
 
   }
 
@@ -367,7 +366,7 @@ public class DriveCommands {
       Pose2d desiredPose = getClosestSource(drive, Meters.of(1000)).orElse(Pose2d.kZero);
       Logger.recordOutput("SnapperPose", desiredPose);
       return snapToPosition(drive, desiredPose);
-    }, Set.of(drive));
+    }, Set.of(drive)).withName("DriveCommands.SourceSnapper");
 
   }
 
@@ -378,7 +377,7 @@ public class DriveCommands {
           getClosestAuto(drive, Meters.of(1000)).orElse(Pose2dSequence.kZero);
       Logger.recordOutput("SnapperPose", desiredPose.outer);
       return snapToPosition(drive, desiredPose.inner);
-    }, Set.of(drive));
+    }, Set.of(drive)).withName("DriveCommands.FirstSnapper");
 
   }
 
@@ -389,7 +388,7 @@ public class DriveCommands {
           getClosestPosition(drive, Meters.of(1000)).orElse(Pose2dSequence.kZero);
       Logger.recordOutput("SnapperPose", desiredPose.outer);
       return snapToPosition(drive, desiredPose.inner);
-    }, Set.of(drive));
+    }, Set.of(drive)).withName("DriveCommands.AutoSnapper");
 
   }
 
@@ -399,7 +398,7 @@ public class DriveCommands {
       return snapToPosition(drive,
           new Pose2d(new Translation2d(Inches.of(Right_Loading_Station_X + 5),
               Inches.of(Right_Loading_Station_Y + 5)), Rotation2d.fromDegrees(55)));
-    }, Set.of(drive));
+    }, Set.of(drive)).withName("DriveCommands.AutoSourceRight");
 
   }
 
@@ -409,7 +408,7 @@ public class DriveCommands {
       return snapToPosition(drive,
           new Pose2d(new Translation2d(Inches.of(Left_Loading_Station_X + 5),
               Inches.of(Left_Loading_Station_Y - 5)), Rotation2d.fromDegrees(55)));
-    }, Set.of(drive));
+    }, Set.of(drive)).withName("DriveCommands.AutoSourceLeft");
 
   }
 
@@ -474,12 +473,14 @@ public class DriveCommands {
     return desiredPose;
   };
 
-  // private static Optional<Pose2d> getClosestSource(Drive drive, Distance radius) {
+  // private static Optional<Pose2d> getClosestSource(Drive drive, Distance
+  // radius) {
   // Optional<Pose2dSequence> desiredPose = Optional.empty();
   // Distance minDistance = Meters.of(1000000);
   // for (int i = 0; i < SOURCE_POSITIONS.length; i++) {
   // Pose2d pose = SOURCE_POSITIONS[i];
-  // double distance = drive.getPose().getTranslation().getDistance(pose.getTranslation());
+  // double distance =
+  // drive.getPose().getTranslation().getDistance(pose.getTranslation());
   // Distance distanceMeasure = Meters.of(distance);
   // if (distanceMeasure.lte(radius) && distanceMeasure.lte(minDistance)) {
   // minDistance = distanceMeasure;
@@ -522,7 +523,8 @@ public class DriveCommands {
               fieldRelativeSpeeds.omegaRadiansPerSecond);
           xController.reset(drive.getPose().getX(), fieldRelativeSpeeds.vxMetersPerSecond);
           yController.reset(drive.getPose().getY(), fieldRelativeSpeeds.vyMetersPerSecond);
-        }).until(() -> angleController.atGoal() && xController.atGoal() && yController.atGoal());
+        }).until(() -> angleController.atGoal() && xController.atGoal() && yController.atGoal())
+        .withName("DriveCommands.snapToPosition");
   }
 
   public static Command joystickDriveAssist(Drive drive, DoubleSupplier xSupplier,
@@ -599,6 +601,6 @@ public class DriveCommands {
               fieldRelativeSpeeds.omegaRadiansPerSecond);
           xController.reset(drive.getPose().getX(), fieldRelativeSpeeds.vxMetersPerSecond);
           yController.reset(drive.getPose().getY(), fieldRelativeSpeeds.vyMetersPerSecond);
-        });
+        }).withName("DriveCommands.joystickDriveAssist");
   }
 }

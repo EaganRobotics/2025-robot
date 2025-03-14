@@ -13,7 +13,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -63,8 +63,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
   private final Algae algae;
 
   // Drive simulation
-  private static final SwerveDriveSimulation driveSimulation = new SwerveDriveSimulation(Drive.MAPLE_SIM_CONFIG,
-      SimConstants.SIM_INITIAL_FIELD_POSE);
+  private static final SwerveDriveSimulation driveSimulation =
+      new SwerveDriveSimulation(Drive.MAPLE_SIM_CONFIG, SimConstants.SIM_INITIAL_FIELD_POSE);
 
   private final CommandXboxController driverController = new CommandXboxController(0);
   private final CommandXboxController operatorController = new CommandXboxController(1);
@@ -72,13 +72,13 @@ public class RobotContainer extends frc.lib.RobotContainer {
   private final LoggedDashboardChooser<Command> autoChooser;
 
   @AutoLogOutput
-  public final Pose3d[] mechanismPoses = new Pose3d[] { Pose3d.kZero, Pose3d.kZero, Pose3d.kZero, };
+  public final Pose3d[] mechanismPoses = new Pose3d[] {Pose3d.kZero, Pose3d.kZero, Pose3d.kZero,};
 
   public RobotContainer() {
     super(driveSimulation);
     // Check for valid swerve config
-    var modules = new SwerveModuleConstants[] { DriveConstants.FrontLeft, DriveConstants.FrontRight,
-        DriveConstants.BackLeft, DriveConstants.BackRight, };
+    var modules = new SwerveModuleConstants[] {DriveConstants.FrontLeft, DriveConstants.FrontRight,
+        DriveConstants.BackLeft, DriveConstants.BackRight,};
     for (var constants : modules) {
       if (constants.DriveMotorType != DriveMotorArrangement.TalonFX_Integrated
           || constants.SteerMotorType != SteerMotorArrangement.TalonFX_Integrated) {
@@ -122,24 +122,15 @@ public class RobotContainer extends frc.lib.RobotContainer {
         break;
       default:
         // Replayed robot, disable IO implementations
-        drive = new Drive(new GyroIO() {
-        }, new ModuleIO() {
-        }, new ModuleIO() {
-        }, new ModuleIO() {
-        },
-            new ModuleIO() {
-            }, driveSimulation::setSimulationWorldPose);
+        drive = new Drive(new GyroIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {},
+            new ModuleIO() {}, driveSimulation::setSimulationWorldPose);
 
-        elevator = new Elevator(new ElevatorIO() {
-        });
+        elevator = new Elevator(new ElevatorIO() {});
 
-        outtake = new Outtake(new OuttakeIO() {
-        });
+        outtake = new Outtake(new OuttakeIO() {});
 
-        vision = new Vision(drive, new VisionIO() {
-        });
-        algae = new Algae(new AlgaeIO() {
-        });
+        vision = new Vision(drive, new VisionIO() {});
+        algae = new Algae(new AlgaeIO() {});
         break;
     }
 
@@ -196,8 +187,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
         DriveCommands.joystickDriveAssist(drive, () -> driverController.getLeftY(),
             () -> driverController.getLeftX(), () -> -driverController.getRightX() * .85,
             driverController.leftTrigger(), driverController.rightTrigger()));
-    outtake
-        .setDefaultCommand(outtake.autoQueueCoral().onlyWhile(elevator.isAtHeight(Level.Intake)));
+    outtake.setDefaultCommand(outtake.autoQueueCoral().onlyWhile(elevator.isAtHeight(Level.Intake))
+        .withName("RobotContainer.outtakeDefaultCommand"));
     driverController.povUpRight()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-45)));
     driverController.povRight()
@@ -210,14 +201,13 @@ public class RobotContainer extends frc.lib.RobotContainer {
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(90)));
     driverController.povUpLeft()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(45)));
-    driverController.start()
-        .onTrue(Commands.runOnce(
-            () -> {
-              drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero));
-              CommandScheduler.getInstance().cancelAll(); // clear out any commands that might be stuck
-              drive.startIgnoringVision();
-            },
-            drive).ignoringDisable(true));
+    driverController.start().onTrue(Commands.runOnce(() -> {
+      drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero));
+      CommandScheduler.getInstance().cancelAll(); // clear out any commands that might be stuck
+      if (DriverStation.isEnabled()) {
+        drive.startIgnoringVision();
+      }
+    }, drive).ignoringDisable(true).withName("RobotContainer.driverZeroCommand"));
     driverController.rightBumper().whileTrue(DriveCommands.Snapper(drive));
     driverController.leftBumper().whileTrue(DriveCommands.SourceSnapper(drive));
 
@@ -255,8 +245,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
   }
 
   @Override
-  public void disabledInit() {
-  }
+  public void disabledInit() {}
 
   @Override
   public void disabledPeriodic() {
@@ -279,6 +268,5 @@ public class RobotContainer extends frc.lib.RobotContainer {
   }
 
   @Override
-  public void simulationPeriodic() {
-  }
+  public void simulationPeriodic() {}
 }

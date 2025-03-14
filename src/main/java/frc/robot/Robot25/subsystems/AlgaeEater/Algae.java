@@ -26,9 +26,7 @@ public class Algae extends SubsystemBase {
       io.setOpenLoop(output);
     }, () -> {
       io.setOpenLoop(Volts.of(0));
-    }
-
-    );
+    }).withName("Algae.setOpenLoop");
   }
 
 }
