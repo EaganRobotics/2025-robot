@@ -63,6 +63,12 @@ import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase implements VisionConsumer {
 
+  private boolean ignoreVision = false;
+
+  public void startIgnoringVision() {
+    ignoreVision = true;
+  }
+
   // Configure path planner
   private static final RobotConfig PP_CONFIG =
       new RobotConfig(DriveConstants.ROBOT_MASS_KG, DriveConstants.ROBOT_MOI,
@@ -351,6 +357,7 @@ public class Drive extends SubsystemBase implements VisionConsumer {
   @Override
   public void accept(Pose2d visionRobotPoseMeters, double timestampSeconds,
       Matrix<N3, N1> visionMeasurementStdDevs) {
+    if (ignoreVision) { return; }
     poseEstimator.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds,
         visionMeasurementStdDevs);
   }
