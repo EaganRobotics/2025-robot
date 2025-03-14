@@ -1,6 +1,5 @@
 package frc.robot.Robot25.subsystems.elevator;
 
-import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
@@ -17,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import java.security.PublicKey;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -54,8 +52,10 @@ public class Elevator extends SubsystemBase {
 
     // original value during W0 = L4 = 72 + 6
 
-    minHeight(MIN_HEIGHT), Intake(Inches.of(16.4 + 4.4)), L1(Inches.of(18 + 14)), L2(
+
+    minHeight(MIN_HEIGHT), Intake(Inches.of(16.4 + 3.5)), L1(Inches.of(18 + 14)), L2(
         Inches.of(31.9 + 7)), L3(Inches.of(47.6 + 7)), L4(Inches.of(72 + 7.25));
+
 
     private final Distance height;
 

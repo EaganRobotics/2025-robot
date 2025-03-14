@@ -2,13 +2,11 @@ package frc.robot.Robot25.subsystems.outtake;
 
 import static edu.wpi.first.units.Units.Volts;
 
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -58,9 +56,9 @@ public class Outtake extends SubsystemBase {
     return this.runEnd(() -> {
       Logger.recordOutput("Outtake/AutoQueuing", true);
       if (inputs.seesCoralAtOutput && inputs.seesCoralAtInput) {
-        io.setRollerOpenLoop(Volts.of(3));
+        io.setRollerOpenLoop(Volts.of(8));
       } else if (!inputs.seesCoralAtOutput && inputs.seesCoralAtInput) {
-        io.setRollerOpenLoop(Volts.of(5));
+        io.setRollerOpenLoop(Volts.of(7));
       } else if (inputs.seesCoralAtOutput && !inputs.seesCoralAtInput) {
         io.setRollerOpenLoop(Volts.of(0));
       } else { // !!
@@ -97,7 +95,6 @@ public class Outtake extends SubsystemBase {
         .withTimeout(1);
   }
 
-
   public Command openLoop(DoubleSupplier speed) {
     return this.runEnd(() -> {
       io.setRollerOpenLoop(Volts.of(speed.getAsDouble() * Math.PI));
@@ -106,8 +103,6 @@ public class Outtake extends SubsystemBase {
       io.setRollerOpenLoop(Volts.of(0));
     });
   }
-
-
 
   public final Trigger seesAtOutputTrigger = new Trigger(() -> inputs.seesCoralAtOutput);
   public final Trigger seesAtInputTrigger = new Trigger(() -> inputs.seesCoralAtInput);

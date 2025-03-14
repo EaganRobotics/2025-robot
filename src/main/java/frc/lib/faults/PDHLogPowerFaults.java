@@ -63,7 +63,6 @@ public class PDHLogPowerFaults {
   private static Fault channel7BreakerFault = new Fault("pdh channel7BreakerFault");
   private static Fault channel8BreakerFault = new Fault("pdh channel8BreakerFault");
   private static Fault channel9BreakerFault = new Fault("pdh channel9BreakerFault");
-  private static Fault channel10BreakerFault = new Fault("pdh channel10BreakerFault");
   private static Fault channel11BreakerFault = new Fault("pdh channel11BreakerFault");
   private static Fault channel12BreakerFault = new Fault("pdh channel12BreakerFault");
   private static Fault channel13BreakerFault = new Fault("pdh channel13BreakerFault");

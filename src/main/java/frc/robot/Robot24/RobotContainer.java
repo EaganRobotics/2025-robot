@@ -38,7 +38,6 @@ import frc.robot.Robot24.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.SimConstants;
 import frc.robot.SimConstants.Mode;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -62,7 +61,9 @@ public class RobotContainer extends frc.lib.RobotContainer {
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  /**
+   * The container for the robot. Contains subsystems, OI devices, and commands.
+   */
   public RobotContainer() {
     super(driveSimulation);
 

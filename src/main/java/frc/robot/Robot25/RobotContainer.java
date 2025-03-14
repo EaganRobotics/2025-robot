@@ -2,11 +2,7 @@
 
 package frc.robot.Robot25;
 
-
-
 import static edu.wpi.first.units.Units.*;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerMotorArrangement;
@@ -17,13 +13,6 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.XboxController;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -69,7 +58,6 @@ public class RobotContainer extends frc.lib.RobotContainer {
   private final Drive drive;
   private final Elevator elevator;
   private final Outtake outtake;
-  @SuppressWarnings("unused")
   private final Vision vision;
   private final Algae algae;
 
@@ -104,7 +92,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
         drive = new Drive(new GyroIOPigeon2(), new ModuleIOTalonFX(DriveConstants.FrontLeft),
             new ModuleIOTalonFX(DriveConstants.FrontRight),
             new ModuleIOTalonFX(DriveConstants.BackLeft),
-            new ModuleIOTalonFX(DriveConstants.BackRight));
+            new ModuleIOTalonFX(DriveConstants.BackRight), driveSimulation::setSimulationWorldPose);
 
         elevator = new Elevator(new ElevatorIOTalonFXNew());
         outtake = new Outtake(new OuttakeIOTalonFX());
@@ -118,22 +106,23 @@ public class RobotContainer extends frc.lib.RobotContainer {
             new ModuleIOSim(driveSimulation.getModules()[0]),
             new ModuleIOSim(driveSimulation.getModules()[1]),
             new ModuleIOSim(driveSimulation.getModules()[2]),
-            new ModuleIOSim(driveSimulation.getModules()[3]));
+            new ModuleIOSim(driveSimulation.getModules()[3]),
+            driveSimulation::setSimulationWorldPose);
         drive.setPose(SimConstants.SIM_INITIAL_FIELD_POSE);
 
         elevator = new Elevator(new ElevatorIOSim());
         outtake = new Outtake(new OuttakeIOSim());
-        vision = new Vision(drive,
-            new VisionIOPhotonVisionSim(VisionConstants.limelightBackName,
-                VisionConstants.limelightBackTransform, () -> drive.getPose()),
+        vision = new Vision(drive, new VisionIOPhotonVisionSim(VisionConstants.limelightBackName,
+            VisionConstants.limelightBackTransform, driveSimulation::getSimulatedDriveTrainPose),
             new VisionIOPhotonVisionSim(VisionConstants.limelightFrontName,
-                VisionConstants.limelightFrontTransform, () -> drive.getPose()));
+                VisionConstants.limelightFrontTransform,
+                driveSimulation::getSimulatedDriveTrainPose));
         algae = new Algae(new AlgaeIOSim());
         break;
       default:
         // Replayed robot, disable IO implementations
         drive = new Drive(new GyroIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {},
-            new ModuleIO() {});
+            new ModuleIO() {}, driveSimulation::setSimulationWorldPose);
 
         elevator = new Elevator(new ElevatorIO() {});
 
@@ -144,14 +133,26 @@ public class RobotContainer extends frc.lib.RobotContainer {
         break;
     }
 
-    NamedCommands.registerCommand("L0", elevator.L0().andThen(outtake.autoQueueCoral2()));
-    NamedCommands.registerCommand("Align", DriveCommands.AutoSnapper(drive));
-    NamedCommands.registerCommand("Source", DriveCommands.AutoSnapperSource(drive));
+    // Values are tuned to speed but may be changed
+    NamedCommands.registerCommand("Auto1", DriveCommands.FirstSnapper(drive).withTimeout(2));
+    NamedCommands.registerCommand("Align1", DriveCommands.AutoSnapper(drive).withTimeout(2));
+    NamedCommands.registerCommand("Align2", DriveCommands.AutoSnapper(drive).withTimeout(2.5));
+    NamedCommands.registerCommand("RightSource", DriveCommands.SourceSnapper(drive).withTimeout(2));
+    NamedCommands.registerCommand("LeftSource", DriveCommands.SourceSnapper(drive).withTimeout(2));
+    // Probably dont change or use
+    NamedCommands.registerCommand("Align3", DriveCommands.FirstSnapper(drive).withTimeout(1));
+    NamedCommands.registerCommand("Align4", DriveCommands.AutoSnapper(drive).withTimeout(1.5));
+    NamedCommands.registerCommand("RightSource2",
+        DriveCommands.AutoSourceRight(drive).withTimeout(1));
+    NamedCommands.registerCommand("LeftSource2",
+        DriveCommands.AutoSourceLeft(drive).withTimeout(1));
 
+    NamedCommands.registerCommand("L0", elevator.L0().andThen(outtake.autoQueueCoral2()));
     NamedCommands.registerCommand("L1", elevator.L1());
     NamedCommands.registerCommand("L2", elevator.L2());
     NamedCommands.registerCommand("L3", elevator.L3());
     NamedCommands.registerCommand("L4", elevator.L4());
+
     NamedCommands.registerCommand("Exhaust", outtake.depositCoral());
 
     // Set up auto routines
@@ -203,7 +204,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
         .onTrue(Commands.runOnce(
             () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
             drive).ignoringDisable(true));
-    driverController.y().whileTrue(DriveCommands.Snapper(drive));
+    driverController.rightBumper().whileTrue(DriveCommands.Snapper(drive));
+    driverController.leftBumper().whileTrue(DriveCommands.SourceSnapper(drive));
 
     operatorController.leftTrigger().whileTrue(outtake.autoQueueCoralOveride());
     operatorController.rightTrigger().whileTrue(outtake.reverseCoral());
@@ -217,14 +219,14 @@ public class RobotContainer extends frc.lib.RobotContainer {
     operatorController.x().onTrue(elevator.L1());
     operatorController.b().onTrue(elevator.L3());
     operatorController.y().onTrue(elevator.L4());
-    operatorController.povRight().whileTrue(algae.setOpenLoop(Volts.of(4)));
-    operatorController.povLeft().whileTrue(algae.setOpenLoop(Volts.of(-4)));
-
-    operatorController.axisMagnitudeGreaterThan(5, 0.1)
-        .whileTrue(outtake.openLoop(operatorController::getRightY));
+    operatorController.povRight().whileTrue(algae.setOpenLoop(Volts.of(10)));
+    operatorController.povLeft().whileTrue(algae.setOpenLoop(Volts.of(-6)));
 
     operatorController.axisMagnitudeGreaterThan(1, 0.1)
-        .whileTrue(elevator.openLoop(operatorController::getLeftY));
+        .whileTrue(outtake.openLoop(operatorController::getLeftY));
+
+    operatorController.axisMagnitudeGreaterThan(5, 0.1)
+        .whileTrue(elevator.openLoop(operatorController::getRightY));
     // ##########################################################################################################
   }
 

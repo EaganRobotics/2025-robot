@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "set 1"
+            "pathName": "AL.2C.L.Path"
           }
         },
         {
@@ -17,7 +17,51 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Align"
+                  "name": "Align3"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L4"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Exhaust"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "LeftSource2"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L0"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Align4"
                 }
               },
               {
@@ -48,26 +92,26 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Source"
+                  "name": "LeftSource2"
                 }
               }
             ]
           }
         },
         {
-          "type": "parallel",
+          "type": "sequential",
           "data": {
             "commands": [
               {
                 "type": "named",
                 "data": {
-                  "name": "Align"
+                  "name": "Align4"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "L2"
+                  "name": "L4"
                 }
               }
             ]
@@ -83,6 +127,6 @@
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "AL.3C.Autos",
   "choreoAuto": false
 }

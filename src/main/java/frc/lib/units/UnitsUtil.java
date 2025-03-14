@@ -1,6 +1,5 @@
 package frc.lib.units;
 
-import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radian;

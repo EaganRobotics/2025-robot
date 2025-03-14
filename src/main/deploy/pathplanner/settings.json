@@ -3,11 +3,16 @@
   "robotLength": 0.838,
   "holonomicMode": true,
   "pathFolders": [
-    "Score Coral",
-    "Score Coral and get Algae",
-    "Score Coral, Score Alage"
+    "AL.Paths",
+    "Calibrate Paths"
   ],
-  "autoFolders": [],
+  "autoFolders": [
+    "AL.0C.Autos",
+    "AL.1C.Autos",
+    "AL.2C.Autos",
+    "Calibration",
+    "AL.3C.Autos"
+  ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 2.0,
   "defaultMaxAngVel": 360.0,
