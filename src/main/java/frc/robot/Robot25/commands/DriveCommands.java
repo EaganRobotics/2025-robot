@@ -289,7 +289,7 @@ public class DriveCommands {
       // Convert to field relative speeds & send command
       ChassisSpeeds speeds = new ChassisSpeeds(linearVelocity.getX() * maxSpeed,
           linearVelocity.getY() * maxSpeed, omega);
-      drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
+      drive.runVelocityFieldRelative(speeds);
     }, drive)
 
         // Reset PID controller command starts
@@ -319,7 +319,7 @@ public class DriveCommands {
       ChassisSpeeds speeds =
           new ChassisSpeeds(linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
               linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(), omega);
-      drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
+      drive.runVelocityFieldRelative(speeds);
     }, drive)
         // Reset PID controller when command starts
         .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()))
@@ -512,7 +512,7 @@ public class DriveCommands {
 
       // Convert to field relative speeds & send command
       ChassisSpeeds speeds = new ChassisSpeeds(x, y, omega);
-      drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
+      drive.runVelocityFieldRelative(speeds);
 
     }, drive)
 
@@ -590,7 +590,7 @@ public class DriveCommands {
 
       // Convert to field relative speeds & send command
       ChassisSpeeds speeds = new ChassisSpeeds(x, y, omega);
-      drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
+      drive.runVelocityFieldRelative(speeds);
 
     }, drive)
 

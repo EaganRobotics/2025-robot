@@ -15,6 +15,7 @@ package frc.robot.Robot25.subsystems.drive;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.swerve.SwerveDrivetrain;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
@@ -60,6 +61,8 @@ import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+
+// class test extends SwerveDrivetrain<> {}
 
 public class Drive extends SubsystemBase implements VisionConsumer {
 
@@ -208,6 +211,16 @@ public class Drive extends SubsystemBase implements VisionConsumer {
 
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && SimConstants.CURRENT_MODE != Mode.SIM);
+  }
+
+  public void runVelocityFieldRelative(ChassisSpeeds speeds) {
+    var alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+    Rotation2d offset = switch (alliance) {
+      case Blue -> Rotation2d.kZero;
+      case Red -> Rotation2d.k180deg;
+    };
+    
+    runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getRotation().plus(offset)));
   }
 
   /**
