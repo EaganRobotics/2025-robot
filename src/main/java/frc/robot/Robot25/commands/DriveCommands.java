@@ -26,6 +26,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ProfiledPIDCommand;
@@ -527,14 +529,20 @@ public class DriveCommands {
         .withName("DriveCommands.snapToPosition");
   }
 
+
   public static Command joystickDriveAssist(Drive drive, DoubleSupplier xSupplier,
       DoubleSupplier ySupplier, DoubleSupplier omegaSupplier, BooleanSupplier snapSupplier,
       BooleanSupplier slowModeSupplier) {
 
+
+
     return Commands.run(() -> {
+
 
       Logger.recordOutput("InnerReefPositions", DriveCommands.INNER_REEF_POSITIONS);
       Logger.recordOutput("OuterReefPositions", DriveCommands.OUTER_REEF_POSITIONS);
+
+      final double isRed = DriverStation.getAlliance().get() == Alliance.Red ? -1 : 1;
 
       final double slowModeMultiplier =
           (slowModeSupplier.getAsBoolean() ? SLOW_MODE_MULTIPLIER : 1.0);
@@ -548,8 +556,8 @@ public class DriveCommands {
 
       final double maxSpeed = drive.getMaxLinearSpeedMetersPerSec();
 
-      double x = linearVelocity.getX() * maxSpeed * slowModeMultiplier;
-      double y = linearVelocity.getY() * maxSpeed * slowModeMultiplier;
+      double x = linearVelocity.getX() * maxSpeed * slowModeMultiplier * isRed;
+      double y = linearVelocity.getY() * maxSpeed * slowModeMultiplier * isRed;
 
       // Square rotation value for more precise control
       omega = Math.copySign(omega * omega, omega);
@@ -581,6 +589,7 @@ public class DriveCommands {
 
         }
       }
+      
 
       Logger.recordOutput("Snap/omega", omega);
       Logger.recordOutput("Snap/x/xDiff", x);
