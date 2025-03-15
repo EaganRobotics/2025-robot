@@ -71,7 +71,8 @@ public class Outtake extends SubsystemBase {
   }
 
   public Command autoQueueCoralOveride() {
-    return Commands.run(() -> io.setRollerOpenLoop(Volts.of(0))).withName("Outtake.autoQueueCoralOveride");
+    return Commands.run(() -> io.setRollerOpenLoop(Volts.of(0)))
+        .withName("Outtake.autoQueueCoralOveride");
   }
 
   public Command autoQueueCoral2() {
