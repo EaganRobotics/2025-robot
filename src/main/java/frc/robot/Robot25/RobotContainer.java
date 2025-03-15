@@ -13,8 +13,10 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -178,6 +180,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
     configureButtonBindings();
   }
 
+
   private void configureButtonBindings() {
 
     // Due to field orientation, joystick Y (forward) controls X direction and vice
@@ -186,8 +189,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
         DriveCommands.joystickDriveAssist(drive, () -> driverController.getLeftY(),
             () -> driverController.getLeftX(), () -> -driverController.getRightX() * .85,
             driverController.leftTrigger(), driverController.rightTrigger()));
-    outtake
-        .setDefaultCommand(outtake.autoQueueCoral().onlyWhile(elevator.isAtHeight(Level.Intake)));
+    outtake.setDefaultCommand(outtake.autoQueueCoral().onlyWhile(elevator.isAtHeight(Level.Intake))
+        .withName("RobotContainer.outtakeDefaultCommand"));
     driverController.povUpRight()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-45)));
     driverController.povRight()
@@ -200,10 +203,13 @@ public class RobotContainer extends frc.lib.RobotContainer {
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(90)));
     driverController.povUpLeft()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(45)));
-    driverController.start()
-        .onTrue(Commands.runOnce(
-            () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
-            drive).ignoringDisable(true));
+    driverController.start().onTrue(Commands.runOnce(() -> {
+      drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero));
+      CommandScheduler.getInstance().cancelAll(); // clear out any commands that might be stuck
+      if (DriverStation.isEnabled()) {
+        drive.startIgnoringVision();
+      }
+    }, drive).ignoringDisable(true).withName("RobotContainer.driverZeroCommand"));
     driverController.rightBumper().whileTrue(DriveCommands.Snapper(drive));
     driverController.leftBumper().whileTrue(DriveCommands.SourceSnapper(drive));
 
@@ -213,7 +219,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
     operatorController.povUp().onTrue(elevator.upLevel());
     operatorController.start().onTrue(elevator.zeroElevator());
     operatorController.back().onTrue(elevator.zeroElevator());
-    operatorController.leftBumper().onTrue(outtake.depositCoral().andThen(elevator.intakeHeight()));
+    operatorController.leftBumper().onTrue(outtake.depositCoral().andThen(elevator.intakeHeight())
+        .withName("RobotContainer.intakeHeight"));
     operatorController.rightBumper().onTrue(elevator.intakeHeight());
     operatorController.a().onTrue(elevator.L2());
     operatorController.x().onTrue(elevator.L1());

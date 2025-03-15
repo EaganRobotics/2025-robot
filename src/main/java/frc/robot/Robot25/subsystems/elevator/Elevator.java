@@ -54,7 +54,7 @@ public class Elevator extends SubsystemBase {
 
 
     minHeight(MIN_HEIGHT), Intake(Inches.of(16.4 + 3.5)), L1(Inches.of(18 + 14)), L2(
-        Inches.of(31.9 + 7)), L3(Inches.of(47.6 + 7)), L4(Inches.of(72 + 7.25));
+        Inches.of(31.9 + 7)), L3(Inches.of(47.6 + 7)), L4(Inches.of(72 + 6.25));
 
 
     private final Distance height;
@@ -115,7 +115,7 @@ public class Elevator extends SubsystemBase {
       io.setWinchOpenLoop(Volts.of(0));
       io.zeroEncoder();
 
-    }).ignoringDisable(true));
+    }).ignoringDisable(true).withName("Elevator.lowerLimitHit"));
 
     // currentLevel = Level.minHeight;
     // Distance height = currentLevel.getHeight();
@@ -155,7 +155,7 @@ public class Elevator extends SubsystemBase {
       Distance height = level.getHeight();
       Angle r = inchesToRadians(height);
       io.setWinchPosition(r);
-    }).andThen(Commands.waitUntil(isAtGoal()));
+    }).andThen(Commands.waitUntil(isAtGoal()).withName("Elevator.goToLevel_" + level.name()));
   }
 
   public Command minHeight() {
@@ -169,7 +169,7 @@ public class Elevator extends SubsystemBase {
         .andThen(Commands.waitUntil(lowerLimitHit)).andThen(Commands.runOnce(() -> {
           // io.zeroEncoder();
           io.setWinchOpenLoop(Volts.of(0));
-        }));
+        })).withName("Elevator.minHeight");
   }
 
   public Command miniHeight() {
@@ -184,7 +184,7 @@ public class Elevator extends SubsystemBase {
         .andThen(Commands.waitUntil(lowerLimitHit)).andThen(Commands.runOnce(() -> {
           // io.zeroEncoder();
           io.setWinchOpenLoop(Volts.of(0));
-        }));
+        })).withName("Elevator.miniHeight");
   }
 
   // public Command miniHeight() {
@@ -193,7 +193,7 @@ public class Elevator extends SubsystemBase {
 
   // }
   public Command zeroElevator() {
-    return Commands.runOnce(() -> io.zeroEncoder());
+    return Commands.runOnce(() -> io.zeroEncoder()).withName("Elevator.zeroElevator");
   }
 
   // src/main/java/frc/robot/Robot25/subsystems/elevator/Elevator.java
@@ -232,7 +232,7 @@ public class Elevator extends SubsystemBase {
       Distance height = desiredLevel.getHeight();
       Angle r = inchesToRadians(height);
       io.setWinchPosition(r);
-    });
+    }).withName("Elevator.upLevel");
   }
 
   public Command downLevel() {
@@ -241,7 +241,7 @@ public class Elevator extends SubsystemBase {
       Distance height = desiredLevel.getHeight();
       Angle r = inchesToRadians(height);
       io.setWinchPosition(r);
-    });
+    }).withName("Elevator.downLevel");
   }
 
   public Command openLoop(DoubleSupplier speed) {
@@ -249,7 +249,7 @@ public class Elevator extends SubsystemBase {
       io.setWinchOpenLoop(Volts.of(speed.getAsDouble() * -4));
     }, () -> {
       io.setWinchPosition(inputs.winchPosition);
-    });
+    }).withName("Elevator.openLoop");
   }
 
   // public Command upLevel() {

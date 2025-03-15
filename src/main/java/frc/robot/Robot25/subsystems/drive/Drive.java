@@ -63,6 +63,17 @@ import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase implements VisionConsumer {
 
+  private boolean ignoreVision = false;
+
+  public void startIgnoringVision() {
+    ignoreVision = true;
+  }
+
+  @AutoLogOutput(key = "Drive/IgnoringVision")
+  public boolean isIgnoringVision() {
+    return ignoreVision;
+  }
+
   // Configure path planner
   private static final RobotConfig PP_CONFIG =
       new RobotConfig(DriveConstants.ROBOT_MASS_KG, DriveConstants.ROBOT_MOI,
@@ -273,12 +284,13 @@ public class Drive extends SubsystemBase implements VisionConsumer {
   /** Returns a command to run a quasistatic test in the specified direction. */
   public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
     return run(() -> runCharacterization(0.0)).withTimeout(1.0)
-        .andThen(sysId.quasistatic(direction));
+        .andThen(sysId.quasistatic(direction)).withName("Drive.sysIdQuasistatic");
   }
 
   /** Returns a command to run a dynamic test in the specified direction. */
   public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-    return run(() -> runCharacterization(0.0)).withTimeout(1.0).andThen(sysId.dynamic(direction));
+    return run(() -> runCharacterization(0.0)).withTimeout(1.0).andThen(sysId.dynamic(direction))
+        .withName("Drive.sysIdDynamic");
   }
 
   /**
@@ -351,6 +363,9 @@ public class Drive extends SubsystemBase implements VisionConsumer {
   @Override
   public void accept(Pose2d visionRobotPoseMeters, double timestampSeconds,
       Matrix<N3, N1> visionMeasurementStdDevs) {
+    if (ignoreVision) {
+      return;
+    }
     poseEstimator.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds,
         visionMeasurementStdDevs);
   }
