@@ -21,9 +21,8 @@ jobs:
       - name: Get changed files and lines
         id: changes
         run: |
-          echo "changed_files=$(git diff --name-only HEAD~1 HEAD | wc -l)" >> $GITHUB_OUTPUT
+          echo "changed_files=$(git diff --name-only HEAD~1 HEAD | wc -l | tr -d ' ')" >> $GITHUB_OUTPUT
           echo "changed_lines=$(git diff HEAD~1 HEAD --stat | awk '{lines+=$1 + $3} END {print lines}')" >> $GITHUB_OUTPUT
-          echo "changed_files_list=$(git diff --name-only HEAD~1 HEAD)" >> $GITHUB_OUTPUT
 
       - name: Check if review is needed
         id: review_needed
@@ -47,7 +46,7 @@ jobs:
 
   fetch_pr_details:
     needs: check_review_needed
-    if: ${{ needs.check_review_needed.outputs.review == 'true' }}
+    if: ${{ needs.check_review_needed.outputs.review_needed == 'true' }}
     runs-on: ubuntu-22.04
     outputs:
       pr_title: ${{ steps.pr-details.outputs.pr_title }}
@@ -74,7 +73,7 @@ jobs:
 
   fetch_pr_commits:
     needs: check_review_needed
-    if: ${{ needs.check_review_needed.outputs.review == 'true' }}
+    if: ${{ needs.check_review_needed.outputs.review_needed == 'true' }}
     runs-on: ubuntu-22.04
     outputs:
       formatted_commits: ${{ steps.pr-commits.outputs.formatted_commits }}
@@ -117,7 +116,7 @@ jobs:
 
   fetch_pr_unified_diff:
     needs: check_review_needed
-    if: ${{ needs.check_review_needed.outputs.review == 'true' }}
+    if: ${{ needs.check_review_needed.outputs.review_needed == 'true' }}
     runs-on: ubuntu-22.04
     outputs:
       formatted_diffs: ${{ steps.pr-unified-diff.outputs.formatted_diffs }}
@@ -152,7 +151,7 @@ jobs:
 
   fetch_pr_all_comments:
     needs: check_review_needed
-    if: ${{ needs.check_review_needed.outputs.review == 'true' }}
+    if: ${{ needs.check_review_needed.outputs.review_needed == 'true' }}
     runs-on: ubuntu-22.04
     outputs:
       formatted_comments: ${{ steps.pr-all-comments.outputs.formatted_comments }}
