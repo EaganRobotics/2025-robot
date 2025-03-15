@@ -219,7 +219,7 @@ public class Drive extends SubsystemBase implements VisionConsumer {
    */
   public void runVelocity(ChassisSpeeds speeds) {
     // Calculate module setpoints
-    previousSetpoint = swerveSetpointGenerator.generateSetpoint(previousSetpoint, speeds, 0.02);
+    previousSetpoint = swerveSetpointGenerator.generateSetpoint(previousSetpoint, speeds, TimedRobot.kDefaultPeriod);
     var setpointStates = previousSetpoint.moduleStates();
 
     // Log unoptimized setpoints and setpoint speeds
