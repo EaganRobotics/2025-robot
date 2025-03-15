@@ -542,7 +542,8 @@ public class DriveCommands {
       Logger.recordOutput("InnerReefPositions", DriveCommands.INNER_REEF_POSITIONS);
       Logger.recordOutput("OuterReefPositions", DriveCommands.OUTER_REEF_POSITIONS);
 
-      final double isRed = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red ? -1 : 1;
+      final double isRed =
+          DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red ? -1 : 1;
 
       final double slowModeMultiplier =
           (slowModeSupplier.getAsBoolean() ? SLOW_MODE_MULTIPLIER : 1.0);
@@ -589,7 +590,7 @@ public class DriveCommands {
 
         }
       }
-      
+
 
       Logger.recordOutput("Snap/omega", omega);
       Logger.recordOutput("Snap/x/xDiff", x);
