@@ -1,3 +1,5 @@
+import org.gradle.internal.os.OperatingSystem
+
 plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2025.2.1"
@@ -8,6 +10,30 @@ plugins {
     // Spotless for format checking
     id "com.diffplug.spotless" version "7.0.2"
 }
+
+// repositories {
+//     mavenLocal()
+//     gradlePluginPortal()
+//     String frcYear = '2025'
+//     File frcHome
+//     if (OperatingSystem.current().isWindows()) {
+//         String publicFolder = System.getenv('PUBLIC')
+//         if (publicFolder == null) {
+//             publicFolder = "C:\\Users\\Public"
+//         }
+//         def homeRoot = new File(publicFolder, "wpilib")
+//         frcHome = new File(homeRoot, frcYear)
+//     } else {
+//         def userFolder = System.getProperty("user.home")
+//         def homeRoot = new File(userFolder, "wpilib")
+//         frcHome = new File(homeRoot, frcYear)
+//     }
+//     def frcHomeMaven = new File(frcHome, 'maven')
+//     maven {
+//         name 'frcHome'
+//         url frcHomeMaven
+//     }
+// }
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -169,4 +195,34 @@ spotless {
     targetExclude('build/**', 'src/main/java/frc/robot/BuildConstants.java')
   }
   enforceCheck = false
+}
+
+// Integration Test Task
+task integrationTest(type: JavaExec) {
+  mainClass = "frc.lib.SimTestRunner"
+  classpath = tasks.named('jar').get().outputs.files + configurations.runtimeClasspath + sourceSets.test.output.files
+
+  dependsOn(project.tasks.named(wpi.java.debugJni.get() ? 'extractDebugNative' : 'extractReleaseNative'))
+
+  doFirst {
+    File ldpath = project.tasks.named(wpi.java.debugJni.get() ? 'extractDebugNative' : 'extractReleaseNative').get().destinationDirectory.get().asFile
+    List<edu.wpi.first.gradlerio.simulation.HalSimPair> extensions = wpi.sim.getHalSimLocations(List.of(ldpath), wpi.java.debugJni.get())
+    Map<String, String> env = wpi.sim.getEnvironment()
+    environment(env)
+
+    def extensionString = extensions.stream().filter(x -> x.defaultEnabled).map(x -> x.libName)
+        .reduce((a, b) -> a + File.pathSeparator + b)
+    if (extensionString.isPresent()) {
+      environment("HALSIM_EXTENSIONS", extensionString.get())
+    }
+
+    if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
+      println("If you receive errors loading the JNI dependencies, make sure you have the latest Visual Studio C++ Redistributable installed.")
+      println("That can be found at https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads")
+    }
+  }
+
+  if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
+    jvmArgs "-XstartOnFirstThread"
+  }
 }
