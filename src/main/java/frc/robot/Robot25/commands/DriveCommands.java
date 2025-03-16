@@ -414,6 +414,27 @@ public class DriveCommands {
 
   }
 
+  public static Command FullSnapperOuter(Drive drive) {
+
+    return Commands.defer(() -> {
+      Pose2d desiredPose = getClosestFullOuter(drive, Meters.of(1000)).orElse(Pose2d.kZero);
+      Logger.recordOutput("SnapperPose", desiredPose);
+      return snapToPosition(drive, desiredPose);
+    }, Set.of(drive)).withName("DriveCommands.SourceSnapper");
+
+  }
+
+  public static Command FullSnapperInner(Drive drive) {
+
+    return Commands.defer(() -> {
+      Pose2d desiredPose = getClosestFullInner(drive, Meters.of(1000)).orElse(Pose2d.kZero);
+      Logger.recordOutput("SnapperPose", desiredPose);
+      return snapToPosition(drive, desiredPose);
+    }, Set.of(drive)).withName("DriveCommands.SourceSnapper");
+
+  }
+
+
   private static final class Pose2dSequence {
     Pose2d inner;
     Pose2d outer;
@@ -448,6 +469,36 @@ public class DriveCommands {
     Optional<Pose2d> desiredPose = Optional.empty();
     Distance minDistance = Meters.of(1000000);
     for (Pose2d pose : SOURCE_POSITIONS) {
+      double distance = drive.getPose().getTranslation().getDistance(pose.getTranslation());
+      Distance distanceMeasure = Meters.of(distance);
+      if (distanceMeasure.lte(radius) && distanceMeasure.lte(minDistance)) {
+        minDistance = distanceMeasure;
+        desiredPose = Optional.of(pose);
+      }
+    }
+
+    return desiredPose;
+  };
+
+  private static Optional<Pose2d> getClosestFullOuter(Drive drive, Distance radius) {
+    Optional<Pose2d> desiredPose = Optional.empty();
+    Distance minDistance = Meters.of(1000000);
+    for (Pose2d pose : OUTER_REEF_POSITIONS) {
+      double distance = drive.getPose().getTranslation().getDistance(pose.getTranslation());
+      Distance distanceMeasure = Meters.of(distance);
+      if (distanceMeasure.lte(radius) && distanceMeasure.lte(minDistance)) {
+        minDistance = distanceMeasure;
+        desiredPose = Optional.of(pose);
+      }
+    }
+
+    return desiredPose;
+  };
+
+  private static Optional<Pose2d> getClosestFullInner(Drive drive, Distance radius) {
+    Optional<Pose2d> desiredPose = Optional.empty();
+    Distance minDistance = Meters.of(1000000);
+    for (Pose2d pose : INNER_REEF_POSITIONS) {
       double distance = drive.getPose().getTranslation().getDistance(pose.getTranslation());
       Distance distanceMeasure = Meters.of(distance);
       if (distanceMeasure.lte(radius) && distanceMeasure.lte(minDistance)) {
