@@ -200,7 +200,6 @@ spotless {
 // Integration Test Task
 task integrationTest(type: JavaExec) {
   mainClass = "frc.lib.SimTestRunner"
-  classpath = tasks.named('jar').get().outputs.files + configurations.runtimeClasspath + sourceSets.test.output.files
 
   dependsOn(project.tasks.named(wpi.java.debugJni.get() ? 'extractDebugNative' : 'extractReleaseNative'))
 
@@ -220,9 +219,24 @@ task integrationTest(type: JavaExec) {
       println("If you receive errors loading the JNI dependencies, make sure you have the latest Visual Studio C++ Redistributable installed.")
       println("That can be found at https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads")
     }
+
+    // Explicitly set java.library.path
+    jvmArgs "-Djava.library.path=${ldpath.getAbsolutePath()}"
+
+    if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
+      environment("DYLD_LIBRARY_PATH", ldpath.getAbsolutePath())
+    }
   }
 
   if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
     jvmArgs "-XstartOnFirstThread"
+  }
+
+  project.afterEvaluate {
+      classpath = project.files(
+          tasks.named('jar').get().outputs.files,
+          configurations.runtimeClasspath,
+          sourceSets.test.output.files
+      )
   }
 }
