@@ -47,8 +47,8 @@ public class DriveCommands {
   private static final double ANGLE_MAX_VELOCITY = 8.0;
   private static final double ANGLE_MAX_ACCELERATION = 20.0;
   private static final double ANGLE_TOLERANCE = Degrees.of(1).in(Radians);
-  private static final double POSITION_MAX_VELOCITY = 3.0;
-  private static final double POSITION_MAX_ACCELERATION = 3.0;
+  private static final double POSITION_MAX_VELOCITY = 4.0;
+  private static final double POSITION_MAX_ACCELERATION = 6.0;
   private static final double POSITION_TOLERANCE = Inches.of(1).in(Meters);
 
   /// Auto snap to position distance
