@@ -212,6 +212,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
     }, drive).ignoringDisable(true).withName("RobotContainer.driverZeroCommand"));
     driverController.rightBumper().whileTrue(DriveCommands.Snapper(drive));
     driverController.leftBumper().whileTrue(DriveCommands.SourceSnapper(drive));
+    // driverController.y().onTrue(DriveCommands.FullSnapper(drive));
 
     operatorController.leftTrigger().whileTrue(outtake.autoQueueCoralOveride());
     operatorController.rightTrigger().whileTrue(outtake.reverseCoral());

@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ProfiledPIDCommand;
 import frc.lib.tunables.LoggedTunableNumber;
 import frc.robot.Robot25.subsystems.drive.Drive;
+import frc.robot.Robot25.subsystems.elevator.Elevator;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
@@ -188,6 +189,7 @@ public class DriveCommands {
   private static final Pose2d[] AUTO_POSITIONS = makeAutoPositions(Inches.of(0));
   private static final Pose2d[] AUTO_POSITIONS_12 = makeAutoPositions(Inches.of(12));
   private static final Pose2d[] SOURCE_POSITIONS = makeSourcePositions();
+  // private static Elevator elevator;
 
   private static final LoggedTunableNumber ANGLE_KP =
       new LoggedTunableNumber("Tuning/SnapToPosition/Angle_kP", 7.0);
@@ -413,6 +415,19 @@ public class DriveCommands {
     }, Set.of(drive)).withName("DriveCommands.AutoSourceLeft");
 
   }
+
+  // public static Command FullSnapper(Drive drive) {
+
+  //   return Commands.defer(() -> {
+  //     Pose2dSequence desiredPose =
+  //         getClosestPosition(drive, Meters.of(1000)).orElse(Pose2dSequence.kZero);
+  //     Logger.recordOutput("SnapperPose", desiredPose.outer);
+  //     return snapToPosition(drive, desiredPose.outer)
+  //         .andThen(snapToPosition(drive, desiredPose.inner).alongWith(elevator.L4()));
+  //   }, Set.of(drive)).withName("DriveCommands.Snapper");
+
+  // }
+
 
   private static final class Pose2dSequence {
     Pose2d inner;
