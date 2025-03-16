@@ -155,6 +155,21 @@ public class RobotContainer extends frc.lib.RobotContainer {
     NamedCommands.registerCommand("L3", elevator.L3());
     NamedCommands.registerCommand("L4", elevator.L4());
 
+    NamedCommands.registerCommand("Maybe1",
+        DriveCommands.FullSnapperOuter(drive)
+            .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
+            .andThen(outtake.depositCoral()).andThen(elevator.L0())
+            .andThen(DriveCommands.FullSnapperOuter(drive)));
+    NamedCommands.registerCommand("Maybe2", DriveCommands.SourceSnapper(drive).withTimeout(3));
+    NamedCommands.registerCommand("Maybe3",
+        DriveCommands.FullSnapperOuterAuto(drive)
+            .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
+            .andThen(outtake.depositCoral()).andThen(elevator.L0()));
+    NamedCommands.registerCommand("Maybe4",
+        DriveCommands.FullSnapperOuter(drive)
+            .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
+            .andThen(outtake.depositCoral()).andThen(elevator.L0()));
+
     NamedCommands.registerCommand("Exhaust", outtake.depositCoral());
 
     // Set up auto routines
@@ -180,7 +195,6 @@ public class RobotContainer extends frc.lib.RobotContainer {
     configureButtonBindings();
   }
 
-  
 
 
   private void configureButtonBindings() {

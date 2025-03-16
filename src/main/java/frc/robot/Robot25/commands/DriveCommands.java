@@ -424,6 +424,17 @@ public class DriveCommands {
 
   }
 
+  public static Command FullSnapperOuterAuto(Drive drive) {
+
+    return Commands.defer(() -> {
+      Pose2d desiredPose = getClosestFullOuterAuto(drive, Meters.of(1000)).orElse(Pose2d.kZero);
+      Logger.recordOutput("SnapperPose", desiredPose);
+      return snapToPosition(drive, desiredPose);
+    }, Set.of(drive)).withName("DriveCommands.SourceSnapper");
+
+  }
+
+
   public static Command FullSnapperInner(Drive drive) {
 
     return Commands.defer(() -> {
@@ -484,6 +495,21 @@ public class DriveCommands {
     Optional<Pose2d> desiredPose = Optional.empty();
     Distance minDistance = Meters.of(1000000);
     for (Pose2d pose : OUTER_REEF_POSITIONS) {
+      double distance = drive.getPose().getTranslation().getDistance(pose.getTranslation());
+      Distance distanceMeasure = Meters.of(distance);
+      if (distanceMeasure.lte(radius) && distanceMeasure.lte(minDistance)) {
+        minDistance = distanceMeasure;
+        desiredPose = Optional.of(pose);
+      }
+    }
+
+    return desiredPose;
+  };
+
+  private static Optional<Pose2d> getClosestFullOuterAuto(Drive drive, Distance radius) {
+    Optional<Pose2d> desiredPose = Optional.empty();
+    Distance minDistance = Meters.of(1000000);
+    for (Pose2d pose : AUTO_POSITIONS) {
       double distance = drive.getPose().getTranslation().getDistance(pose.getTranslation());
       Distance distanceMeasure = Meters.of(distance);
       if (distanceMeasure.lte(radius) && distanceMeasure.lte(minDistance)) {
