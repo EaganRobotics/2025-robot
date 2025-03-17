@@ -64,7 +64,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
   private final Algae algae;
 
   // Drive simulation
-  private static final SwerveDriveSimulation driveSimulation =
+  public static final SwerveDriveSimulation DRIVE_SIMULATION =
       new SwerveDriveSimulation(Drive.MAPLE_SIM_CONFIG, SimConstants.SIM_INITIAL_FIELD_POSE);
 
   private final CommandXboxController driverController = new CommandXboxController(0);
@@ -76,7 +76,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
   public final Pose3d[] mechanismPoses = new Pose3d[] {Pose3d.kZero, Pose3d.kZero, Pose3d.kZero,};
 
   public RobotContainer() {
-    super(driveSimulation);
+    super(DRIVE_SIMULATION);
     // Check for valid swerve config
     var modules = new SwerveModuleConstants[] {DriveConstants.FrontLeft, DriveConstants.FrontRight,
         DriveConstants.BackLeft, DriveConstants.BackRight,};
@@ -94,7 +94,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
         drive = new Drive(new GyroIOPigeon2(), new ModuleIOTalonFX(DriveConstants.FrontLeft),
             new ModuleIOTalonFX(DriveConstants.FrontRight),
             new ModuleIOTalonFX(DriveConstants.BackLeft),
-            new ModuleIOTalonFX(DriveConstants.BackRight), driveSimulation::setSimulationWorldPose);
+            new ModuleIOTalonFX(DriveConstants.BackRight),
+            DRIVE_SIMULATION::setSimulationWorldPose);
 
         elevator = new Elevator(new ElevatorIOTalonFXNew());
         outtake = new Outtake(new OuttakeIOTalonFX());
@@ -104,27 +105,27 @@ public class RobotContainer extends frc.lib.RobotContainer {
         algae = new Algae(new AlgaeIOTalonFX());
         break;
       case SIM:
-        drive = new Drive(new GyroIOSim(driveSimulation.getGyroSimulation()),
-            new ModuleIOSim(driveSimulation.getModules()[0]),
-            new ModuleIOSim(driveSimulation.getModules()[1]),
-            new ModuleIOSim(driveSimulation.getModules()[2]),
-            new ModuleIOSim(driveSimulation.getModules()[3]),
-            driveSimulation::setSimulationWorldPose);
+        drive = new Drive(new GyroIOSim(DRIVE_SIMULATION.getGyroSimulation()),
+            new ModuleIOSim(DRIVE_SIMULATION.getModules()[0]),
+            new ModuleIOSim(DRIVE_SIMULATION.getModules()[1]),
+            new ModuleIOSim(DRIVE_SIMULATION.getModules()[2]),
+            new ModuleIOSim(DRIVE_SIMULATION.getModules()[3]),
+            DRIVE_SIMULATION::setSimulationWorldPose);
         drive.setPose(SimConstants.SIM_INITIAL_FIELD_POSE);
 
         elevator = new Elevator(new ElevatorIOSim());
         outtake = new Outtake(new OuttakeIOSim());
         vision = new Vision(drive, new VisionIOPhotonVisionSim(VisionConstants.limelightBackName,
-            VisionConstants.limelightBackTransform, driveSimulation::getSimulatedDriveTrainPose),
+            VisionConstants.limelightBackTransform, DRIVE_SIMULATION::getSimulatedDriveTrainPose),
             new VisionIOPhotonVisionSim(VisionConstants.limelightFrontName,
                 VisionConstants.limelightFrontTransform,
-                driveSimulation::getSimulatedDriveTrainPose));
+                DRIVE_SIMULATION::getSimulatedDriveTrainPose));
         algae = new Algae(new AlgaeIOSim());
         break;
       default:
         // Replayed robot, disable IO implementations
         drive = new Drive(new GyroIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {},
-            new ModuleIO() {}, driveSimulation::setSimulationWorldPose);
+            new ModuleIO() {}, DRIVE_SIMULATION::setSimulationWorldPose);
 
         elevator = new Elevator(new ElevatorIO() {});
 
@@ -179,7 +180,6 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
     configureButtonBindings();
   }
-
 
   private void configureButtonBindings() {
 

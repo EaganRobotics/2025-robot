@@ -9,7 +9,7 @@ import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Volts;
 
 public class OuttakeConstants {
-  public static final double GEARING = 5.0;
+  public static final double GEARING = 1;
   public static final Current CURRENT_LIMIT = Amps.of(40);
 
   public static final class Sim {
@@ -20,8 +20,8 @@ public class OuttakeConstants {
     public static final double kG = 0.43; // 0.37
     public static final double kV = 0.10146; // 2.67
     public static final double kA = 0.002; // * DRUM_RADIUS.in(Meters); // 0.05
-    public static final MomentOfInertia MOTOR_LOAD_MOI = KilogramSquareMeters.of(0.04); // TODO
-                                                                                        // estimate
-    public static final Voltage FRICTION_VOLTAGE = Volts.of(0.5);
+    public static final MomentOfInertia MOTOR_LOAD_MOI = KilogramSquareMeters.of(0.001); // TODO
+                                                                                         // estimate
+    public static final Voltage FRICTION_VOLTAGE = Volts.of(0.1);
   }
 }

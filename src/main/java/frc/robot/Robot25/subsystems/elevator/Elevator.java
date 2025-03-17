@@ -25,6 +25,15 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
 public class Elevator extends SubsystemBase {
 
+  private static Elevator elevator = null;
+
+  public static Elevator getInstance() {
+    if (elevator == null) {
+      throw new RuntimeException("Elevator not initialized");
+    }
+    return elevator;
+  }
+
   private final ElevatorIO io;
 
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
@@ -52,10 +61,8 @@ public class Elevator extends SubsystemBase {
 
     // original value during W0 = L4 = 72 + 6
 
-
     minHeight(MIN_HEIGHT), Intake(Inches.of(16.4 + 3.5)), L1(Inches.of(18 + 14)), L2(
         Inches.of(31.9 + 7)), L3(Inches.of(47.6 + 7)), L4(Inches.of(72 + 6.25));
-
 
     private final Distance height;
 
@@ -122,6 +129,11 @@ public class Elevator extends SubsystemBase {
     // Angle r = inchesToRadians(height);
     // io.setWinchPosition(r);
     goToLevel(Level.minHeight);
+
+    if (elevator != null) {
+      throw new IllegalStateException("Elevator already initialized");
+    }
+    elevator = this;
   }
 
   @Override
@@ -306,4 +318,7 @@ public class Elevator extends SubsystemBase {
     });
   }
 
+  public Distance getCurrentHeight() {
+    return radiansToInches(inputs.winchPosition);
+  }
 }

@@ -1,26 +1,67 @@
 package frc.robot.Robot25.subsystems.outtake;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Robot25.subsystems.outtake.OuttakeConstants.CURRENT_LIMIT;
 import static frc.robot.Robot25.subsystems.outtake.OuttakeConstants.GEARING;
 
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
+
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.lib.tunables.LoggedTunableBoolean;
+import frc.robot.Robot25.RobotContainer;
+import frc.robot.Robot25.subsystems.elevator.Elevator;
 import frc.robot.Robot25.subsystems.outtake.OuttakeConstants.Sim;
+
+import org.ironmaple.simulation.IntakeSimulation;
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.IntakeSimulation.IntakeSide;
+import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation;
 import org.ironmaple.simulation.motorsims.MapleMotorSim;
 import org.ironmaple.simulation.motorsims.SimMotorConfigs;
 import org.ironmaple.simulation.motorsims.SimulatedMotorController;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
+import org.littletonrobotics.junction.Logger;
 
 public class OuttakeIOSim implements OuttakeIO {
+
+  private final AbstractDriveTrainSimulation driveSim = RobotContainer.DRIVE_SIMULATION;
+
+  private final IntakeSimulation intakeSim =
+      IntakeSimulation.InTheFrameIntake("Coral", driveSim, Inches.of(16.743), IntakeSide.BACK, 1);
+
+  private static final Transform3d MIDDLE_CORAL_POSE =
+      new Transform3d(Inches.of(-1.356 + 9), Inches.of(-0.012), Inches.of(20.196 - 0.75),
+          new Rotation3d(Degrees.zero(), Degrees.of(34.411), Degrees.zero()))
+          .plus(new Transform3d(Inches.of(-2), Inches.zero(), Inches.zero(), Rotation3d.kZero));
+  private static final Transform3d LOADING_CORAL_POSE = MIDDLE_CORAL_POSE
+      .plus(new Transform3d(Inches.of(-10), Inches.zero(), Inches.zero(), Rotation3d.kZero));
+  private static final Transform3d LOADED_CORAL_POSE = MIDDLE_CORAL_POSE
+      .plus(new Transform3d(Inches.of(4), Inches.zero(), Inches.zero(), Rotation3d.kZero));
+  private static final double LOAD_TIME_SECONDS = 0.3;
+
+  private double loadTimeSeconds = -1;
+  private Optional<Pose3d> coralPose = Optional.empty();
+
   private static final DCMotor outtakeGearbox = DCMotor.getKrakenX60(1);
   private final SimulatedMotorController.GenericMotorController outtakeMotorController;
   private final MapleMotorSim outtakeMotor;
@@ -42,12 +83,49 @@ public class OuttakeIOSim implements OuttakeIO {
         new SimMotorConfigs(outtakeGearbox, GEARING, Sim.MOTOR_LOAD_MOI, Sim.FRICTION_VOLTAGE));
     outtakeMotorController =
         outtakeMotor.useSimpleDCMotorController().withCurrentLimit(CURRENT_LIMIT);
+
+    intakeSim.addGamePieceToIntake();
   }
 
   @Override
   public void setOpenLoop(Voltage output) {
     outtakeAppliedVoltage = output;
     isClosedLoop = false;
+    if (output.in(Volts) > 0 && coralPose.isPresent()) {
+      var projectile = new ReefscapeCoralOnFly(
+          driveSim.getSimulatedDriveTrainPose().getTranslation(),
+          LOADED_CORAL_POSE.getTranslation().toTranslation2d(),
+          driveSim.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
+          driveSim.getSimulatedDriveTrainPose().getRotation(),
+          Elevator.getInstance().getCurrentHeight(), MetersPerSecond.of(3), Degrees.of(-34.411));
+      coralPose = Optional.empty();
+      CompletableFuture.runAsync(() -> {
+        System.out.println("Disabling sensors");
+        try {
+          Thread.sleep(50);
+          LoadSideSensor.set(false);
+          Thread.sleep(100);
+          ScoreSideSensor.set(false);
+        } catch (InterruptedException e) {
+          LoadSideSensor.set(false);
+          ScoreSideSensor.set(false);
+          Thread.currentThread().interrupt();
+        }
+      });
+      SimulatedArena.getInstance().addGamePieceProjectile(projectile);
+    }
+  }
+
+  @Override
+  public void setRollerOpenLoop(Voltage output) {
+    // TODO simulate another motor?
+    outtakeAppliedVoltage = output;
+    isClosedLoop = false;
+    if (output.in(Volts) > 0 && coralPose.isEmpty()) {
+      intakeSim.startIntake();
+    } else {
+      intakeSim.stopIntake();
+    }
   }
 
   @Override
@@ -62,6 +140,29 @@ public class OuttakeIOSim implements OuttakeIO {
     outtakeSim.setInputVoltage(outtakeMotor.getAppliedVoltage().in(Volts));
     outtakeMotor.update(Seconds.of(TimedRobot.kDefaultPeriod));
     outtakeSim.update(TimedRobot.kDefaultPeriod);
+
+    var robotPose = new Pose3d(driveSim.getSimulatedDriveTrainPose())
+        .plus(new Transform3d(Inches.of(0), Inches.of(0),
+            Elevator.getInstance().getCurrentHeight().minus(Elevator.Level.Intake.getHeight()),
+            Rotation3d.kZero));
+    if (intakeSim.obtainGamePieceFromIntake()) {
+      LoadSideSensor.set(true);
+      coralPose = Optional.of(robotPose.plus(LOADING_CORAL_POSE));
+      loadTimeSeconds = Timer.getFPGATimestamp();
+    } else if (coralPose.isPresent()) {
+      var t = (Timer.getFPGATimestamp() - loadTimeSeconds) / LOAD_TIME_SECONDS;
+      if (t >= 1) {
+        ScoreSideSensor.set(true);
+        coralPose = Optional.of(robotPose.plus(LOADED_CORAL_POSE));
+      } else if (t > 0 && t < 1) {
+        coralPose = Optional.of(
+            robotPose.plus(LOADING_CORAL_POSE).interpolate(robotPose.plus(LOADED_CORAL_POSE), t));
+      }
+    }
+
+    // Record coral pose simulation output
+    Logger.recordOutput("Outtake/CoralPoseSim",
+        coralPose.isPresent() ? new Pose3d[] {coralPose.get()} : new Pose3d[] {});
 
     // Update motor inputs
     inputs.outtakeConnected = true;
