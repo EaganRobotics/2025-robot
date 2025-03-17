@@ -6,6 +6,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Robot;
@@ -55,6 +56,9 @@ public final class SimTestRunner {
     });
 
     // Send the test command to the robot and start it
+    DriverStationSim.setDsAttached(true);
+    DriverStationSim.setTest(true);
+    DriverStationSim.setEnabled(true);
     var testCommandField = Robot.class.getDeclaredField("testCommand");
     testCommandField.setAccessible(true);
     testCommandField.set(robot, testCommand);
