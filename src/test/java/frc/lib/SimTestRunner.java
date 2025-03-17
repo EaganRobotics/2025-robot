@@ -43,11 +43,17 @@ public final class SimTestRunner {
         return Commands
             .run(() -> System.out.println("XB Controller LY: " + xbc.getLeftY() + ", LX: " + xbc.getLeftX() + ", RX: "
                 + xbc.getRightX()))
-            .withTimeout(12)
+            .withTimeout(7)
             .alongWith(Commands.print("\n\n----------------------Starting test----------------------\n\n")
-                .andThen(Commands.waitSeconds(1)).andThen(xb.holdLeftY(0.5,
-                    10).alongWith(xb.holdLeftX(0.8, 10)))
-                .andThen(Commands.print("\n\n----------------------Test complete----------------------\n\n")));
+                .andThen(Commands.waitSeconds(1)).andThen(xb.lerpLeftY(5,
+                    0, 0.25, 0.5, 0.5, 0.25, 0).alongWith(
+                        xb.lerpLeftX(5,
+                            0, 0.25, 0.5, 0, -0.5, -0.5, -0.25, 0)
+                            .alongWith(Commands.waitSeconds(1).andThen(
+                                xb.lerpRightX(4, 0, 0.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.5, 0.25, 0.2, 0.15,
+                                    0)))))
+                .andThen(
+                    Commands.print("\n\n----------------------Test complete----------------------\n\n")));
       }
     };
 
