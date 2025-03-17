@@ -6,9 +6,13 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
+import edu.wpi.first.wpilibj.simulation.XboxControllerSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.lib.controllers.CommandXBoxWrapper;
 import frc.robot.Robot;
 import frc.robot.Robot25.RobotContainerProvider;
 import frc.robot.Robot25.commands.DriveCommands;
@@ -22,13 +26,28 @@ public final class SimTestRunner {
 
   public static void main(String[] args) throws NoSuchFieldException, IllegalAccessException {
     // create an example test command
+    // var exampleTest = new IntegrationTest() {
+    // @Override
+    // public Command testCommand(RobotContainer robotContainer) {
+    // var drive = RobotContainerProvider.getDriveSubsystem(robotContainer);
+
+    // return DriveCommands.joystickDrive(drive, () -> 0.2, () -> 0.0, () -> 0.0)
+    // .withDeadline(Commands.waitSeconds(2));
+    // }
+    // };
     var exampleTest = new IntegrationTest() {
       @Override
       public Command testCommand(RobotContainer robotContainer) {
-        var drive = RobotContainerProvider.getDriveSubsystem(robotContainer);
-
-        return DriveCommands.joystickDrive(drive, () -> 0.2, () -> 0.0, () -> 0.0)
-            .withDeadline(Commands.waitSeconds(2));
+        var xb = new MockXboxController(0);
+        var xbc = new XboxController(0);
+        return Commands
+            .run(() -> System.out.println("XB Controller LY: " + xbc.getLeftY() + ", LX: " + xbc.getLeftX() + ", RX: "
+                + xbc.getRightX()))
+            .withTimeout(12)
+            .alongWith(Commands.print("\n\n----------------------Starting test----------------------\n\n")
+                .andThen(Commands.waitSeconds(1)).andThen(xb.holdLeftY(0.5,
+                    10).alongWith(xb.holdLeftX(0.8, 10)))
+                .andThen(Commands.print("\n\n----------------------Test complete----------------------\n\n")));
       }
     };
 
@@ -57,7 +76,7 @@ public final class SimTestRunner {
 
     // Send the test command to the robot and start it
     DriverStationSim.setDsAttached(true);
-    DriverStationSim.setTest(true);
+    // DriverStationSim.setTest(true);
     DriverStationSim.setEnabled(true);
     var testCommandField = Robot.class.getDeclaredField("testCommand");
     testCommandField.setAccessible(true);
@@ -66,6 +85,7 @@ public final class SimTestRunner {
   }
 
   private static void stopRobot() throws InterruptedException {
+    System.exit(0);
     var robotThreadId = RobotBase.getMainThreadId();
     var threads = new Thread[Thread.activeCount()];
     Thread.enumerate(threads);
