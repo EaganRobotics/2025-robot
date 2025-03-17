@@ -21,6 +21,9 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.lib.RobotContainer;
 import frc.lib.RobotInstance;
 import frc.lib.replay.WPILogReadMACAddress;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiConsumer;
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -62,6 +65,25 @@ public class Robot extends LoggedRobot {
         Logger.recordMetadata("GitDirty", "Unknown");
         break;
     }
+
+    // Log active commands
+    // from
+    // https://github.com/Mechanical-Advantage/RobotCode2025Public/blob/aa2a88501601c3bac295cf80e46352c6b257088e/src/main/java/org/littletonrobotics/frc2025/Robot.java#L155-L171
+    Map<String, Integer> commandCounts = new HashMap<>();
+    BiConsumer<Command, Boolean> logCommandFunction = (Command command, Boolean active) -> {
+      String name = command.getName();
+      int count = commandCounts.getOrDefault(name, 0) + (active ? 1 : -1);
+      commandCounts.put(name, count);
+      Logger.recordOutput("CommandsUnique/" + name + "_" + Integer.toHexString(command.hashCode()),
+          active);
+      Logger.recordOutput("CommandsAll/" + name, count > 0);
+    };
+    CommandScheduler.getInstance()
+        .onCommandInitialize((Command command) -> logCommandFunction.accept(command, true));
+    CommandScheduler.getInstance()
+        .onCommandFinish((Command command) -> logCommandFunction.accept(command, false));
+    CommandScheduler.getInstance()
+        .onCommandInterrupt((Command command) -> logCommandFunction.accept(command, false));
 
     // Record MAC address from log replay
     String macAddress = null;
