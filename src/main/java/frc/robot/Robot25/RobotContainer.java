@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Robot25.commands.DriveCharacterization;
@@ -201,17 +202,15 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
     // Due to field orientation, joystick Y (forward) controls X direction and vice
     // versa
-    if (elevator.isAtHeight(Level.L4).getAsBoolean() == true) {
-      System.out.println("Using Expo Assist");
-      drive.setDefaultCommand(DriveCommands.expoAssist(drive, () -> driverController.getLeftY(),
-          () -> driverController.getLeftX(), () -> -driverController.getRightX() * .85,
-          driverController.leftTrigger(), driverController.rightTrigger()));
-    } else {
-      System.out.println("Using Joystick Drive Assist");
-      drive.setDefaultCommand(DriveCommands.joystickDriveAssist(drive, () -> driverController.getLeftY(),
-          () -> driverController.getLeftX(), () -> -driverController.getRightX() * .85,
-          driverController.leftTrigger(), driverController.rightTrigger()));
-    }
+    drive.setDefaultCommand(new ConditionalCommand(
+        DriveCommands.expoAssist(drive, () -> driverController.getLeftY(),
+            () -> driverController.getLeftX(), () -> -driverController.getRightX() * 0.1,
+            driverController.leftTrigger(), driverController.rightTrigger()),
+        DriveCommands.joystickDriveAssist(drive, () -> driverController.getLeftY(),
+            () -> driverController.getLeftX(), () -> -driverController.getRightX() * 0.85,
+            driverController.leftTrigger(), driverController.rightTrigger()),
+        elevator.isAtHeight(Level.L4)::getAsBoolean 
+    ));
 
     outtake.setDefaultCommand(outtake.autoQueueCoral().onlyWhile(elevator.isAtHeight(Level.Intake))
         .withName("RobotContainer.outtakeDefaultCommand"));
