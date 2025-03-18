@@ -201,12 +201,21 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
     // Due to field orientation, joystick Y (forward) controls X direction and vice
     // versa
-    drive.setDefaultCommand(
-        DriveCommands.joystickDriveAssist(drive, () -> driverController.getLeftY(),
-            () -> driverController.getLeftX(), () -> -driverController.getRightX() * .85,
-            driverController.leftTrigger(), driverController.rightTrigger()));
+    if (elevator.isAtHeight(Level.L4).getAsBoolean() == true) {
+      System.out.println("Using Expo Assist");
+      drive.setDefaultCommand(DriveCommands.expoAssist(drive, () -> driverController.getLeftY(),
+          () -> driverController.getLeftX(), () -> -driverController.getRightX() * .85,
+          driverController.leftTrigger(), driverController.rightTrigger()));
+    } else {
+      System.out.println("Using Joystick Drive Assist");
+      drive.setDefaultCommand(DriveCommands.joystickDriveAssist(drive, () -> driverController.getLeftY(),
+          () -> driverController.getLeftX(), () -> -driverController.getRightX() * .85,
+          driverController.leftTrigger(), driverController.rightTrigger()));
+    }
+
     outtake.setDefaultCommand(outtake.autoQueueCoral().onlyWhile(elevator.isAtHeight(Level.Intake))
         .withName("RobotContainer.outtakeDefaultCommand"));
+
     driverController.povUpRight()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-45)));
     driverController.povRight()
@@ -240,6 +249,9 @@ public class RobotContainer extends frc.lib.RobotContainer {
         .whileTrue(DriveCommands.FullSnapperOuter(drive)
             .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L2()))
             .andThen(outtake.depositCoral()).andThen(elevator.L0()));
+
+    driverController.x().onTrue(
+        Commands.runOnce(() -> System.out.println(elevator.isAtHeight(Level.L4).getAsBoolean())));
 
 
 
