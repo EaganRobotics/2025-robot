@@ -14,9 +14,17 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.lib.RobotContainer;
+
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
+
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -39,8 +47,13 @@ public final class SimConstants {
   public static final Supplier<RobotContainer> SIM_ROBOT_SUPPLIER =
       () -> new frc.robot.Robot25.RobotContainer();
 
-  public static final boolean IS_MAC =
-      System.getProperty("os.name").toLowerCase().indexOf("mac") >= 0;
+  public static final Pose3d HIDDEN_CORAL_POSE =
+      new Pose3d(-100, -100, -100, new Rotation3d(0, 0, 0));
+  public static final Pose3d LEFT_STATION_CORAL_POSE = new Pose3d(0.636, 7.693, 1.265,
+      new Rotation3d(Degrees.zero(), Degrees.of(35), Degrees.of(-54)));
+  public static final Pose3d RIGHT_STATION_CORAL_POSE = new Pose3d(0.641, 0.359, 1.280,
+      new Rotation3d(Degrees.zero(), Degrees.of(35), Degrees.of(54)));
+  public static final Distance LOADING_STATION_WIDTH = Meters.of(1.626);
 
   /* DO NOT CHANGE */
   public static final Mode CURRENT_MODE = RobotBase.isReal() ? Mode.REAL : SIM_MODE;

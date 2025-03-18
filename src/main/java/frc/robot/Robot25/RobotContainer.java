@@ -13,6 +13,9 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -69,11 +72,14 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
   private final CommandXboxController driverController = new CommandXboxController(0);
   private final CommandXboxController operatorController = new CommandXboxController(1);
+  private final CommandXboxController humanPlayerController = new CommandXboxController(2);
 
   private final LoggedDashboardChooser<Command> autoChooser;
 
-  @AutoLogOutput
-  public final Pose3d[] mechanismPoses = new Pose3d[] {Pose3d.kZero, Pose3d.kZero, Pose3d.kZero,};
+  private final Pose3d[] mechanismPoses = new Pose3d[] {Pose3d.kZero, Pose3d.kZero, Pose3d.kZero,};
+
+  public static final Pose3d[] simCoralPoses =
+      new Pose3d[] {Pose3d.kZero, Pose3d.kZero, Pose3d.kZero,};
 
   public RobotContainer() {
     super(DRIVE_SIMULATION);
@@ -103,6 +109,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
             new VisionIOLimelight("limelight-front", () -> drive.getPose().getRotation()),
             new VisionIOLimelight("limelight-back", () -> drive.getPose().getRotation()));
         algae = new Algae(new AlgaeIOTalonFX());
+
         break;
       case SIM:
         drive = new Drive(new GyroIOSim(DRIVE_SIMULATION.getGyroSimulation()),
@@ -121,6 +128,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
                 VisionConstants.limelightFrontTransform,
                 DRIVE_SIMULATION::getSimulatedDriveTrainPose));
         algae = new Algae(new AlgaeIOSim());
+
         break;
       default:
         // Replayed robot, disable IO implementations
@@ -133,6 +141,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
         vision = new Vision(drive, new VisionIO() {});
         algae = new Algae(new AlgaeIO() {});
+
         break;
     }
 
@@ -270,6 +279,26 @@ public class RobotContainer extends frc.lib.RobotContainer {
     mechanismPoses[2] = elevatorPoses[2];
   }
 
+  private Transform3d leftCoralTransform, rightCoralTransform;
+
   @Override
-  public void simulationPeriodic() {}
+  public void simulationPeriodic() {
+
+    Logger.recordOutput("MechanismPoses", mechanismPoses);
+
+    if (SimConstants.CURRENT_MODE == SimConstants.Mode.SIM) {
+
+      leftCoralTransform = new Transform3d(Inches.of(10),
+          SimConstants.LOADING_STATION_WIDTH.times(-humanPlayerController.getLeftX() / 2),
+          Inches.zero(), Rotation3d.kZero);
+      rightCoralTransform = new Transform3d(Inches.of(10),
+          SimConstants.LOADING_STATION_WIDTH.times(-humanPlayerController.getRightX() / 2),
+          Inches.zero(), Rotation3d.kZero);
+
+      simCoralPoses[1] = SimConstants.LEFT_STATION_CORAL_POSE.plus(leftCoralTransform);
+      simCoralPoses[2] = SimConstants.RIGHT_STATION_CORAL_POSE.plus(rightCoralTransform);
+
+      Logger.recordOutput("SimCoralPoses", simCoralPoses);
+    }
+  }
 }

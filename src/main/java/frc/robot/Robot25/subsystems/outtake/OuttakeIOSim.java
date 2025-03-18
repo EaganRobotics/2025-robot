@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.lib.tunables.LoggedTunableBoolean;
+import frc.robot.SimConstants;
 import frc.robot.Robot25.RobotContainer;
 import frc.robot.Robot25.subsystems.elevator.Elevator;
 import frc.robot.Robot25.subsystems.elevator.Elevator.Level;
@@ -170,8 +171,7 @@ public class OuttakeIOSim implements OuttakeIO {
     }
 
     // Record coral pose simulation output
-    Logger.recordOutput("Outtake/CoralPoseSim",
-        coralPose.isPresent() ? new Pose3d[] {coralPose.get()} : new Pose3d[] {});
+    RobotContainer.simCoralPoses[0] = coralPose.orElse(SimConstants.HIDDEN_CORAL_POSE);
 
     // Update motor inputs
     inputs.outtakeConnected = true;
