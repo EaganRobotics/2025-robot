@@ -260,7 +260,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
   @Override
   public Command getAutonomousCommand() {
-    return autoChooser.get();
+    return autoChooser.get().asProxy();
 
   }
 
@@ -281,7 +281,6 @@ public class RobotContainer extends frc.lib.RobotContainer {
       Pose2d startPose = auto.getStartingPose();
       Logger.recordOutput("AutoStartPose", startPose);
     }
-
   }
 
   @Override
@@ -316,7 +315,6 @@ public class RobotContainer extends frc.lib.RobotContainer {
       SimulatedArena.getInstance().addGamePieceProjectile(droppedCoral);
     });
   }
-
 
   @Override
   public void simulationInit() {
