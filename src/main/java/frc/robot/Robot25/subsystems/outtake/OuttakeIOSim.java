@@ -3,7 +3,6 @@ package frc.robot.Robot25.subsystems.outtake;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
@@ -13,8 +12,6 @@ import static frc.robot.Robot25.subsystems.outtake.OuttakeConstants.GEARING;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
-
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -23,7 +20,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -34,6 +30,7 @@ import frc.robot.Robot25.RobotContainer;
 import frc.robot.Robot25.subsystems.elevator.Elevator;
 import frc.robot.Robot25.subsystems.elevator.Elevator.Level;
 import frc.robot.Robot25.subsystems.outtake.OuttakeConstants.Sim;
+import static frc.robot.Robot25.util.Pose2dNearLine.isNearSegment;
 
 import org.ironmaple.simulation.IntakeSimulation;
 import org.ironmaple.simulation.SimulatedArena;
@@ -131,11 +128,6 @@ public class OuttakeIOSim implements OuttakeIO {
     // TODO simulate another motor?
     outtakeAppliedVoltage = output;
     isClosedLoop = false;
-    if (output.in(Volts) > 0 && coralPose.isEmpty()) {
-      intakeSim.startIntake();
-    } else {
-      intakeSim.stopIntake();
-    }
   }
 
   @Override
@@ -150,6 +142,18 @@ public class OuttakeIOSim implements OuttakeIO {
     outtakeSim.setInputVoltage(outtakeMotor.getAppliedVoltage().in(Volts));
     outtakeMotor.update(Seconds.of(TimedRobot.kDefaultPeriod));
     outtakeSim.update(TimedRobot.kDefaultPeriod);
+
+    var nearLoadingStation =
+        isNearSegment(driveSim.getSimulatedDriveTrainPose(), SimConstants.BR_LOADING_STATION,
+            SimConstants.FR_LOADING_STATION, SimConstants.LOADING_STATION_TOLERANCE)
+            || isNearSegment(driveSim.getSimulatedDriveTrainPose(), SimConstants.BL_LOADING_STATION,
+                SimConstants.FL_LOADING_STATION, SimConstants.LOADING_STATION_TOLERANCE);
+    Logger.recordOutput("Outtake/NearLoadingStation", nearLoadingStation);
+    if (outtakeAppliedVoltage.in(Volts) > 0 && coralPose.isEmpty() && nearLoadingStation) {
+      intakeSim.startIntake();
+    } else {
+      intakeSim.stopIntake();
+    }
 
     var robotPose = new Pose3d(driveSim.getSimulatedDriveTrainPose())
         .plus(new Transform3d(Inches.of(0), Inches.of(0),

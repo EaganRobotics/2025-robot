@@ -17,6 +17,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.lib.RobotContainer;
@@ -54,6 +55,12 @@ public final class SimConstants {
   public static final Pose3d RIGHT_STATION_CORAL_POSE = new Pose3d(0.641, 0.359, 1.280,
       new Rotation3d(Degrees.zero(), Degrees.of(35), Degrees.of(54)));
   public static final Distance LOADING_STATION_WIDTH = Meters.of(1.626);
+
+  public static final Translation2d FR_LOADING_STATION = new Translation2d(1.66, 0.52);
+  public static final Translation2d BR_LOADING_STATION = new Translation2d(0.53, 1.38);
+  public static final Translation2d FL_LOADING_STATION = new Translation2d(1.66, 7.53);
+  public static final Translation2d BL_LOADING_STATION = new Translation2d(0.53, 6.71);
+  public static final Distance LOADING_STATION_TOLERANCE = Inches.of(2);
 
   /* DO NOT CHANGE */
   public static final Mode CURRENT_MODE = RobotBase.isReal() ? Mode.REAL : SIM_MODE;
