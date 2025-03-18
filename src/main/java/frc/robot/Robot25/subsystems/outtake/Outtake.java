@@ -115,4 +115,10 @@ public class Outtake extends SubsystemBase {
   public Command reverseCoral() {
     return setRopenLoop(Volts.of(-5)).withTimeout(1.25).withName("Outtake.reverseCoral");
   }
+
+  public void simStageCoral() {
+    if (io instanceof OuttakeIOSim) {
+      ((OuttakeIOSim) io).simStageCoral();
+    }
+  }
 }

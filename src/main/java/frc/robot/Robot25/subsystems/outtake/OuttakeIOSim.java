@@ -89,7 +89,9 @@ public class OuttakeIOSim implements OuttakeIO {
         new SimMotorConfigs(outtakeGearbox, GEARING, Sim.MOTOR_LOAD_MOI, Sim.FRICTION_VOLTAGE));
     outtakeMotorController =
         outtakeMotor.useSimpleDCMotorController().withCurrentLimit(CURRENT_LIMIT);
+  }
 
+  public void simStageCoral() {
     intakeSim.addGamePieceToIntake();
   }
 

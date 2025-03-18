@@ -22,11 +22,13 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Robot25.commands.DriveCharacterization;
 import frc.robot.Robot25.commands.DriveCommands;
+import frc.robot.Robot25.commands.SimDriverPractice;
 import frc.robot.Robot25.subsystems.AlgaeEater.Algae;
 import frc.robot.Robot25.subsystems.AlgaeEater.AlgaeIO;
 import frc.robot.Robot25.subsystems.AlgaeEater.AlgaeIOSim;
@@ -71,24 +73,26 @@ public class RobotContainer extends frc.lib.RobotContainer {
   private final Algae algae;
 
   // Drive simulation
-  public static final SwerveDriveSimulation DRIVE_SIMULATION = new SwerveDriveSimulation(Drive.MAPLE_SIM_CONFIG,
-      SimConstants.SIM_INITIAL_FIELD_POSE);
+  public static final SwerveDriveSimulation DRIVE_SIMULATION =
+      new SwerveDriveSimulation(Drive.MAPLE_SIM_CONFIG, SimConstants.SIM_INITIAL_FIELD_POSE);
 
   private final CommandXboxController driverController = new CommandXboxController(0);
   private final CommandXboxController operatorController = new CommandXboxController(1);
   private final CommandXboxController humanPlayerController = new CommandXboxController(2);
 
   private final LoggedDashboardChooser<Command> autoChooser;
+  private final LoggedDashboardChooser<Command> testChooser;
 
-  private final Pose3d[] mechanismPoses = new Pose3d[] { Pose3d.kZero, Pose3d.kZero, Pose3d.kZero, };
+  private final Pose3d[] mechanismPoses = new Pose3d[] {Pose3d.kZero, Pose3d.kZero, Pose3d.kZero,};
 
-  public static final Pose3d[] simCoralPoses = new Pose3d[] { Pose3d.kZero, Pose3d.kZero, Pose3d.kZero, };
+  public static final Pose3d[] simCoralPoses =
+      new Pose3d[] {Pose3d.kZero, Pose3d.kZero, Pose3d.kZero,};
 
   public RobotContainer() {
     super(DRIVE_SIMULATION);
     // Check for valid swerve config
-    var modules = new SwerveModuleConstants[] { DriveConstants.FrontLeft, DriveConstants.FrontRight,
-        DriveConstants.BackLeft, DriveConstants.BackRight, };
+    var modules = new SwerveModuleConstants[] {DriveConstants.FrontLeft, DriveConstants.FrontRight,
+        DriveConstants.BackLeft, DriveConstants.BackRight,};
     for (var constants : modules) {
       if (constants.DriveMotorType != DriveMotorArrangement.TalonFX_Integrated
           || constants.SteerMotorType != SteerMotorArrangement.TalonFX_Integrated) {
@@ -135,24 +139,15 @@ public class RobotContainer extends frc.lib.RobotContainer {
         break;
       default:
         // Replayed robot, disable IO implementations
-        drive = new Drive(new GyroIO() {
-        }, new ModuleIO() {
-        }, new ModuleIO() {
-        }, new ModuleIO() {
-        },
-            new ModuleIO() {
-            }, DRIVE_SIMULATION::setSimulationWorldPose);
+        drive = new Drive(new GyroIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {},
+            new ModuleIO() {}, DRIVE_SIMULATION::setSimulationWorldPose);
 
-        elevator = new Elevator(new ElevatorIO() {
-        });
+        elevator = new Elevator(new ElevatorIO() {});
 
-        outtake = new Outtake(new OuttakeIO() {
-        });
+        outtake = new Outtake(new OuttakeIO() {});
 
-        vision = new Vision(drive, new VisionIO() {
-        });
-        algae = new Algae(new AlgaeIO() {
-        });
+        vision = new Vision(drive, new VisionIO() {});
+        algae = new Algae(new AlgaeIO() {});
 
         break;
     }
@@ -177,26 +172,30 @@ public class RobotContainer extends frc.lib.RobotContainer {
     NamedCommands.registerCommand("L3", elevator.L3());
     NamedCommands.registerCommand("L4", elevator.L4());
 
-    NamedCommands.registerCommand("Exhaust", outtake.depositCoral());
+    NamedCommands.registerCommand("Exhaust",
+        new WaitUntilCommand(elevator.isAtGoal()).andThen(outtake.depositCoral()));
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
-    autoChooser.addOption("Static Drive Voltage", Commands.run(() -> drive.driveOpenLoop(10)));
-    autoChooser.addOption("Static Turn Voltage", Commands.run(() -> drive.TurnOpenLoop(10)));
+    // Set up test routines
+    testChooser = new LoggedDashboardChooser<>("Test Choices");
+
+    // Add sim driver practice
+    testChooser.addDefaultOption("Sim Driver Practice", SimDriverPractice.simDriverPractice(this));
 
     // Set up SysId routines
-    autoChooser.addOption("Drive Wheel Radius Characterization",
+    testChooser.addOption("Drive Wheel Radius Characterization",
         DriveCharacterization.wheelRadiusCharacterization(drive));
-    autoChooser.addOption("Drive Simple FF Characterization",
+    testChooser.addOption("Drive Simple FF Characterization",
         DriveCharacterization.feedforwardCharacterization(drive));
-    autoChooser.addOption("Drive SysId (Quasistatic Forward)",
+    testChooser.addOption("Drive SysId (Quasistatic Forward)",
         drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption("Drive SysId (Quasistatic Reverse)",
+    testChooser.addOption("Drive SysId (Quasistatic Reverse)",
         drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption("Drive SysId (Dynamic Forward)",
+    testChooser.addOption("Drive SysId (Dynamic Forward)",
         drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption("Drive SysId (Dynamic Reverse)",
+    testChooser.addOption("Drive SysId (Dynamic Reverse)",
         drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     configureButtonBindings();
@@ -260,16 +259,23 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
   @Override
   public Command getAutonomousCommand() {
-    return autoChooser.get().asProxy();
+    return autoChooser.get();
 
   }
 
+  @Override
   public Command getTestCommand() {
-    return Commands.none();
+    return testChooser.get();
   }
 
   @Override
   public void disabledInit() {
+    drive.stop();
+  }
+
+  @Override
+  public void teleopInit() {
+    drive.stop();
   }
 
   @Override
@@ -292,7 +298,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
   }
 
   private Transform3d leftCoralTransform, rightCoralTransform;
-  private double lastDropTimeSec = 1 - SimConstants.LOAD_CORAL_DELAY.in(Seconds);
+  private double lastDropTimeSec = 0;
   private Trigger canDropCoral = new Trigger(
       () -> Timer.getFPGATimestamp() - lastDropTimeSec > SimConstants.LOAD_CORAL_DELAY.in(Seconds));
 
@@ -349,5 +355,11 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
       Logger.recordOutput("SimCoralPoses", simCoralPoses);
     }
+  }
+
+  @Override
+  public void resetSimulation() {
+    super.resetSimulation();
+    outtake.simStageCoral();
   }
 }
