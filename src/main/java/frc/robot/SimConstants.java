@@ -35,7 +35,7 @@ public final class SimConstants {
   public static final Mode SIM_MODE =
       Optional.ofNullable(System.getenv("AKIT_SIM_MODE")).map(Mode::valueOf).orElse(Mode.SIM);
 
-  public static final Pose2d SIM_INITIAL_FIELD_POSE = new Pose2d(3, 3, new Rotation2d());
+  public static final Pose2d SIM_INITIAL_FIELD_POSE = new Pose2d(3.28, 3.86, new Rotation2d());
   public static final Supplier<RobotContainer> SIM_ROBOT_SUPPLIER =
       () -> new frc.robot.Robot25.RobotContainer();
 

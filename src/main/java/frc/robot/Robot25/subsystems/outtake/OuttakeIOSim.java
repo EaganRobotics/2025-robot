@@ -19,6 +19,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -30,6 +31,7 @@ import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.lib.tunables.LoggedTunableBoolean;
 import frc.robot.Robot25.RobotContainer;
 import frc.robot.Robot25.subsystems.elevator.Elevator;
+import frc.robot.Robot25.subsystems.elevator.Elevator.Level;
 import frc.robot.Robot25.subsystems.outtake.OuttakeConstants.Sim;
 
 import org.ironmaple.simulation.IntakeSimulation;
@@ -92,12 +94,19 @@ public class OuttakeIOSim implements OuttakeIO {
     outtakeAppliedVoltage = output;
     isClosedLoop = false;
     if (output.in(Volts) > 0 && coralPose.isPresent()) {
-      var projectile = new ReefscapeCoralOnFly(
-          driveSim.getSimulatedDriveTrainPose().getTranslation(),
-          LOADED_CORAL_POSE.getTranslation().toTranslation2d(),
-          driveSim.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
-          driveSim.getSimulatedDriveTrainPose().getRotation(),
-          Elevator.getInstance().getCurrentHeight(), MetersPerSecond.of(3), Degrees.of(-34.411));
+      var coralTranslation = LOADED_CORAL_POSE.getTranslation().toTranslation2d();
+      var height = Elevator.getInstance().getCurrentHeight();
+      var angle = Degrees.of(-34.411);
+      if (Elevator.getInstance().isAtHeight(Level.L4).getAsBoolean()) {
+        coralTranslation = coralTranslation.plus(new Translation2d(Inches.of(4), Inches.zero()));
+        height = height.plus(Inches.of(4));
+        angle = Degrees.of(-70);
+      }
+      var projectile =
+          new ReefscapeCoralOnFly(driveSim.getSimulatedDriveTrainPose().getTranslation(),
+              coralTranslation, driveSim.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
+              driveSim.getSimulatedDriveTrainPose().getRotation(), height,
+              MetersPerSecond.of(output.in(Volts) / 3), angle);
       coralPose = Optional.empty();
       CompletableFuture.runAsync(() -> {
         System.out.println("Disabling sensors");
