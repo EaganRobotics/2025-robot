@@ -17,9 +17,8 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -59,7 +58,6 @@ import frc.robot.SimConstants;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -286,10 +284,13 @@ public class RobotContainer extends frc.lib.RobotContainer {
   }
 
   private Transform3d leftCoralTransform, rightCoralTransform;
-  private static final double dropCoralDelay = 2;
+  private double lastDropTimeSec = 1 - SimConstants.LOAD_CORAL_DELAY.in(Seconds);
+  private Trigger canDropCoral = new Trigger(
+      () -> Timer.getFPGATimestamp() - lastDropTimeSec > SimConstants.LOAD_CORAL_DELAY.in(Seconds));
 
-  private static Command dropCoral(boolean leftCoral) {
+  private Command dropCoral(boolean leftCoral) {
     return Commands.runOnce(() -> {
+      lastDropTimeSec = Timer.getFPGATimestamp();
       System.out.println("Dropping " + (leftCoral ? "left" : "right") + " coral");
       Pose3d coralPose;
       if (leftCoral) {
@@ -307,37 +308,33 @@ public class RobotContainer extends frc.lib.RobotContainer {
     });
   }
 
+
   @Override
   public void simulationInit() {
     if (SimConstants.CURRENT_MODE == SimConstants.Mode.SIM) {
-
       var lb = humanPlayerController.leftBumper();
       var rb = humanPlayerController.rightBumper();
 
-      var canDropLeftCoral = lb.negate().debounce(dropCoralDelay);
-      var canDropRightCoral = rb.negate().debounce(dropCoralDelay);
-
-      canDropLeftCoral.whileTrue(Commands.run(() -> {
+      canDropCoral.whileTrue(Commands.run(() -> {
         leftCoralTransform = new Transform3d(Inches.of(10),
             SimConstants.LOADING_STATION_WIDTH.times(-humanPlayerController.getLeftX() / 2),
             Inches.zero(), Rotation3d.kZero);
-        simCoralPoses[1] = SimConstants.LEFT_STATION_CORAL_POSE.plus(leftCoralTransform);
-      }));
-
-      canDropRightCoral.whileTrue(Commands.run(() -> {
         rightCoralTransform = new Transform3d(Inches.of(10),
             SimConstants.LOADING_STATION_WIDTH.times(-humanPlayerController.getRightX() / 2),
             Inches.zero(), Rotation3d.kZero);
+        simCoralPoses[1] = SimConstants.LEFT_STATION_CORAL_POSE.plus(leftCoralTransform);
         simCoralPoses[2] = SimConstants.RIGHT_STATION_CORAL_POSE.plus(rightCoralTransform);
-      }));
+      }).ignoringDisable(true));
 
-      lb.onTrue(dropCoral(true));
-      rb.onTrue(dropCoral(false));
+      lb.and(canDropCoral).onTrue(dropCoral(true));
+      rb.and(canDropCoral).onTrue(dropCoral(false));
     }
   }
 
   @Override
   public void simulationPeriodic() {
+
+    Logger.recordOutput("CanDropCoral", canDropCoral);
 
     Logger.recordOutput("MechanismPoses", mechanismPoses);
 

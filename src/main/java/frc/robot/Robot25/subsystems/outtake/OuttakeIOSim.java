@@ -21,9 +21,11 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.tunables.LoggedTunableBoolean;
 import frc.robot.SimConstants;
 import frc.robot.Robot25.RobotContainer;
@@ -78,6 +80,10 @@ public class OuttakeIOSim implements OuttakeIO {
   LoggedTunableBoolean ScoreSideSensor =
       new LoggedTunableBoolean("Tuning/Outtake/ScoreSideSensor", false);
 
+  private Trigger hasGamePiece = new Trigger(LoadSideSensor::get);
+  private Trigger canGetGamePiece =
+      hasGamePiece.negate().debounce(SimConstants.LOAD_CORAL_DELAY.in(Seconds));
+
   public OuttakeIOSim() {
     outtakeMotor = new MapleMotorSim(
         new SimMotorConfigs(outtakeGearbox, GEARING, Sim.MOTOR_LOAD_MOI, Sim.FRICTION_VOLTAGE));
@@ -114,6 +120,7 @@ public class OuttakeIOSim implements OuttakeIO {
           Thread.sleep(100);
           ScoreSideSensor.set(false);
         } catch (InterruptedException e) {
+          e.printStackTrace();
           LoadSideSensor.set(false);
           ScoreSideSensor.set(false);
           Thread.currentThread().interrupt();
@@ -149,8 +156,26 @@ public class OuttakeIOSim implements OuttakeIO {
             || isNearSegment(driveSim.getSimulatedDriveTrainPose(), SimConstants.BL_LOADING_STATION,
                 SimConstants.FL_LOADING_STATION, SimConstants.LOADING_STATION_TOLERANCE);
     Logger.recordOutput("Outtake/NearLoadingStation", nearLoadingStation);
-    if (outtakeAppliedVoltage.in(Volts) > 0 && coralPose.isEmpty() && nearLoadingStation) {
+    var joystickName = DriverStation.getJoystickName(2);
+    var humanPlayerControllerConnected = joystickName != null && !joystickName.isBlank();
+    Logger.recordOutput("HumanPlayerConnected", humanPlayerControllerConnected);
+    Logger.recordOutput("HasGamePiece", hasGamePiece);
+    Logger.recordOutput("CanGetGamePiece", canGetGamePiece);
+    if (humanPlayerControllerConnected && outtakeAppliedVoltage.in(Volts) > 0 && coralPose.isEmpty()
+        && nearLoadingStation) {
       intakeSim.startIntake();
+    } else if (!humanPlayerControllerConnected && nearLoadingStation
+        && canGetGamePiece.getAsBoolean()) {
+      CompletableFuture.runAsync(() -> {
+        try {
+          Thread.sleep(100);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+          Thread.currentThread().interrupt();
+        } finally {
+          intakeSim.addGamePieceToIntake();
+        }
+      });
     } else {
       intakeSim.stopIntake();
     }

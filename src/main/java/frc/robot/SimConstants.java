@@ -19,12 +19,14 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.lib.RobotContainer;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -61,6 +63,8 @@ public final class SimConstants {
   public static final Translation2d FL_LOADING_STATION = new Translation2d(1.66, 7.53);
   public static final Translation2d BL_LOADING_STATION = new Translation2d(0.53, 6.71);
   public static final Distance LOADING_STATION_TOLERANCE = Inches.of(2);
+
+  public static final Time LOAD_CORAL_DELAY = Seconds.of(1.5);
 
   /* DO NOT CHANGE */
   public static final Mode CURRENT_MODE = RobotBase.isReal() ? Mode.REAL : SIM_MODE;
