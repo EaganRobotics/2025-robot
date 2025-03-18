@@ -226,7 +226,7 @@ public class Robot extends LoggedRobot {
 
     if (IsSimMatch) {
       var timeOutCommand =
-          Commands.waitSeconds(10).finallyDo(() -> DriverStationSim.setEnabled(false));
+          Commands.waitSeconds(135).finallyDo(() -> DriverStationSim.setEnabled(false));
       timeOutCommand.schedule();
     }
 
@@ -266,14 +266,13 @@ public class Robot extends LoggedRobot {
 
 
 
-    var autoPeriodCommand = autoCommand.alongWith(Commands.waitSeconds(5)).finallyDo(() -> {
+    var autoPeriodCommand = autoCommand.alongWith(Commands.waitSeconds(15)).finallyDo(() -> {
       DriverStationSim.setDsAttached(true);
       DriverStationSim.setTest(false);
       DriverStationSim.setAutonomous(false);
       DriverStationSim.setEnabled(true);
       DriverStationSim.notifyNewData();
-      System.out.println(
-          "TELEOP************************************************************************************************");
+      System.out.println("Switched to teleOp");
       IsSimMatch = true;
 
     });
