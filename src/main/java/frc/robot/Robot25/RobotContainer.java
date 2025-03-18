@@ -15,6 +15,8 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -22,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Robot25.commands.DriveCharacterization;
 import frc.robot.Robot25.commands.DriveCommands;
@@ -52,7 +55,10 @@ import frc.robot.Robot25.subsystems.vision.VisionIO;
 import frc.robot.Robot25.subsystems.vision.VisionIOLimelight;
 import frc.robot.Robot25.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.SimConstants;
+
+import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -67,8 +73,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
   private final Algae algae;
 
   // Drive simulation
-  public static final SwerveDriveSimulation DRIVE_SIMULATION =
-      new SwerveDriveSimulation(Drive.MAPLE_SIM_CONFIG, SimConstants.SIM_INITIAL_FIELD_POSE);
+  public static final SwerveDriveSimulation DRIVE_SIMULATION = new SwerveDriveSimulation(Drive.MAPLE_SIM_CONFIG,
+      SimConstants.SIM_INITIAL_FIELD_POSE);
 
   private final CommandXboxController driverController = new CommandXboxController(0);
   private final CommandXboxController operatorController = new CommandXboxController(1);
@@ -76,16 +82,15 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
   private final LoggedDashboardChooser<Command> autoChooser;
 
-  private final Pose3d[] mechanismPoses = new Pose3d[] {Pose3d.kZero, Pose3d.kZero, Pose3d.kZero,};
+  private final Pose3d[] mechanismPoses = new Pose3d[] { Pose3d.kZero, Pose3d.kZero, Pose3d.kZero, };
 
-  public static final Pose3d[] simCoralPoses =
-      new Pose3d[] {Pose3d.kZero, Pose3d.kZero, Pose3d.kZero,};
+  public static final Pose3d[] simCoralPoses = new Pose3d[] { Pose3d.kZero, Pose3d.kZero, Pose3d.kZero, };
 
   public RobotContainer() {
     super(DRIVE_SIMULATION);
     // Check for valid swerve config
-    var modules = new SwerveModuleConstants[] {DriveConstants.FrontLeft, DriveConstants.FrontRight,
-        DriveConstants.BackLeft, DriveConstants.BackRight,};
+    var modules = new SwerveModuleConstants[] { DriveConstants.FrontLeft, DriveConstants.FrontRight,
+        DriveConstants.BackLeft, DriveConstants.BackRight, };
     for (var constants : modules) {
       if (constants.DriveMotorType != DriveMotorArrangement.TalonFX_Integrated
           || constants.SteerMotorType != SteerMotorArrangement.TalonFX_Integrated) {
@@ -132,15 +137,24 @@ public class RobotContainer extends frc.lib.RobotContainer {
         break;
       default:
         // Replayed robot, disable IO implementations
-        drive = new Drive(new GyroIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {},
-            new ModuleIO() {}, DRIVE_SIMULATION::setSimulationWorldPose);
+        drive = new Drive(new GyroIO() {
+        }, new ModuleIO() {
+        }, new ModuleIO() {
+        }, new ModuleIO() {
+        },
+            new ModuleIO() {
+            }, DRIVE_SIMULATION::setSimulationWorldPose);
 
-        elevator = new Elevator(new ElevatorIO() {});
+        elevator = new Elevator(new ElevatorIO() {
+        });
 
-        outtake = new Outtake(new OuttakeIO() {});
+        outtake = new Outtake(new OuttakeIO() {
+        });
 
-        vision = new Vision(drive, new VisionIO() {});
-        algae = new Algae(new AlgaeIO() {});
+        vision = new Vision(drive, new VisionIO() {
+        });
+        algae = new Algae(new AlgaeIO() {
+        });
 
         break;
     }
@@ -257,7 +271,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
   }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+  }
 
   @Override
   public void disabledPeriodic() {
@@ -280,6 +295,55 @@ public class RobotContainer extends frc.lib.RobotContainer {
   }
 
   private Transform3d leftCoralTransform, rightCoralTransform;
+  private static final double dropCoralDelay = 2;
+
+  private static Command dropCoral(boolean leftCoral) {
+    return Commands.runOnce(() -> {
+      System.out.println("Dropping " + (leftCoral ? "left" : "right") + " coral");
+      Pose3d coralPose;
+      if (leftCoral) {
+        coralPose = simCoralPoses[1];
+        simCoralPoses[1] = SimConstants.HIDDEN_CORAL_POSE;
+      } else {
+        coralPose = simCoralPoses[2];
+        simCoralPoses[2] = SimConstants.HIDDEN_CORAL_POSE;
+      }
+      var droppedCoral = new ReefscapeCoralOnFly(coralPose.getTranslation().toTranslation2d(),
+          Translation2d.kZero, new ChassisSpeeds(),
+          coralPose.getRotation().toRotation2d(), coralPose.getMeasureZ().plus(Meters.of(0.07)),
+          MetersPerSecond.of(2), coralPose.getRotation().getMeasureY().unaryMinus());
+      SimulatedArena.getInstance().addGamePieceProjectile(droppedCoral);
+    });
+  }
+
+  @Override
+  public void simulationInit() {
+    if (SimConstants.CURRENT_MODE == SimConstants.Mode.SIM) {
+
+      var lb = humanPlayerController.leftBumper();
+      var rb = humanPlayerController.rightBumper();
+
+      var canDropLeftCoral = lb.negate().debounce(dropCoralDelay);
+      var canDropRightCoral = rb.negate().debounce(dropCoralDelay);
+
+      canDropLeftCoral.whileTrue(Commands.run(() -> {
+        leftCoralTransform = new Transform3d(Inches.of(10),
+            SimConstants.LOADING_STATION_WIDTH.times(-humanPlayerController.getLeftX() / 2),
+            Inches.zero(), Rotation3d.kZero);
+        simCoralPoses[1] = SimConstants.LEFT_STATION_CORAL_POSE.plus(leftCoralTransform);
+      }));
+
+      canDropRightCoral.whileTrue(Commands.run(() -> {
+        rightCoralTransform = new Transform3d(Inches.of(10),
+            SimConstants.LOADING_STATION_WIDTH.times(-humanPlayerController.getRightX() / 2),
+            Inches.zero(), Rotation3d.kZero);
+        simCoralPoses[2] = SimConstants.RIGHT_STATION_CORAL_POSE.plus(rightCoralTransform);
+      }));
+
+      lb.onTrue(dropCoral(true));
+      rb.onTrue(dropCoral(false));
+    }
+  }
 
   @Override
   public void simulationPeriodic() {
@@ -287,16 +351,6 @@ public class RobotContainer extends frc.lib.RobotContainer {
     Logger.recordOutput("MechanismPoses", mechanismPoses);
 
     if (SimConstants.CURRENT_MODE == SimConstants.Mode.SIM) {
-
-      leftCoralTransform = new Transform3d(Inches.of(10),
-          SimConstants.LOADING_STATION_WIDTH.times(-humanPlayerController.getLeftX() / 2),
-          Inches.zero(), Rotation3d.kZero);
-      rightCoralTransform = new Transform3d(Inches.of(10),
-          SimConstants.LOADING_STATION_WIDTH.times(-humanPlayerController.getRightX() / 2),
-          Inches.zero(), Rotation3d.kZero);
-
-      simCoralPoses[1] = SimConstants.LEFT_STATION_CORAL_POSE.plus(leftCoralTransform);
-      simCoralPoses[2] = SimConstants.RIGHT_STATION_CORAL_POSE.plus(rightCoralTransform);
 
       Logger.recordOutput("SimCoralPoses", simCoralPoses);
     }
