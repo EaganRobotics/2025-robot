@@ -16,8 +16,11 @@ package frc.robot;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Threads;
+import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import frc.lib.RobotContainer;
 import frc.lib.RobotInstance;
 import frc.lib.replay.WPILogReadMACAddress;
@@ -41,6 +44,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 public class Robot extends LoggedRobot {
   private Command testCommand;
   private RobotContainer robotContainer;
+  private boolean IsSimMatch = false;
 
   public Robot() {
     // Record metadata
@@ -220,6 +224,14 @@ public class Robot extends LoggedRobot {
       testCommand.cancel();
     }
 
+    if (IsSimMatch) {
+      var timeOutCommand =
+          Commands.waitSeconds(10).finallyDo(() -> DriverStationSim.setEnabled(false));
+      timeOutCommand.schedule();
+    }
+
+
+
     robotContainer.teleopInit();
   }
 
@@ -232,18 +244,43 @@ public class Robot extends LoggedRobot {
   /** This function is called once when test mode is enabled. */
   @Override
   public void testInit() {
+
+
     // Cancels all running commands at the start of test mode.
+
+
     CommandScheduler.getInstance().cancelAll();
 
     // Only gets the robot container test command if one isn't already assigned
-    if (testCommand == null) {
-      testCommand = robotContainer.getTestCommand();
-    }
-
+    // if (testCommand == null) {
+    // testCommand = robotContainer.getTestCommand();
+    // }
     // schedule the autonomous command (example)
-    if (testCommand != null) {
-      testCommand.schedule();
-    }
+    // if (testCommand != null) {
+    // testCommand.schedule();
+    // }
+
+
+
+    var autoCommand = robotContainer.getAutonomousCommand();
+
+
+
+    var autoPeriodCommand = autoCommand.alongWith(Commands.waitSeconds(5)).finallyDo(() -> {
+      DriverStationSim.setDsAttached(true);
+      DriverStationSim.setTest(false);
+      DriverStationSim.setAutonomous(false);
+      DriverStationSim.setEnabled(true);
+      DriverStationSim.notifyNewData();
+      System.out.println(
+          "TELEOP************************************************************************************************");
+      IsSimMatch = true;
+
+    });
+
+    autoPeriodCommand.schedule();
+
+
 
     robotContainer.testInit();
   }
