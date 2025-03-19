@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Robot25.commands.DriveCharacterization;
@@ -159,14 +158,16 @@ public class RobotContainer extends frc.lib.RobotContainer {
     NamedCommands.registerCommand("Maybe1",
         DriveCommands.FullSnapperOuter(drive)
             .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
-            .andThen(outtake.depositCoral()).andThen(elevator.L0())
-            .andThen(DriveCommands.FullSnapperOuter(drive)));
+            .andThen(outtake.depositCoral())
+            .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L0())));
     NamedCommands.registerCommand("Maybe2", DriveCommands.SourceSnapper(drive).withTimeout(3));
     NamedCommands.registerCommand("Maybe3",
         DriveCommands.FullSnapperOuterAuto(drive)
             .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
-            .andThen(outtake.depositCoral()).andThen(elevator.L0()));
+            .andThen(outtake.depositCoral()));
     NamedCommands.registerCommand("Maybe4",
+        elevator.L4().alongWith(DriveCommands.SourceSnapper(drive).withTimeout(3)));
+    NamedCommands.registerCommand("Maybe5",
         DriveCommands.FullSnapperOuter(drive)
             .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
             .andThen(outtake.depositCoral()).andThen(elevator.L0()));
@@ -202,19 +203,12 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
     // Due to field orientation, joystick Y (forward) controls X direction and vice
     // versa
-    drive.setDefaultCommand(new ConditionalCommand(
-        DriveCommands.expoAssist(drive, () -> driverController.getLeftY(),
-            () -> driverController.getLeftX(), () -> -driverController.getRightX() * 0.1,
-            driverController.leftTrigger(), driverController.rightTrigger()),
+    drive.setDefaultCommand(
         DriveCommands.joystickDriveAssist(drive, () -> driverController.getLeftY(),
-            () -> driverController.getLeftX(), () -> -driverController.getRightX() * 0.85,
-            driverController.leftTrigger(), driverController.rightTrigger()),
-        elevator.isAtHeight(Level.L4)::getAsBoolean 
-    ));
-
+            () -> driverController.getLeftX(), () -> -driverController.getRightX() * .85,
+            driverController.leftTrigger(), driverController.rightTrigger()));
     outtake.setDefaultCommand(outtake.autoQueueCoral().onlyWhile(elevator.isAtHeight(Level.Intake))
         .withName("RobotContainer.outtakeDefaultCommand"));
-
     driverController.povUpRight()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-45)));
     driverController.povRight()
@@ -248,9 +242,6 @@ public class RobotContainer extends frc.lib.RobotContainer {
         .whileTrue(DriveCommands.FullSnapperOuter(drive)
             .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L2()))
             .andThen(outtake.depositCoral()).andThen(elevator.L0()));
-
-    driverController.x().onTrue(
-        Commands.runOnce(() -> System.out.println(elevator.isAtHeight(Level.L4).getAsBoolean())));
 
 
 
