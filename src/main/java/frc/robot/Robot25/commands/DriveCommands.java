@@ -43,7 +43,7 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class DriveCommands {
   private static final double SLOW_MODE_MULTIPLIER = 0.5;
-  private static final double DEADBAND = 0.1;
+  private static final double DEADBAND = 0.06;
   private static final double ANGLE_MAX_VELOCITY = 8.0;
   private static final double ANGLE_MAX_ACCELERATION = 20.0;
   private static final double ANGLE_TOLERANCE = Degrees.of(1).in(Radians);
