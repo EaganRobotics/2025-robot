@@ -307,13 +307,14 @@ public class Elevator extends SubsystemBase {
 
     return isAtGoal().and(() -> desiredLevel == this.desiredLevel);
 
+
   }
 
   // todo CHECK VALID TOLERANCE
   public Trigger isAtGoal() {
     return new Trigger(() -> {
       return Math.abs((inputs.winchPosition.in(Radians)
-          - inchesToRadians(desiredLevel.getHeight()).in(Radians))) < 1.5;
+          - inchesToRadians(desiredLevel.getHeight()).in(Radians))) < 1;
 
     });
   }
