@@ -478,6 +478,25 @@ public class DriveCommands {
     return desiredPose;
   };
 
+
+  function Pose2d
+
+  getPointInFront(double x, double y, double heading /*the current movemint direction*/) {
+
+    double radians = Math.toRadians(heading);
+
+    double tunevar
+
+    double distanceOut = robotSpeed * tunevar
+
+    double newX = x + Math.cos(radians) * 1.0;
+    double newY = y + Math.sin(radians) * 1.0;
+
+    return new Pose2d(newX, newY);
+}
+
+
+
   private static Optional<Pose2d> getClosestSource(Drive drive, Distance radius) {
     Optional<Pose2d> desiredPose = Optional.empty();
     Distance minDistance = Meters.of(1000000);
