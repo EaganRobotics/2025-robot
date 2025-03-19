@@ -302,7 +302,7 @@ public class Elevator extends SubsystemBase {
   public Trigger isAtGoal() {
     return new Trigger(() -> {
       return Math.abs((inputs.winchPosition.in(Radians)
-          - inchesToRadians(desiredLevel.getHeight()).in(Radians))) < 1.5;
+          - inchesToRadians(desiredLevel.getHeight()).in(Radians))) < 1;
 
     });
   }
