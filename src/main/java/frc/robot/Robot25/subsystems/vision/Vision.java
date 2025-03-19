@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot25.subsystems.vision.VisionIO.PoseObservationType;
+import frc.robot.Robot25.subsystems.vision.VisionIO.TargetObservation;
 import java.util.LinkedList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
@@ -40,6 +41,10 @@ public class Vision extends SubsystemBase {
     this.consumer = consumer;
     this.io = io;
 
+    // this dose nothing except stop a crash/freeze
+    Logger.recordOutput("vision/FixFreeze",
+        new TargetObservation(new Rotation2d((int) Math.PI), new Rotation2d(1)));
+
     // Initialize inputs
     this.inputs = new VisionIOInputsAutoLogged[io.length];
     for (int i = 0; i < inputs.length; i++) {
@@ -52,6 +57,11 @@ public class Vision extends SubsystemBase {
       disconnectedAlerts[i] = new Alert(
           "Vision camera " + Integer.toString(i) + " is disconnected.", AlertType.kWarning);
     }
+  }
+
+  private Rotation2d Rotation2d(int i) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'Rotation2d'");
   }
 
   /**
