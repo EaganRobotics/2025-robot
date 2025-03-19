@@ -462,6 +462,8 @@ public class DriveCommands {
   private static Optional<Pose2dSequence> getClosestPosition(Drive drive, Distance radius) {
     Optional<Pose2dSequence> desiredPose = Optional.empty();
     Distance minDistance = Meters.of(1000000);
+    // figure out the future trajectory (the current heading at 1 inch out multiplyed by speed)
+
     for (int i = 0; i < OUTER_REEF_POSITIONS.length; i++) {
       Pose2d pose = OUTER_REEF_POSITIONS[i];
       double distance = drive.getPose().getTranslation().getDistance(pose.getTranslation());
