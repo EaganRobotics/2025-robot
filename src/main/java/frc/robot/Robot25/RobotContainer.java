@@ -155,6 +155,21 @@ public class RobotContainer extends frc.lib.RobotContainer {
     NamedCommands.registerCommand("L3", elevator.L3());
     NamedCommands.registerCommand("L4", elevator.L4());
 
+    NamedCommands.registerCommand("Maybe1",
+        DriveCommands.FullSnapperOuter(drive)
+            .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
+            .andThen(outtake.depositCoral()).andThen(elevator.L0())
+            .andThen(DriveCommands.FullSnapperOuter(drive)));
+    NamedCommands.registerCommand("Maybe2", DriveCommands.SourceSnapper(drive).withTimeout(3));
+    NamedCommands.registerCommand("Maybe3",
+        DriveCommands.FullSnapperOuterAuto(drive)
+            .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
+            .andThen(outtake.depositCoral()).andThen(elevator.L0()));
+    NamedCommands.registerCommand("Maybe4",
+        DriveCommands.FullSnapperOuter(drive)
+            .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
+            .andThen(outtake.depositCoral()).andThen(elevator.L0()));
+
     NamedCommands.registerCommand("Exhaust", outtake.depositCoral());
 
     // Set up auto routines
@@ -179,6 +194,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
     configureButtonBindings();
   }
+
 
 
   private void configureButtonBindings() {
@@ -212,6 +228,20 @@ public class RobotContainer extends frc.lib.RobotContainer {
     }, drive).ignoringDisable(true).withName("RobotContainer.driverZeroCommand"));
     driverController.rightBumper().whileTrue(DriveCommands.Snapper(drive));
     driverController.leftBumper().whileTrue(DriveCommands.SourceSnapper(drive));
+    driverController.y()
+        .whileTrue(DriveCommands.FullSnapperOuter(drive)
+            .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
+            .andThen(outtake.depositCoral()).andThen(elevator.L0()));
+    driverController.b()
+        .whileTrue(DriveCommands.FullSnapperOuter(drive)
+            .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L3()))
+            .andThen(outtake.depositCoral()).andThen(elevator.L0()));
+    driverController.a()
+        .whileTrue(DriveCommands.FullSnapperOuter(drive)
+            .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L2()))
+            .andThen(outtake.depositCoral()).andThen(elevator.L0()));
+
+
 
     operatorController.leftTrigger().whileTrue(outtake.autoQueueCoralOveride());
     operatorController.rightTrigger().whileTrue(outtake.reverseCoral());
