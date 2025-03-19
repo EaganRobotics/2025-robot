@@ -12,10 +12,10 @@ import frc.robot.SimConstants;
 public final class SimDriverPractice {
 
   // Private constructor to prevent instantiation
-  private SimDriverPractice() {
-  }
+  private SimDriverPractice() {}
 
-  public static Command simDriverPractice(RobotContainer robotContainer, Runnable resetRobotCallback) {
+  public static Command simDriverPractice(RobotContainer robotContainer,
+      Runnable resetRobotCallback) {
 
     return Commands.defer(() -> {
 

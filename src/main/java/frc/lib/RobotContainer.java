@@ -71,7 +71,7 @@ public abstract class RobotContainer {
     if (SimConstants.CURRENT_MODE != SimConstants.Mode.SIM)
       return;
 
-    driveSimulation.setSimulationWorldPose(SimConstants.SIM_INITIAL_FIELD_POSE);
+    // driveSimulation.setSimulationWorldPose(SimConstants.SIM_INITIAL_FIELD_POSE);
     SimulatedArena.getInstance().resetFieldForAuto();
   }
 
