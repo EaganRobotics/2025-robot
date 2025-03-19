@@ -73,8 +73,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
   private final Algae algae;
 
   // Drive simulation
-  public static final SwerveDriveSimulation DRIVE_SIMULATION =
-      new SwerveDriveSimulation(Drive.MAPLE_SIM_CONFIG, SimConstants.SIM_INITIAL_FIELD_POSE);
+  public static final SwerveDriveSimulation DRIVE_SIMULATION = new SwerveDriveSimulation(Drive.MAPLE_SIM_CONFIG,
+      SimConstants.SIM_INITIAL_FIELD_POSE);
 
   private final CommandXboxController driverController = new CommandXboxController(0);
   private final CommandXboxController operatorController = new CommandXboxController(1);
@@ -83,16 +83,15 @@ public class RobotContainer extends frc.lib.RobotContainer {
   private final LoggedDashboardChooser<Command> autoChooser;
   private final LoggedDashboardChooser<Command> testChooser;
 
-  private final Pose3d[] mechanismPoses = new Pose3d[] {Pose3d.kZero, Pose3d.kZero, Pose3d.kZero,};
+  private final Pose3d[] mechanismPoses = new Pose3d[] { Pose3d.kZero, Pose3d.kZero, Pose3d.kZero, };
 
-  public static final Pose3d[] simCoralPoses =
-      new Pose3d[] {Pose3d.kZero, Pose3d.kZero, Pose3d.kZero,};
+  public static final Pose3d[] simCoralPoses = new Pose3d[] { Pose3d.kZero, Pose3d.kZero, Pose3d.kZero, };
 
   public RobotContainer() {
     super(DRIVE_SIMULATION);
     // Check for valid swerve config
-    var modules = new SwerveModuleConstants[] {DriveConstants.FrontLeft, DriveConstants.FrontRight,
-        DriveConstants.BackLeft, DriveConstants.BackRight,};
+    var modules = new SwerveModuleConstants[] { DriveConstants.FrontLeft, DriveConstants.FrontRight,
+        DriveConstants.BackLeft, DriveConstants.BackRight, };
     for (var constants : modules) {
       if (constants.DriveMotorType != DriveMotorArrangement.TalonFX_Integrated
           || constants.SteerMotorType != SteerMotorArrangement.TalonFX_Integrated) {
@@ -139,15 +138,24 @@ public class RobotContainer extends frc.lib.RobotContainer {
         break;
       default:
         // Replayed robot, disable IO implementations
-        drive = new Drive(new GyroIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {},
-            new ModuleIO() {}, DRIVE_SIMULATION::setSimulationWorldPose);
+        drive = new Drive(new GyroIO() {
+        }, new ModuleIO() {
+        }, new ModuleIO() {
+        }, new ModuleIO() {
+        },
+            new ModuleIO() {
+            }, DRIVE_SIMULATION::setSimulationWorldPose);
 
-        elevator = new Elevator(new ElevatorIO() {});
+        elevator = new Elevator(new ElevatorIO() {
+        });
 
-        outtake = new Outtake(new OuttakeIO() {});
+        outtake = new Outtake(new OuttakeIO() {
+        });
 
-        vision = new Vision(drive, new VisionIO() {});
-        algae = new Algae(new AlgaeIO() {});
+        vision = new Vision(drive, new VisionIO() {
+        });
+        algae = new Algae(new AlgaeIO() {
+        });
 
         break;
     }
@@ -196,7 +204,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
     testChooser = new LoggedDashboardChooser<>("Test Choices");
 
     // Add sim driver practice
-    testChooser.addDefaultOption("Sim Driver Practice", SimDriverPractice.simDriverPractice(this));
+    testChooser.addDefaultOption("Sim Driver Practice", SimDriverPractice.simDriverPractice(this, () -> {
+    }));
 
     // Set up SysId routines
     testChooser.addOption("Drive Wheel Radius Characterization",
@@ -258,8 +267,6 @@ public class RobotContainer extends frc.lib.RobotContainer {
         .whileTrue(DriveCommands.FullSnapperOuter(drive)
             .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L2()))
             .andThen(outtake.depositCoral()).andThen(elevator.L0()));
-
-
 
     operatorController.leftTrigger().whileTrue(outtake.autoQueueCoralOveride());
     operatorController.rightTrigger().whileTrue(outtake.reverseCoral());

@@ -2,12 +2,9 @@ package frc.robot.Robot25.commands;
 
 import java.util.Set;
 
-import edu.wpi.first.hal.HALValue;
-import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.lib.RobotContainer;
 import frc.robot.SimConstants;
@@ -15,9 +12,10 @@ import frc.robot.SimConstants;
 public final class SimDriverPractice {
 
   // Private constructor to prevent instantiation
-  private SimDriverPractice() {}
+  private SimDriverPractice() {
+  }
 
-  public static Command simDriverPractice(RobotContainer robotContainer) {
+  public static Command simDriverPractice(RobotContainer robotContainer, Runnable resetRobotCallback) {
 
     return Commands.defer(() -> {
 
@@ -27,6 +25,7 @@ public final class SimDriverPractice {
 
       // CommandScheduler.getInstance().cancelAll();
       robotContainer.resetSimulation();
+      resetRobotCallback.run();
 
       var autoCommand = robotContainer.getAutonomousCommand().asProxy();
 
