@@ -30,7 +30,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ProfiledPIDCommand;
 import frc.lib.tunables.LoggedTunableNumber;
 import frc.robot.Robot25.subsystems.drive.Drive;
 import java.util.Optional;
@@ -39,7 +38,6 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class DriveCommands {
   private static final double SLOW_MODE_MULTIPLIER = 0.5;
@@ -55,6 +53,7 @@ public class DriveCommands {
   private static final Distance SNAPPY_RADIUS = Inches.of(12);
 
   private static final double INCHES_FROM_REEF = 16.75 + 11.757361 - 0.5;
+  private static final double INCHES_FROM_ALGAE = 16.75 + 11.757361 - 0.5 + 20;
   private static final double REEF_CENTER_X_INCHES = 176.745545;
   private static final double REEF_CENTER_Y_INCHES = 158.500907;
 
@@ -68,6 +67,8 @@ public class DriveCommands {
       new Translation2d(Inches.of(REEF_CENTER_X_INCHES), Inches.of(REEF_CENTER_Y_INCHES));
   private static final Translation2d RED_REEF_CENTER =
       new Translation2d(Inches.of(REEF_CENTER_X_INCHES + 337.385), Inches.of(REEF_CENTER_Y_INCHES));
+
+  // private static final Distance BARGE_LINE = Inches.of(50);
 
   public static Pose2d[] makeReefPositions(Distance reefOffset) {
     Transform2d REEF_BRANCH_TO_ROBOT = new Transform2d(
@@ -150,6 +151,36 @@ public class DriveCommands {
     };
   }
 
+  public static Pose2d[] makeAlgaePositions(Distance algaeOffset) {
+    Transform2d FRONT_ALGAE_TO_ROBOT = new Transform2d(
+        Inches.of(-INCHES_FROM_ALGAE).minus(algaeOffset), Inches.zero(), Rotation2d.kZero);
+    Transform2d FRONT_RIGHT_TO_ROBOT = new Transform2d(
+        Inches.of(-INCHES_FROM_ALGAE).minus(algaeOffset), Inches.zero(), Rotation2d.kZero);
+    Transform2d FRONT_LEFT_TO_ROBOT = new Transform2d(
+        Inches.of(-INCHES_FROM_ALGAE).minus(algaeOffset), Inches.zero(), Rotation2d.kZero);
+    Transform2d BACK_ALGAE_TO_ROBOT = new Transform2d(
+        Inches.of(-INCHES_FROM_ALGAE).minus(algaeOffset), Inches.zero(), Rotation2d.kZero);
+    Transform2d BACK_RIGHT_TO_ROBOT = new Transform2d(
+        Inches.of(-INCHES_FROM_ALGAE).minus(algaeOffset), Inches.zero(), Rotation2d.kZero);
+    Transform2d BACK_LEFT_TO_ROBOT = new Transform2d(
+        Inches.of(-INCHES_FROM_ALGAE).minus(algaeOffset), Inches.zero(), Rotation2d.kZero);
+
+    return new Pose2d[] {
+        new Pose2d(BLUE_REEF_CENTER, Rotation2d.kZero).transformBy(FRONT_ALGAE_TO_ROBOT),
+        new Pose2d(BLUE_REEF_CENTER, Rotation2d.fromDegrees(60)).transformBy(FRONT_RIGHT_TO_ROBOT),
+        new Pose2d(BLUE_REEF_CENTER, Rotation2d.fromDegrees(300)).transformBy(FRONT_LEFT_TO_ROBOT),
+        new Pose2d(BLUE_REEF_CENTER, Rotation2d.fromDegrees(180)).transformBy(BACK_ALGAE_TO_ROBOT),
+        new Pose2d(BLUE_REEF_CENTER, Rotation2d.fromDegrees(120)).transformBy(BACK_RIGHT_TO_ROBOT),
+        new Pose2d(BLUE_REEF_CENTER, Rotation2d.fromDegrees(240)).transformBy(BACK_LEFT_TO_ROBOT),
+
+        new Pose2d(RED_REEF_CENTER, Rotation2d.kZero).transformBy(FRONT_ALGAE_TO_ROBOT),
+        new Pose2d(RED_REEF_CENTER, Rotation2d.fromDegrees(60)).transformBy(FRONT_RIGHT_TO_ROBOT),
+        new Pose2d(RED_REEF_CENTER, Rotation2d.fromDegrees(300)).transformBy(FRONT_LEFT_TO_ROBOT),
+        new Pose2d(RED_REEF_CENTER, Rotation2d.fromDegrees(180)).transformBy(BACK_ALGAE_TO_ROBOT),
+        new Pose2d(RED_REEF_CENTER, Rotation2d.fromDegrees(120)).transformBy(BACK_RIGHT_TO_ROBOT),
+        new Pose2d(RED_REEF_CENTER, Rotation2d.fromDegrees(240)).transformBy(BACK_LEFT_TO_ROBOT),};
+  }
+
   public static Pose2d[] makeSourcePositions() {
     return new Pose2d[] {
 
@@ -185,6 +216,8 @@ public class DriveCommands {
 
   private static final Pose2d[] OUTER_REEF_POSITIONS = makeReefPositions(Inches.of(12));
   private static final Pose2d[] INNER_REEF_POSITIONS = makeReefPositions(Inches.of(0));
+  private static final Pose2d[] OUTER_ALGAE_POSITIONS = makeAlgaePositions(Inches.of(15));
+  private static final Pose2d[] INNER_ALGAE_POSITIONS = makeAlgaePositions(Inches.of(0));
   private static final Pose2d[] AUTO_POSITIONS = makeAutoPositions(Inches.of(0));
   private static final Pose2d[] AUTO_POSITIONS_12 = makeAutoPositions(Inches.of(12));
   private static final Pose2d[] SOURCE_POSITIONS = makeSourcePositions();
@@ -354,13 +387,38 @@ public class DriveCommands {
 
     return Commands.defer(() -> {
       Pose2dSequence desiredPose =
-          getClosestPosition(drive, Meters.of(1000)).orElse(Pose2dSequence.kZero);
+          getClosestReefPosition(drive, Meters.of(1000)).orElse(Pose2dSequence.kZero);
       Logger.recordOutput("SnapperPose", desiredPose.outer);
       return snapToPosition(drive, desiredPose.outer)
           .andThen(snapToPosition(drive, desiredPose.inner));
     }, Set.of(drive)).withName("DriveCommands.Snapper");
 
   }
+
+  public static Command AlgaeSnapper(Drive drive) {
+
+    return Commands.defer(() -> {
+      Pose2dSequence desiredPose =
+          getClosestAlgaePosition(drive, Meters.of(1000)).orElse(Pose2dSequence.kZero);
+      Logger.recordOutput("AlgaeSnapperPose", desiredPose.outer);
+      return snapToPosition(drive, desiredPose.outer)
+          .andThen(snapToPosition(drive, desiredPose.inner));
+    }, Set.of(drive)).withName("DriveCommands.AlgaeSnapper");
+
+  }
+
+  // public static Command BargeSnapper(Drive drive) {
+
+  // return Commands.defer(() -> {
+  // Pose2dSequence desiredPose = new Pose2dSequence(
+  // new Pose2d(new Translation2d(BARGE_LINE, BARGE_LINE), Rotation2d.kZero),
+  // new Pose2d(new Translation2d(BARGE_LINE, BARGE_LINE), Rotation2d.kZero));
+  // Logger.recordOutput("BargeSnapperPose", desiredPose.outer);
+  // return snapToPosition(drive, desiredPose.outer)
+  // .andThen(snapToPosition(drive, desiredPose.inner));
+  // }, Set.of(drive)).withName("DriveCommands.BargeSnapper");
+
+  // }
 
   public static Command SourceSnapper(Drive drive) {
 
@@ -387,7 +445,7 @@ public class DriveCommands {
 
     return Commands.defer(() -> {
       Pose2dSequence desiredPose =
-          getClosestPosition(drive, Meters.of(1000)).orElse(Pose2dSequence.kZero);
+          getClosestReefPosition(drive, Meters.of(1000)).orElse(Pose2dSequence.kZero);
       Logger.recordOutput("SnapperPose", desiredPose.outer);
       return snapToPosition(drive, desiredPose.inner);
     }, Set.of(drive)).withName("DriveCommands.AutoSnapper");
@@ -427,7 +485,7 @@ public class DriveCommands {
 
   }
 
-  private static Optional<Pose2dSequence> getClosestPosition(Drive drive, Distance radius) {
+  private static Optional<Pose2dSequence> getClosestReefPosition(Drive drive, Distance radius) {
     Optional<Pose2dSequence> desiredPose = Optional.empty();
     Distance minDistance = Meters.of(1000000);
     for (int i = 0; i < OUTER_REEF_POSITIONS.length; i++) {
@@ -438,6 +496,23 @@ public class DriveCommands {
         minDistance = distanceMeasure;
         desiredPose =
             Optional.of(new Pose2dSequence(INNER_REEF_POSITIONS[i], OUTER_REEF_POSITIONS[i]));
+      }
+    }
+
+    return desiredPose;
+  };
+
+  private static Optional<Pose2dSequence> getClosestAlgaePosition(Drive drive, Distance radius) {
+    Optional<Pose2dSequence> desiredPose = Optional.empty();
+    Distance minDistance = Meters.of(1000000);
+    for (int i = 0; i < OUTER_ALGAE_POSITIONS.length; i++) {
+      Pose2d pose = OUTER_ALGAE_POSITIONS[i];
+      double distance = drive.getPose().getTranslation().getDistance(pose.getTranslation());
+      Distance distanceMeasure = Meters.of(distance);
+      if (distanceMeasure.lte(radius) && distanceMeasure.lte(minDistance)) {
+        minDistance = distanceMeasure;
+        desiredPose =
+            Optional.of(new Pose2dSequence(INNER_ALGAE_POSITIONS[i], OUTER_ALGAE_POSITIONS[i]));
       }
     }
 
@@ -529,18 +604,16 @@ public class DriveCommands {
         .withName("DriveCommands.snapToPosition");
   }
 
-
   public static Command joystickDriveAssist(Drive drive, DoubleSupplier xSupplier,
       DoubleSupplier ySupplier, DoubleSupplier omegaSupplier, BooleanSupplier snapSupplier,
       BooleanSupplier slowModeSupplier) {
 
-
-
     return Commands.run(() -> {
 
-
       Logger.recordOutput("InnerReefPositions", DriveCommands.INNER_REEF_POSITIONS);
+      Logger.recordOutput("InnerAlgaePositions", DriveCommands.INNER_ALGAE_POSITIONS);
       Logger.recordOutput("OuterReefPositions", DriveCommands.OUTER_REEF_POSITIONS);
+      Logger.recordOutput("OuterAlgaePositions", DriveCommands.OUTER_ALGAE_POSITIONS);
 
       final double isRed =
           DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red ? -1 : 1;
@@ -568,7 +641,8 @@ public class DriveCommands {
         Logger.recordOutput("DriveState", "Driver");
         Logger.recordOutput("Snap/desiredPos", new Pose2d(-50, -50, Rotation2d.kZero));
       } else if (snapSupplier.getAsBoolean()) {
-        Optional<Pose2dSequence> closestOptionalPose = getClosestPosition(drive, SNAPPY_RADIUS);
+        Optional<Pose2dSequence> closestOptionalPose =
+            getClosestAlgaePosition(drive, SNAPPY_RADIUS);
 
         if (closestOptionalPose.isPresent()) {
           Pose2dSequence closestPoseSequence = closestOptionalPose.orElse(Pose2dSequence.kZero);
@@ -590,7 +664,6 @@ public class DriveCommands {
 
         }
       }
-
 
       Logger.recordOutput("Snap/omega", omega);
       Logger.recordOutput("Snap/x/xDiff", x);
