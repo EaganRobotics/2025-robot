@@ -295,8 +295,9 @@ public class Elevator extends SubsystemBase {
 
     return isAtGoal().and(() -> desiredLevel == this.desiredLevel);
 
-    
+
   }
+
   // todo CHECK VALID TOLERANCE
   public Trigger isAtGoal() {
     return new Trigger(() -> {
