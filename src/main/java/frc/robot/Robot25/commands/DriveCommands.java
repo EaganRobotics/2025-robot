@@ -611,37 +611,34 @@ public class DriveCommands {
       DoubleSupplier ySupplier, DoubleSupplier omegaSupplier, BooleanSupplier snapSupplier,
       BooleanSupplier slowModeSupplier) {
 
-
-
     return Commands.run(() -> {
-
 
       Logger.recordOutput("InnerReefPositions", DriveCommands.INNER_REEF_POSITIONS);
       Logger.recordOutput("OuterReefPositions", DriveCommands.OUTER_REEF_POSITIONS);
 
       final double isRed =
-          DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red ? -1 : 1;
+          DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red ? 1 : -1;
 
       final double slowModeMultiplier =
           (slowModeSupplier.getAsBoolean() ? SLOW_MODE_MULTIPLIER : 1.0);
 
       // Get linear velocity
       Translation2d linearVelocity =
-          getLinearVelocityFromJoysticks(-xSupplier.getAsDouble(), -ySupplier.getAsDouble());
+          getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
 
       // Apply rotation deadband
       double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
 
       final double maxSpeed = drive.getMaxLinearSpeedMetersPerSec();
 
-      double x = linearVelocity.getX() * maxSpeed * slowModeMultiplier * isRed;
-      double y = linearVelocity.getY() * maxSpeed * slowModeMultiplier * isRed;
+      double linearX = linearVelocity.getX() * maxSpeed * slowModeMultiplier * isRed;
+      double linearY = linearVelocity.getY() * maxSpeed * slowModeMultiplier * isRed;
 
       // Square rotation value for more precise control
       omega = Math.copySign(omega * omega, omega);
 
       omega *= drive.getMaxAngularSpeedRadPerSec();
-      if ((Math.abs(omega) > 1E-6) || (Math.abs(x) > 1E-6) || (Math.abs(y) > 1E-6)) {
+      if ((Math.abs(omega) > 1E-6) || (Math.abs(linearX) > 1E-6) || (Math.abs(linearY) > 1E-6)) {
         Logger.recordOutput("DriveState", "Driver");
         Logger.recordOutput("Snap/desiredPos", new Pose2d(-50, -50, Rotation2d.kZero));
       } else if (snapSupplier.getAsBoolean()) {
@@ -653,13 +650,13 @@ public class DriveCommands {
           Logger.recordOutput("DriveState", "Robot");
           Logger.recordOutput("Snap/desiredPos", closestPose);
           if (angleController.atGoal() && xController.atGoal() && yController.atGoal()) {
-            x = 0;
-            y = 0;
+            linearX = 0;
+            linearY = 0;
             omega = 0;
           } else {
-            x = xController.calculate(drive.getPose().getX(), closestPose.getX());
+            linearX = xController.calculate(drive.getPose().getX(), closestPose.getX());
 
-            y = yController.calculate(drive.getPose().getY(), closestPose.getY());
+            linearY = yController.calculate(drive.getPose().getY(), closestPose.getY());
 
             omega = angleController.calculate(drive.getRotation().getRadians(),
                 closestPose.getRotation().getRadians());
@@ -668,15 +665,14 @@ public class DriveCommands {
         }
       }
 
-
       Logger.recordOutput("Snap/omega", omega);
-      Logger.recordOutput("Snap/x/xDiff", x);
+      Logger.recordOutput("Snap/x/xDiff", linearX);
       Logger.recordOutput("Snap/x/currentXPos", drive.getPose().getX());
-      Logger.recordOutput("Snap/y/yDiff", y);
+      Logger.recordOutput("Snap/y/yDiff", linearY);
       Logger.recordOutput("Snap/y/currentYPos", drive.getPose().getY());
 
       // Convert to field relative speeds & send command
-      ChassisSpeeds speeds = new ChassisSpeeds(x, y, omega);
+      ChassisSpeeds speeds = new ChassisSpeeds(linearX, linearY, omega);
       drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
 
     }, drive)
@@ -689,5 +685,79 @@ public class DriveCommands {
           xController.reset(drive.getPose().getX(), fieldRelativeSpeeds.vxMetersPerSecond);
           yController.reset(drive.getPose().getY(), fieldRelativeSpeeds.vyMetersPerSecond);
         }).withName("DriveCommands.joystickDriveAssist");
+  }
+
+  public static Command expoAssist(Drive drive, DoubleSupplier xSupplier, DoubleSupplier ySupplier,
+      DoubleSupplier omegaSupplier, BooleanSupplier snapSupplier,
+      BooleanSupplier slowModeSupplier) {
+
+    return Commands.run(() -> {
+
+      System.out.println("Expo Assist");
+
+      final double isRed =
+          DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red ? 1 : -1;
+
+      final double slowModeMultiplier =
+          (slowModeSupplier.getAsBoolean() ? SLOW_MODE_MULTIPLIER : 1.0);
+
+      // Get exponential velocity
+      Translation2d exponentialVelocity = getLinearVelocityFromJoysticks(
+          Math.pow(-xSupplier.getAsDouble(), (3)), Math.pow(-ySupplier.getAsDouble(), (3)));
+
+      // Apply rotation deadband
+      double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
+
+      final double maxSpeed = drive.getMaxLinearSpeedMetersPerSec();
+
+      double exponentialX = exponentialVelocity.getX() * maxSpeed * slowModeMultiplier * isRed;
+      double exponentialY = exponentialVelocity.getY() * maxSpeed * slowModeMultiplier * isRed;
+
+      // Square rotation value for more precise control
+      omega = Math.copySign(omega * omega, omega);
+
+      omega *= drive.getMaxAngularSpeedRadPerSec();
+      if ((Math.abs(omega) > 1E-6) || (Math.abs(exponentialX) > 1E-6)
+          || (Math.abs(exponentialY) > 1E-6)) {
+        Logger.recordOutput("DriveState", "Driver");
+        Logger.recordOutput("Snap/desiredPos", new Pose2d(-50, -50, Rotation2d.kZero));
+      } else if (snapSupplier.getAsBoolean()) {
+        Optional<Pose2dSequence> closestOptionalPose = getClosestPosition(drive, SNAPPY_RADIUS);
+
+        if (closestOptionalPose.isPresent()) {
+          Pose2dSequence closestPoseSequence = closestOptionalPose.orElse(Pose2dSequence.kZero);
+          Pose2d closestPose = closestPoseSequence.inner;
+          Logger.recordOutput("DriveState", "Robot");
+          Logger.recordOutput("Snap/desiredPos", closestPose);
+          if (angleController.atGoal() && xController.atGoal() && yController.atGoal()) {
+            exponentialX = 0;
+            exponentialY = 0;
+            omega = 0;
+          } else {
+            exponentialX = xController.calculate(drive.getPose().getX(), closestPose.getX());
+
+            exponentialY = yController.calculate(drive.getPose().getY(), closestPose.getY());
+
+            omega = angleController.calculate(drive.getRotation().getRadians(),
+                closestPose.getRotation().getRadians());
+          }
+
+        }
+      }
+
+      // Convert to field relative speeds & send command
+      ChassisSpeeds speeds = new ChassisSpeeds(exponentialX, exponentialY, omega);
+      drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
+
+    }, drive)
+
+        // Reset PID controller when command starts
+        .beforeStarting(() -> {
+          var fieldRelativeSpeeds = drive.getFieldRelativeSpeeds();
+          angleController.reset(drive.getRotation().getRadians(),
+              fieldRelativeSpeeds.omegaRadiansPerSecond);
+          xController.reset(drive.getPose().getX(), fieldRelativeSpeeds.vxMetersPerSecond);
+          yController.reset(drive.getPose().getY(), fieldRelativeSpeeds.vyMetersPerSecond);
+        });
   }
 }
