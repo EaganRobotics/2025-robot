@@ -1,6 +1,7 @@
 package frc.robot.Robot25.commands;
 
 import java.util.Set;
+import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
@@ -15,7 +16,7 @@ public final class SimDriverPractice {
   private SimDriverPractice() {}
 
   public static Command simDriverPractice(RobotContainer robotContainer,
-      Runnable resetRobotCallback) {
+      Supplier<Command> resetRobotCommand) {
 
     return Commands.defer(() -> {
 
@@ -25,11 +26,10 @@ public final class SimDriverPractice {
 
       // CommandScheduler.getInstance().cancelAll();
       robotContainer.resetSimulation();
-      resetRobotCallback.run();
 
       var autoCommand = robotContainer.getAutonomousCommand().asProxy();
 
-      return autoCommand.beforeStarting(() -> {
+      return resetRobotCommand.get().andThen(autoCommand.beforeStarting(() -> {
         DriverStationSim.setDsAttached(true);
         DriverStationSim.setEventName("Sim Driver Practice");
         DriverStationSim.setGameSpecificMessage("Sim Driver Practice");
@@ -59,7 +59,7 @@ public final class SimDriverPractice {
         });
 
         teleopPeriodCommand.schedule();
-      });
+      }));
     }, Set.of());
   }
 }

@@ -199,8 +199,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
     // Add sim driver practice
     testChooser.addDefaultOption("Sim Driver Practice",
-        SimDriverPractice.simDriverPractice(this, () -> {
-        }));
+        SimDriverPractice.simDriverPractice(this, this::simResetRobot));
 
     // Set up SysId routines
     testChooser.addOption("Drive Wheel Radius Characterization",
@@ -287,6 +286,10 @@ public class RobotContainer extends frc.lib.RobotContainer {
     // ##########################################################################################################
   }
 
+  private Command simResetRobot() {
+    return Commands.none();
+  }
+
   @Override
   public Command getAutonomousCommand() {
     return autoChooser.get();
@@ -346,7 +349,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
       }
       var droppedCoral = new ReefscapeCoralOnFly(coralPose.getTranslation().toTranslation2d(),
           Translation2d.kZero, new ChassisSpeeds(), coralPose.getRotation().toRotation2d(),
-          coralPose.getMeasureZ().plus(Meters.of(0.07)), MetersPerSecond.of(1),
+          coralPose.getMeasureZ().plus(Meters.of(0.07)), MetersPerSecond.of(1.5),
           coralPose.getRotation().getMeasureY().unaryMinus());
       SimulatedArena.getInstance().addGamePieceProjectile(droppedCoral);
     });
