@@ -135,7 +135,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
     }
 
     // Values are tuned to speed but may be changed
-    NamedCommands.registerCommand("Auto1", DriveCommands.FirstSnapper(drive).withTimeout(2));
+    NamedCommands.registerCommand("Auto1",
+        DriveCommands.FirstSnapper(drive).withTimeout(2).alongWith(elevator.L0()));
     NamedCommands.registerCommand("Align1", DriveCommands.AutoSnapper(drive).withTimeout(2));
     NamedCommands.registerCommand("Align2", DriveCommands.AutoSnapper(drive).withTimeout(2.5));
     NamedCommands.registerCommand("RightSource", DriveCommands.SourceSnapper(drive).withTimeout(2));
@@ -156,7 +157,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
     NamedCommands.registerCommand("Algae", elevator.Algae());
 
     NamedCommands.registerCommand("Maybe1",
-        DriveCommands.FullSnapperOuter(drive)
+        DriveCommands.FullSnapperOuter(drive).alongWith(elevator.L0())
             .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
             .andThen(outtake.depositCoral())
             .andThen(DriveCommands.FullSnapperOuter(drive).alongWith(elevator.L0())));
