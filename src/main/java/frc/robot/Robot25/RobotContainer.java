@@ -192,7 +192,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
         new WaitUntilCommand(elevator.isAtGoal()).andThen(outtake.depositCoral()));
 
     // Set up auto routines
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+    autoChooser =
+        new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser("AL.0C.1M"));
 
     // Set up test routines
     testChooser = new LoggedDashboardChooser<>("Test Choices");
@@ -249,6 +250,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
     }, drive).ignoringDisable(true).withName("RobotContainer.driverZeroCommand"));
     driverController.rightBumper().whileTrue(DriveCommands.Snapper(drive));
     driverController.leftBumper().whileTrue(DriveCommands.SourceSnapper(drive));
+
+    driverController.x().whileTrue(DriveCommands.AlgaeSnapper(drive));
     driverController.y()
         .whileTrue(DriveCommands.FullSnapperOuter(drive)
             .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
@@ -261,6 +264,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
         .whileTrue(DriveCommands.FullSnapperOuter(drive)
             .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L2()))
             .andThen(outtake.depositCoral()).andThen(elevator.L0()));
+
+    driverController.povUp().whileTrue(DriveCommands.BargeSnapper(drive));
 
     operatorController.leftTrigger().whileTrue(outtake.autoQueueCoralOveride());
     operatorController.rightTrigger().whileTrue(outtake.reverseCoral());
