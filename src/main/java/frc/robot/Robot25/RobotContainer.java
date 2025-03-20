@@ -210,12 +210,14 @@ public class RobotContainer extends frc.lib.RobotContainer {
         .withName("RobotContainer.outtakeDefaultCommand"));
     driverController.povUpRight()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-45)));
-    driverController.povRight().onTrue(DriveCommands.RightSnapper(drive));
+    driverController.povRight()
+        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-90)));
     driverController.povDownRight()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-135)));
     driverController.povDownLeft()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(135)));
-    driverController.povLeft().onTrue(DriveCommands.LeftSnapper(drive));
+    driverController.povLeft()
+        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(90)));
     driverController.povUpLeft()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(45)));
     driverController.start().onTrue(Commands.runOnce(() -> {
