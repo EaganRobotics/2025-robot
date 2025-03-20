@@ -229,7 +229,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
     }, drive).ignoringDisable(true).withName("RobotContainer.driverZeroCommand"));
     driverController.rightBumper().whileTrue(DriveCommands.Snapper(drive));
     driverController.leftBumper().whileTrue(DriveCommands.SourceSnapper(drive));
-    
+
     driverController.x().whileTrue(DriveCommands.AlgaeSnapper(drive));
     driverController.y()
         .whileTrue(DriveCommands.FullSnapperOuter(drive)
@@ -243,6 +243,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
         .whileTrue(DriveCommands.FullSnapperOuter(drive)
             .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L2()))
             .andThen(outtake.depositCoral()).andThen(elevator.L0()));
+
+    driverController.povUp().whileTrue(DriveCommands.BargeSnapper(drive));
 
     operatorController.leftTrigger().whileTrue(outtake.autoQueueCoralOveride());
     operatorController.rightTrigger().whileTrue(outtake.reverseCoral());
