@@ -20,7 +20,11 @@ import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.pathfinding.Pathfinding;
+import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.PathPlannerLogging;
+import com.pathplanner.lib.util.swerve.SwerveSetpoint;
+import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
+
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -96,6 +100,11 @@ public class Drive extends SubsystemBase implements VisionConsumer {
               KilogramSquareMeters.of(DriveConstants.FrontLeft.SteerInertia),
               DriveConstants.WHEEL_COF));
 
+  // Enhanced swerve setpoint generator
+  private final SwerveSetpointGenerator swerveSetpointGenerator =
+      new SwerveSetpointGenerator(PP_CONFIG, DriveConstants.MAX_ANGULAR_VELOCITY);
+  private SwerveSetpoint previousSetpoint;
+
   static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
@@ -153,6 +162,12 @@ public class Drive extends SubsystemBase implements VisionConsumer {
             (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
         new SysIdRoutine.Mechanism((voltage) -> runCharacterization(voltage.in(Volts)), null,
             this));
+
+    // Configure SwerveSetpoint
+    var moduleStates = getModuleStates();
+    var robotRelativeSpeeds = kinematics.toChassisSpeeds(moduleStates);
+    previousSetpoint = new SwerveSetpoint(robotRelativeSpeeds, moduleStates,
+        DriveFeedforwards.zeros(PP_CONFIG.numModules));
   }
 
   @Override
@@ -165,10 +180,9 @@ public class Drive extends SubsystemBase implements VisionConsumer {
     }
     odometryLock.unlock();
 
-    // Log velocity, position, and voltage for characterization
-    logDriveCharacterization();
+    // For SysId: Log velocity, position, and voltage for characterization
+    // logDriveCharacterization();
 
-    // TODO is this necessary?
     // Log empty setpoint states when disabled
     if (DriverStation.isDisabled()) {
       Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
@@ -217,9 +231,9 @@ public class Drive extends SubsystemBase implements VisionConsumer {
    */
   public void runVelocity(ChassisSpeeds speeds) {
     // Calculate module setpoints
-    speeds = ChassisSpeeds.discretize(speeds, TimedRobot.kDefaultPeriod);
-    SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(speeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, DriveConstants.kSpeedAt12Volts);
+    previousSetpoint = swerveSetpointGenerator.generateSetpoint(previousSetpoint, speeds,
+        TimedRobot.kDefaultPeriod);
+    var setpointStates = previousSetpoint.moduleStates();
 
     // Log unoptimized setpoints and setpoint speeds
     Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
@@ -241,14 +255,14 @@ public class Drive extends SubsystemBase implements VisionConsumer {
     }
   }
 
-  /** Stops the drive. */
-  public void stop() {
-    runVelocity(new ChassisSpeeds());
-  }
-
   public ChassisSpeeds getFieldRelativeSpeeds() {
     var robotRelativeSpeeds = kinematics.toChassisSpeeds(getModuleStates());
     return ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeSpeeds, getPose().getRotation());
+  }
+
+  /** Stops the drive. */
+  public void stop() {
+    runVelocity(new ChassisSpeeds());
   }
 
   /**
