@@ -207,7 +207,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDriveAssist(drive, () -> driverController.getLeftY(),
             () -> driverController.getLeftX(), () -> -driverController.getRightX() * .85,
-            driverController.leftTrigger(), driverController.rightTrigger()));
+            driverController.leftTrigger(), driverController.rightTrigger(0.15)));
     outtake.setDefaultCommand(outtake.autoQueueCoral().onlyWhile(elevator.isAtHeight(Level.Intake))
         .withName("RobotContainer.outtakeDefaultCommand"));
     driverController.povUpRight()
