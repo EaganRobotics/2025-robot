@@ -171,6 +171,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
     NamedCommands.registerCommand("L2", elevator.L2());
     NamedCommands.registerCommand("L3", elevator.L3());
     NamedCommands.registerCommand("L4", elevator.L4());
+    NamedCommands.registerCommand("L4", elevator.Algae());
 
     NamedCommands.registerCommand("Maybe1",
         DriveCommands.FullSnapperOuter(drive)
@@ -272,7 +273,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
     operatorController.leftBumper().onTrue(outtake.depositCoral().andThen(elevator.intakeHeight())
         .withName("RobotContainer.intakeHeight"));
     operatorController.rightBumper().onTrue(elevator.intakeHeight());
-    operatorController.a().onTrue(elevator.L2());
+    operatorController.a().onTrue(elevator.Algae());
     operatorController.x().onTrue(elevator.L1());
     operatorController.b().onTrue(elevator.L3());
     operatorController.y().onTrue(elevator.L4());
