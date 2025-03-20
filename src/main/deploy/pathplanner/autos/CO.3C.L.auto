@@ -43,7 +43,7 @@
       ]
     }
   },
-  "resetOdom": false,
+  "resetOdom": true,
   "folder": "CO.3C.Autos",
   "choreoAuto": false
 }
