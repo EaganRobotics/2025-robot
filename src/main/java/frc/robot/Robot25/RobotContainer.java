@@ -153,7 +153,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
     NamedCommands.registerCommand("L2", elevator.L2());
     NamedCommands.registerCommand("L3", elevator.L3());
     NamedCommands.registerCommand("L4", elevator.L4());
-    NamedCommands.registerCommand("L4", elevator.Algae());
+    NamedCommands.registerCommand("Algae", elevator.Algae());
 
     NamedCommands.registerCommand("Maybe1",
         DriveCommands.FullSnapperOuter(drive)
