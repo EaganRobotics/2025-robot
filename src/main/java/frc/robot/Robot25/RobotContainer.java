@@ -19,6 +19,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -73,26 +74,29 @@ public class RobotContainer extends frc.lib.RobotContainer {
   private final Algae algae;
 
   // Drive simulation
-  public static final SwerveDriveSimulation DRIVE_SIMULATION =
-      new SwerveDriveSimulation(Drive.MAPLE_SIM_CONFIG, SimConstants.SIM_INITIAL_FIELD_POSE);
+  public static final SwerveDriveSimulation DRIVE_SIMULATION = new SwerveDriveSimulation(Drive.MAPLE_SIM_CONFIG,
+      SimConstants.SIM_INITIAL_FIELD_POSE);
+
+  // Opponent Robot Simulation
+  OpponentRobotSim opponentRobotSim = new OpponentRobotSim(1);
 
   private final CommandXboxController driverController = new CommandXboxController(0);
   private final CommandXboxController operatorController = new CommandXboxController(1);
   private final CommandXboxController humanPlayerController = new CommandXboxController(2);
+  private final XboxController opponentController = new XboxController(5);
 
   private final LoggedDashboardChooser<Command> autoChooser;
   private final LoggedDashboardChooser<Command> testChooser;
 
-  private final Pose3d[] mechanismPoses = new Pose3d[] {Pose3d.kZero, Pose3d.kZero, Pose3d.kZero,};
+  private final Pose3d[] mechanismPoses = new Pose3d[] { Pose3d.kZero, Pose3d.kZero, Pose3d.kZero, };
 
-  public static final Pose3d[] simCoralPoses =
-      new Pose3d[] {Pose3d.kZero, Pose3d.kZero, Pose3d.kZero,};
+  public static final Pose3d[] simCoralPoses = new Pose3d[] { Pose3d.kZero, Pose3d.kZero, Pose3d.kZero, };
 
   public RobotContainer() {
     super(DRIVE_SIMULATION);
     // Check for valid swerve config
-    var modules = new SwerveModuleConstants[] {DriveConstants.FrontLeft, DriveConstants.FrontRight,
-        DriveConstants.BackLeft, DriveConstants.BackRight,};
+    var modules = new SwerveModuleConstants[] { DriveConstants.FrontLeft, DriveConstants.FrontRight,
+        DriveConstants.BackLeft, DriveConstants.BackRight, };
     for (var constants : modules) {
       if (constants.DriveMotorType != DriveMotorArrangement.TalonFX_Integrated
           || constants.SteerMotorType != SteerMotorArrangement.TalonFX_Integrated) {
@@ -139,15 +143,24 @@ public class RobotContainer extends frc.lib.RobotContainer {
         break;
       default:
         // Replayed robot, disable IO implementations
-        drive = new Drive(new GyroIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {},
-            new ModuleIO() {}, DRIVE_SIMULATION::setSimulationWorldPose);
+        drive = new Drive(new GyroIO() {
+        }, new ModuleIO() {
+        }, new ModuleIO() {
+        }, new ModuleIO() {
+        },
+            new ModuleIO() {
+            }, DRIVE_SIMULATION::setSimulationWorldPose);
 
-        elevator = new Elevator(new ElevatorIO() {});
+        elevator = new Elevator(new ElevatorIO() {
+        });
 
-        outtake = new Outtake(new OuttakeIO() {});
+        outtake = new Outtake(new OuttakeIO() {
+        });
 
-        vision = new Vision(drive, new VisionIO() {});
-        algae = new Algae(new AlgaeIO() {});
+        vision = new Vision(drive, new VisionIO() {
+        });
+        algae = new Algae(new AlgaeIO() {
+        });
 
         break;
     }
@@ -192,8 +205,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
         new WaitUntilCommand(elevator.isAtGoal()).andThen(outtake.depositCoral()));
 
     // Set up auto routines
-    autoChooser =
-        new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser("AL.0C.1M"));
+    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser("AL.0C.1M"));
 
     // Set up test routines
     testChooser = new LoggedDashboardChooser<>("Test Choices");
@@ -288,6 +300,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
     operatorController.axisMagnitudeGreaterThan(5, 0.1)
         .whileTrue(elevator.openLoop(operatorController::getRightY));
+
+    opponentRobotSim.setDefaultCommand(opponentRobotSim.joystickDrive(opponentController));
     // ##########################################################################################################
   }
 
@@ -363,6 +377,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
   @Override
   public void simulationInit() {
     if (SimConstants.CURRENT_MODE == SimConstants.Mode.SIM) {
+
       var lb = humanPlayerController.leftBumper();
       var rb = humanPlayerController.rightBumper();
 
