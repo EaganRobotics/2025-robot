@@ -183,14 +183,15 @@ public class RobotContainer extends frc.lib.RobotContainer {
             .andThen(outtake.depositCoral())
             .andThen(DriveCommands.FullSnapperOuter(drive).alongWith(elevator.L0())));
     NamedCommands.registerCommand("Maybe2",
-        (DriveCommands.SourceSnapper(drive).withTimeout(2)).andThen(outtake.autoQueueCoral2()));
+        (DriveCommands.SourceSnapper(drive).withTimeout(2))
+            .andThen(outtake.autoQueueCoral3().until(outtake.seesAtOutputTrigger.debounce(0.1))));
     NamedCommands.registerCommand("Maybe3",
         (DriveCommands.FullSnapperOuterAuto(drive).raceWith(outtake.autoQueueCoral3()))
             .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
             .andThen(outtake.depositCoral()));
     NamedCommands.registerCommand("Maybe4",
         (elevator.L0().alongWith(DriveCommands.SourceSnapper(drive).withTimeout(2)))
-            .andThen(outtake.autoQueueCoral2()));
+            .andThen(outtake.autoQueueCoral3().until(outtake.seesAtOutputTrigger.debounce(0.1))));
     NamedCommands.registerCommand("Maybe5",
         (DriveCommands.FullSnapperOuter(drive).raceWith(outtake.autoQueueCoral3()))
             .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
