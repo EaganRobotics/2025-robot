@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Robot25.commands.DriveCharacterization;
 import frc.robot.Robot25.commands.DriveCommands;
+import frc.robot.Robot25.commands.PathPlanning;
 import frc.robot.Robot25.commands.SimDriverPractice;
 import frc.robot.Robot25.subsystems.AlgaeEater.Algae;
 import frc.robot.Robot25.subsystems.AlgaeEater.AlgaeIO;
@@ -79,7 +80,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
   // Opponent Robot Simulation
   OpponentRobotSim opponentRobotSim = new OpponentRobotSim(1);
-  
+
   private final CommandXboxController driverController = new CommandXboxController(0);
   private final CommandXboxController operatorController = new CommandXboxController(1);
   private final CommandXboxController humanPlayerController = new CommandXboxController(2);
@@ -143,8 +144,13 @@ public class RobotContainer extends frc.lib.RobotContainer {
         break;
       default:
         // Replayed robot, disable IO implementations
-        drive = new Drive(new GyroIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {},
-            new ModuleIO() {}, DRIVE_SIMULATION::setSimulationWorldPose);
+        drive = new Drive(new GyroIO() {
+        }, new ModuleIO() {
+        }, new ModuleIO() {
+        }, new ModuleIO() {
+        },
+            new ModuleIO() {
+            }, DRIVE_SIMULATION::setSimulationWorldPose);
 
         elevator = new Elevator(new ElevatorIO() {
         });
@@ -152,8 +158,10 @@ public class RobotContainer extends frc.lib.RobotContainer {
         outtake = new Outtake(new OuttakeIO() {
         });
 
-        vision = new Vision(drive, new VisionIO() {});
-        algae = new Algae(new AlgaeIO() {});
+        vision = new Vision(drive, new VisionIO() {
+        });
+        algae = new Algae(new AlgaeIO() {
+        });
 
         break;
     }
@@ -214,6 +222,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
             .andThen(outtake.depositCoral()).andThen(elevator.L0()));
     NamedCommands.registerCommand("Exhaust",
         new WaitUntilCommand(elevator.isAtGoal()).andThen(outtake.depositCoral()));
+
+    NamedCommands.registerCommand("Test.NearestReefAlign", PathPlanning.drivePathToClosestReef(drive));
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser("AL.0C.1M"));

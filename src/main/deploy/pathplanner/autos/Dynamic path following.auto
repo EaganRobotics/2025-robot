@@ -1,0 +1,25 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "pose starter left"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Test.NearestReefAlign"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Calibration",
+  "choreoAuto": false
+}
