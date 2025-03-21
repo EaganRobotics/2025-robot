@@ -118,9 +118,9 @@ public class Outtake extends SubsystemBase {
     }).withName("Outtake.openLoop");
   }
 
-  public final Trigger seesAtOutputTrigger = new Trigger(() -> inputs.seesCoralAtOutput).debounce(0.1,
+  public final Trigger seesAtOutputTrigger = new Trigger(() -> inputs.seesCoralAtOutput).debounce(0.15,
       DebounceType.kFalling);
-  public final Trigger seesAtInputTrigger = new Trigger(() -> inputs.seesCoralAtInput).debounce(0.1,
+  public final Trigger seesAtInputTrigger = new Trigger(() -> inputs.seesCoralAtInput).debounce(0.15,
       DebounceType.kFalling);
 
   // public Command specialDepositCoral() {
