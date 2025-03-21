@@ -46,6 +46,12 @@
           "data": {
             "name": "L0"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlgaeSnapper"
+          }
         }
       ]
     }
