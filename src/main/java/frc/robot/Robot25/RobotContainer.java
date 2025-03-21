@@ -158,6 +158,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
     NamedCommands.registerCommand("Align2", DriveCommands.AutoSnapper(drive).withTimeout(2.5));
     NamedCommands.registerCommand("RightSource", DriveCommands.SourceSnapper(drive).withTimeout(2));
     NamedCommands.registerCommand("LeftSource", DriveCommands.SourceSnapper(drive).withTimeout(2));
+    NamedCommands.registerCommand("AlgaeSnapper", DriveCommands.AlgaeSnapper(drive).withTimeout(2));
     // Probably dont change or use
     NamedCommands.registerCommand("Align3", DriveCommands.FirstSnapper(drive).withTimeout(1));
     NamedCommands.registerCommand("Align4", DriveCommands.AutoSnapper(drive).withTimeout(1.5));
@@ -171,20 +172,20 @@ public class RobotContainer extends frc.lib.RobotContainer {
     NamedCommands.registerCommand("L2", elevator.L2());
     NamedCommands.registerCommand("L3", elevator.L3());
     NamedCommands.registerCommand("L4", elevator.L4());
-    NamedCommands.registerCommand("L4", elevator.Algae());
+    NamedCommands.registerCommand("Algae", elevator.Algae());
 
     NamedCommands.registerCommand("Maybe1",
-        DriveCommands.FullSnapperOuter(drive)
+        DriveCommands.FullSnapperOuter(drive).alongWith(elevator.L0())
             .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
             .andThen(outtake.depositCoral())
-            .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L0())));
-    NamedCommands.registerCommand("Maybe2", DriveCommands.SourceSnapper(drive).withTimeout(3));
+            .andThen(DriveCommands.FullSnapperOuter(drive).alongWith(elevator.L0())));
+    NamedCommands.registerCommand("Maybe2", DriveCommands.SourceSnapper(drive).withTimeout(4));
     NamedCommands.registerCommand("Maybe3",
         DriveCommands.FullSnapperOuterAuto(drive)
             .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
             .andThen(outtake.depositCoral()));
     NamedCommands.registerCommand("Maybe4",
-        elevator.L0().alongWith(DriveCommands.SourceSnapper(drive).withTimeout(3)));
+        elevator.L0().alongWith(DriveCommands.SourceSnapper(drive).withTimeout(4)));
     NamedCommands.registerCommand("Maybe5",
         DriveCommands.FullSnapperOuter(drive)
             .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
@@ -227,19 +228,17 @@ public class RobotContainer extends frc.lib.RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDriveAssist(drive, () -> driverController.getLeftY(),
             () -> driverController.getLeftX(), () -> -driverController.getRightX() * .85,
-            driverController.leftTrigger(), driverController.rightTrigger()));
+            driverController.leftTrigger(), driverController.rightTrigger(0.15)));
     outtake.setDefaultCommand(outtake.autoQueueCoral().onlyWhile(elevator.isAtHeight(Level.Intake))
         .withName("RobotContainer.outtakeDefaultCommand"));
     driverController.povUpRight()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-45)));
-    driverController.povRight()
-        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-90)));
+    driverController.povRight().onTrue(DriveCommands.RightSnapper(drive));
     driverController.povDownRight()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-135)));
     driverController.povDownLeft()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(135)));
-    driverController.povLeft()
-        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(90)));
+    driverController.povLeft().onTrue(DriveCommands.LeftSnapper(drive));
     driverController.povUpLeft()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(45)));
     driverController.start().onTrue(Commands.runOnce(() -> {
@@ -251,6 +250,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
     }, drive).ignoringDisable(true).withName("RobotContainer.driverZeroCommand"));
     driverController.rightBumper().whileTrue(DriveCommands.Snapper(drive));
     driverController.leftBumper().whileTrue(DriveCommands.SourceSnapper(drive));
+
+    driverController.x().whileTrue(DriveCommands.AlgaeSnapper(drive));
     driverController.y()
         .whileTrue(DriveCommands.FullSnapperOuter(drive)
             .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
@@ -264,6 +265,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
             .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L2()))
             .andThen(outtake.depositCoral()).andThen(elevator.L0()));
 
+    driverController.povUp().whileTrue(DriveCommands.BargeSnapper(drive));
+
     operatorController.leftTrigger().whileTrue(outtake.autoQueueCoralOveride());
     operatorController.rightTrigger().whileTrue(outtake.reverseCoral());
     operatorController.povDown().onTrue(elevator.downLevel());
@@ -273,8 +276,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
     operatorController.leftBumper().onTrue(outtake.depositCoral().andThen(elevator.intakeHeight())
         .withName("RobotContainer.intakeHeight"));
     operatorController.rightBumper().onTrue(elevator.intakeHeight());
-    operatorController.a().onTrue(elevator.Algae());
-    operatorController.x().onTrue(elevator.L1());
+    operatorController.a().onTrue(elevator.L2());
+    operatorController.x().onTrue(elevator.Algae());
     operatorController.b().onTrue(elevator.L3());
     operatorController.y().onTrue(elevator.L4());
     operatorController.povRight().whileTrue(algae.setOpenLoop(Volts.of(10)));

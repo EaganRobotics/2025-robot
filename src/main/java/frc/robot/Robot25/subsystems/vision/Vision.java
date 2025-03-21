@@ -41,9 +41,8 @@ public class Vision extends SubsystemBase {
     this.consumer = consumer;
     this.io = io;
 
-    // this dose nothing except stop a crash/freeze
-    Logger.recordOutput("vision/FixFreeze",
-        new TargetObservation(new Rotation2d((int) Math.PI), new Rotation2d(1)));
+    // This does nothing except stop a crash/freeze
+    aprilTagLayout.getTagPose(0);
 
     // Initialize inputs
     this.inputs = new VisionIOInputsAutoLogged[io.length];
@@ -59,13 +58,9 @@ public class Vision extends SubsystemBase {
     }
   }
 
-  private Rotation2d Rotation2d(int i) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'Rotation2d'");
-  }
-
   /**
-   * Returns the X angle to the best target, which can be used for simple servoing with vision.
+   * Returns the X angle to the best target, which can be used for simple servoing
+   * with vision.
    *
    * @param cameraIndex The index of the camera to use.
    */
@@ -134,8 +129,7 @@ public class Vision extends SubsystemBase {
         }
 
         // Calculate standard deviations
-        double stdDevFactor =
-            Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount();
+        double stdDevFactor = Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount();
         double linearStdDev = linearStdDevBaseline * stdDevFactor;
         double angularStdDev = angularStdDevBaseline * stdDevFactor;
         if (observation.type() == PoseObservationType.MEGATAG_2) {

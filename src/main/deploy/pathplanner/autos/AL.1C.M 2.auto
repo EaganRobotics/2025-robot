@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "L0"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "1M"
@@ -39,6 +45,12 @@
           "type": "named",
           "data": {
             "name": "L0"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlgaeSnapper"
           }
         }
       ]
