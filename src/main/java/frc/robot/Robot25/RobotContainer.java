@@ -79,7 +79,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
   // Opponent Robot Simulation
   OpponentRobotSim opponentRobotSim = new OpponentRobotSim(1);
-
+  
   private final CommandXboxController driverController = new CommandXboxController(0);
   private final CommandXboxController operatorController = new CommandXboxController(1);
   private final CommandXboxController humanPlayerController = new CommandXboxController(2);
@@ -95,8 +95,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
   public RobotContainer() {
     super(DRIVE_SIMULATION);
     // Check for valid swerve config
-    var modules = new SwerveModuleConstants[] {DriveConstants.FrontLeft, DriveConstants.FrontRight,
-        DriveConstants.BackLeft, DriveConstants.BackRight,};
+    var modules = new SwerveModuleConstants[] { DriveConstants.FrontLeft, DriveConstants.FrontRight,
+        DriveConstants.BackLeft, DriveConstants.BackRight, };
     for (var constants : modules) {
       if (constants.DriveMotorType != DriveMotorArrangement.TalonFX_Integrated
           || constants.SteerMotorType != SteerMotorArrangement.TalonFX_Integrated) {
@@ -146,9 +146,11 @@ public class RobotContainer extends frc.lib.RobotContainer {
         drive = new Drive(new GyroIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {},
             new ModuleIO() {}, DRIVE_SIMULATION::setSimulationWorldPose);
 
-        elevator = new Elevator(new ElevatorIO() {});
+        elevator = new Elevator(new ElevatorIO() {
+        });
 
-        outtake = new Outtake(new OuttakeIO() {});
+        outtake = new Outtake(new OuttakeIO() {
+        });
 
         vision = new Vision(drive, new VisionIO() {});
         algae = new Algae(new AlgaeIO() {});
@@ -178,30 +180,43 @@ public class RobotContainer extends frc.lib.RobotContainer {
     NamedCommands.registerCommand("L4", elevator.L4());
     NamedCommands.registerCommand("Algae", elevator.Algae());
 
+    NamedCommands.registerCommand("CO.ScoreFirstL4",
+        DriveCommands.FullSnapperOuterAuto(drive).alongWith(elevator.L0())
+            .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
+            .andThen(outtake.depositCoral())
+            .andThen(DriveCommands.FullSnapperOuter(drive).alongWith(elevator.L0())));
+    NamedCommands.registerCommand("CO.ScoreL4",
+        DriveCommands.FullSnapperOuterAuto(drive)
+            .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
+            .andThen(outtake.depositCoral())
+            .andThen(DriveCommands.FullSnapperOuter(drive).alongWith(elevator.L0())));
+    NamedCommands.registerCommand("CO.LoadCoral", DriveCommands.SourceSnapper(drive).withTimeout(2)
+        .andThen(outtake.autoQueueCoral().until(outtake.seesAtOutputTrigger.debounce(0.1))));
+
     NamedCommands.registerCommand("Maybe1",
         DriveCommands.FullSnapperOuter(drive).alongWith(elevator.L0())
             .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
             .andThen(outtake.depositCoral())
             .andThen(DriveCommands.FullSnapperOuter(drive).alongWith(elevator.L0())));
     NamedCommands.registerCommand("Maybe2",
-        (DriveCommands.SourceSnapper(drive).withTimeout(2)).andThen(outtake.autoQueueCoral2()));
+        (DriveCommands.SourceSnapper(drive).withTimeout(2))
+            .andThen(outtake.autoQueueCoral3().until(outtake.seesAtOutputTrigger.debounce(0.1))));
     NamedCommands.registerCommand("Maybe3",
         (DriveCommands.FullSnapperOuterAuto(drive).raceWith(outtake.autoQueueCoral3()))
             .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
             .andThen(outtake.depositCoral()));
     NamedCommands.registerCommand("Maybe4",
         (elevator.L0().alongWith(DriveCommands.SourceSnapper(drive).withTimeout(2)))
-            .andThen(outtake.autoQueueCoral2()));
+            .andThen(outtake.autoQueueCoral3().until(outtake.seesAtOutputTrigger.debounce(0.1))));
     NamedCommands.registerCommand("Maybe5",
-        (DriveCommands.FullSnapperOuterAuto(drive).raceWith(outtake.autoQueueCoral3()))
+        (DriveCommands.FullSnapperOuter(drive).raceWith(outtake.autoQueueCoral3()))
             .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
             .andThen(outtake.depositCoral()).andThen(elevator.L0()));
     NamedCommands.registerCommand("Exhaust",
         new WaitUntilCommand(elevator.isAtGoal()).andThen(outtake.depositCoral()));
 
     // Set up auto routines
-    autoChooser =
-        new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser("AL.0C.1M"));
+    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser("AL.0C.1M"));
 
     // Set up test routines
     testChooser = new LoggedDashboardChooser<>("Test Choices");
@@ -316,11 +331,6 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
   @Override
   public void disabledInit() {
-    drive.stop();
-  }
-
-  @Override
-  public void teleopInit() {
     drive.stop();
   }
 
