@@ -74,8 +74,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
   private final Algae algae;
 
   // Drive simulation
-  public static final SwerveDriveSimulation DRIVE_SIMULATION =
-      new SwerveDriveSimulation(Drive.MAPLE_SIM_CONFIG, SimConstants.SIM_INITIAL_FIELD_POSE);
+  public static final SwerveDriveSimulation DRIVE_SIMULATION = new SwerveDriveSimulation(Drive.MAPLE_SIM_CONFIG,
+      SimConstants.SIM_INITIAL_FIELD_POSE);
 
   // Opponent Robot Simulation
   OpponentRobotSim opponentRobotSim = new OpponentRobotSim(1);
@@ -88,10 +88,9 @@ public class RobotContainer extends frc.lib.RobotContainer {
   private final LoggedDashboardChooser<Command> autoChooser;
   private final LoggedDashboardChooser<Command> testChooser;
 
-  private final Pose3d[] mechanismPoses = new Pose3d[] {Pose3d.kZero, Pose3d.kZero, Pose3d.kZero,};
+  private final Pose3d[] mechanismPoses = new Pose3d[] { Pose3d.kZero, Pose3d.kZero, Pose3d.kZero, };
 
-  public static final Pose3d[] simCoralPoses =
-      new Pose3d[] {Pose3d.kZero, Pose3d.kZero, Pose3d.kZero,};
+  public static final Pose3d[] simCoralPoses = new Pose3d[] { Pose3d.kZero, Pose3d.kZero, Pose3d.kZero, };
 
   public RobotContainer() {
     super(DRIVE_SIMULATION);
@@ -163,6 +162,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
     NamedCommands.registerCommand("Align2", DriveCommands.AutoSnapper(drive).withTimeout(2.5));
     NamedCommands.registerCommand("RightSource", DriveCommands.SourceSnapper(drive).withTimeout(2));
     NamedCommands.registerCommand("LeftSource", DriveCommands.SourceSnapper(drive).withTimeout(2));
+    NamedCommands.registerCommand("AlgaeSnapper", DriveCommands.AlgaeSnapper(drive).withTimeout(2));
     // Probably dont change or use
     NamedCommands.registerCommand("Align3", DriveCommands.FirstSnapper(drive).withTimeout(1));
     NamedCommands.registerCommand("Align4", DriveCommands.AutoSnapper(drive).withTimeout(1.5));
@@ -176,23 +176,24 @@ public class RobotContainer extends frc.lib.RobotContainer {
     NamedCommands.registerCommand("L2", elevator.L2());
     NamedCommands.registerCommand("L3", elevator.L3());
     NamedCommands.registerCommand("L4", elevator.L4());
-    NamedCommands.registerCommand("L4", elevator.Algae());
+    NamedCommands.registerCommand("Algae", elevator.Algae());
 
     NamedCommands.registerCommand("Maybe1",
-        DriveCommands.FullSnapperOuter(drive)
+        DriveCommands.FullSnapperOuter(drive).alongWith(elevator.L0())
             .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
             .andThen(outtake.depositCoral())
             .andThen(DriveCommands.FullSnapperOuter(drive).alongWith(elevator.L0())));
-    NamedCommands.registerCommand("Maybe2", DriveCommands.SourceSnapper(drive).withTimeout(3)
-        .andThen(Commands.waitUntil(outtake.seesAtInputTrigger)));
+    NamedCommands.registerCommand("Maybe2",
+        (DriveCommands.SourceSnapper(drive).withTimeout(2)).andThen(outtake.autoQueueCoral2()));
     NamedCommands.registerCommand("Maybe3",
-        DriveCommands.FullSnapperOuterAuto(drive)
+        (DriveCommands.FullSnapperOuterAuto(drive).raceWith(outtake.autoQueueCoral3()))
             .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
             .andThen(outtake.depositCoral()));
     NamedCommands.registerCommand("Maybe4",
-        elevator.L0().alongWith(DriveCommands.SourceSnapper(drive).withTimeout(3)));
+        (elevator.L0().alongWith(DriveCommands.SourceSnapper(drive).withTimeout(2)))
+            .andThen(outtake.autoQueueCoral2()));
     NamedCommands.registerCommand("Maybe5",
-        DriveCommands.FullSnapperOuter(drive)
+        (DriveCommands.FullSnapperOuterAuto(drive).raceWith(outtake.autoQueueCoral3()))
             .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
             .andThen(outtake.depositCoral()).andThen(elevator.L0()));
     NamedCommands.registerCommand("Exhaust",
@@ -233,19 +234,17 @@ public class RobotContainer extends frc.lib.RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDriveAssist(drive, () -> driverController.getLeftY(),
             () -> driverController.getLeftX(), () -> -driverController.getRightX() * .85,
-            driverController.leftTrigger(), driverController.rightTrigger()));
+            driverController.leftTrigger(), driverController.rightTrigger(0.15)));
     outtake.setDefaultCommand(outtake.autoQueueCoral().onlyWhile(elevator.isAtHeight(Level.Intake))
         .withName("RobotContainer.outtakeDefaultCommand"));
     driverController.povUpRight()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-45)));
-    driverController.povRight()
-        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-90)));
+    driverController.povRight().onTrue(DriveCommands.RightSnapper(drive));
     driverController.povDownRight()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-135)));
     driverController.povDownLeft()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(135)));
-    driverController.povLeft()
-        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(90)));
+    driverController.povLeft().onTrue(DriveCommands.LeftSnapper(drive));
     driverController.povUpLeft()
         .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(45)));
     driverController.start().onTrue(Commands.runOnce(() -> {
@@ -283,8 +282,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
     operatorController.leftBumper().onTrue(outtake.depositCoral().andThen(elevator.intakeHeight())
         .withName("RobotContainer.intakeHeight"));
     operatorController.rightBumper().onTrue(elevator.intakeHeight());
-    operatorController.a().onTrue(elevator.Algae());
-    operatorController.x().onTrue(elevator.L1());
+    operatorController.a().onTrue(elevator.L2());
+    operatorController.x().onTrue(elevator.Algae());
     operatorController.b().onTrue(elevator.L3());
     operatorController.y().onTrue(elevator.L4());
     operatorController.povRight().whileTrue(algae.setOpenLoop(Volts.of(10)));

@@ -107,7 +107,8 @@ public class Robot extends LoggedRobot {
         // Replaying a log, set up replay source
         setUseTiming(false); // Run as fast as possible
         String logPath = LogFileUtil.findReplayLog();
-        macAddress = WPILogReadMACAddress.get(logPath);
+        // macAddress = WPILogReadMACAddress.get(logPath);
+        macAddress = "00-80-2F-36-FD-D6";
         Logger.setReplaySource(new WPILOGReader(logPath));
         Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
         break;

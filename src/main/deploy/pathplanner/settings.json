@@ -4,14 +4,16 @@
   "holonomicMode": true,
   "pathFolders": [
     "AL.Paths",
-    "Calibrate Paths"
+    "Calibrate Paths",
+    "CO.Paths"
   ],
   "autoFolders": [
     "AL.0C.Autos",
     "AL.1C.Autos",
     "AL.2C.Autos",
+    "AL.3C.Autos",
     "Calibration",
-    "AL.3C.Autos"
+    "CO.3C.Autos"
   ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 2.0,

@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "L0"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "AL.2C.L.Path"
@@ -92,7 +98,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "LeftSour"
+                  "name": "LeftSource"
                 }
               }
             ]
