@@ -19,6 +19,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -76,9 +77,13 @@ public class RobotContainer extends frc.lib.RobotContainer {
   public static final SwerveDriveSimulation DRIVE_SIMULATION =
       new SwerveDriveSimulation(Drive.MAPLE_SIM_CONFIG, SimConstants.SIM_INITIAL_FIELD_POSE);
 
+  // Opponent Robot Simulation
+  OpponentRobotSim opponentRobotSim = new OpponentRobotSim(1);
+
   private final CommandXboxController driverController = new CommandXboxController(0);
   private final CommandXboxController operatorController = new CommandXboxController(1);
   private final CommandXboxController humanPlayerController = new CommandXboxController(2);
+  private final XboxController opponentController = new XboxController(5);
 
   private final LoggedDashboardChooser<Command> autoChooser;
   private final LoggedDashboardChooser<Command> testChooser;
@@ -179,7 +184,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
             .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
             .andThen(outtake.depositCoral())
             .andThen(DriveCommands.FullSnapperOuter(drive).alongWith(elevator.L0())));
-    NamedCommands.registerCommand("Maybe2", DriveCommands.SourceSnapper(drive).withTimeout(4));
+    NamedCommands.registerCommand("Maybe2", DriveCommands.SourceSnapper(drive).withTimeout(3)
+        .andThen(Commands.waitUntil(outtake.seesAtInputTrigger)));
     NamedCommands.registerCommand("Maybe3",
         DriveCommands.FullSnapperOuterAuto(drive)
             .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
@@ -201,8 +207,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
     // Add sim driver practice
     testChooser.addDefaultOption("Sim Driver Practice",
-        SimDriverPractice.simDriverPractice(this, () -> {
-        }));
+        SimDriverPractice.simDriverPractice(this, this::simResetRobot));
 
     // Set up SysId routines
     testChooser.addOption("Drive Wheel Radius Characterization",
@@ -288,7 +293,13 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
     operatorController.axisMagnitudeGreaterThan(5, 0.1)
         .whileTrue(elevator.openLoop(operatorController::getRightY));
+
+    opponentRobotSim.setDefaultCommand(opponentRobotSim.joystickDrive(opponentController));
     // ##########################################################################################################
+  }
+
+  private Command simResetRobot() {
+    return Commands.none();
   }
 
   @Override
@@ -350,7 +361,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
       }
       var droppedCoral = new ReefscapeCoralOnFly(coralPose.getTranslation().toTranslation2d(),
           Translation2d.kZero, new ChassisSpeeds(), coralPose.getRotation().toRotation2d(),
-          coralPose.getMeasureZ().plus(Meters.of(0.07)), MetersPerSecond.of(1),
+          coralPose.getMeasureZ().plus(Meters.of(0.07)), MetersPerSecond.of(1.5),
           coralPose.getRotation().getMeasureY().unaryMinus());
       SimulatedArena.getInstance().addGamePieceProjectile(droppedCoral);
     });
@@ -359,6 +370,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
   @Override
   public void simulationInit() {
     if (SimConstants.CURRENT_MODE == SimConstants.Mode.SIM) {
+
       var lb = humanPlayerController.leftBumper();
       var rb = humanPlayerController.rightBumper();
 
