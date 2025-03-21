@@ -65,7 +65,6 @@ public class RobotContainer extends frc.lib.RobotContainer {
   // Drive simulation
   private static final SwerveDriveSimulation driveSimulation = new SwerveDriveSimulation(Drive.MAPLE_SIM_CONFIG,
       SimConstants.SIM_INITIAL_FIELD_POSE);
-
   private final CommandXboxController driverController = new CommandXboxController(0);
   private final CommandXboxController operatorController = new CommandXboxController(1);
 
@@ -164,6 +163,19 @@ public class RobotContainer extends frc.lib.RobotContainer {
     NamedCommands.registerCommand("L3", elevator.L3());
     NamedCommands.registerCommand("L4", elevator.L4());
     NamedCommands.registerCommand("Algae", elevator.Algae());
+
+    NamedCommands.registerCommand("CO.ScoreFirstL4",
+        DriveCommands.FullSnapperOuterAuto(drive).alongWith(elevator.L0())
+            .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
+            .andThen(outtake.depositCoral())
+            .andThen(DriveCommands.FullSnapperOuter(drive).alongWith(elevator.L0())));
+    NamedCommands.registerCommand("CO.ScoreL4",
+        DriveCommands.FullSnapperOuterAuto(drive)
+            .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
+            .andThen(outtake.depositCoral())
+            .andThen(DriveCommands.FullSnapperOuter(drive).alongWith(elevator.L0())));
+    NamedCommands.registerCommand("CO.LoadCoral", DriveCommands.SourceSnapper(drive).withTimeout(2)
+        .andThen(outtake.autoQueueCoral().until(outtake.seesAtOutputTrigger.debounce(0.1))));
 
     NamedCommands.registerCommand("Maybe1",
         DriveCommands.FullSnapperOuter(drive).alongWith(elevator.L0())
