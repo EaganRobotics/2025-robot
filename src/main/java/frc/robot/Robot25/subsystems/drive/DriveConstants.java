@@ -16,7 +16,7 @@ public class DriveConstants {
   // Stator current limits
   public static final Current DRIVE_CURRENT_LIMIT = Amps.of(60); // TODO consider raising to 70 or
                                                                  // 80 amps
-  public static final Current TURN_CURRENT_LIMIT = Amps.of(60); // TODO consider lowering to about
+  public static final Current TURN_CURRENT_LIMIT = Amps.of(45); // TODO consider lowering to about
                                                                 // 40 amps
 
   // The stator current at which the wheels start to slip;
