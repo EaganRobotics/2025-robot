@@ -64,7 +64,7 @@ public final class SimConstants {
   public static final Translation2d BL_LOADING_STATION = new Translation2d(0.53, 6.71);
   public static final Distance LOADING_STATION_TOLERANCE = Inches.of(2);
 
-  public static final Time LOAD_CORAL_DELAY = Seconds.of(1.5);
+  public static final Time LOAD_CORAL_DELAY = Seconds.of(1);
 
   /* DO NOT CHANGE */
   public static final Mode CURRENT_MODE = RobotBase.isReal() ? Mode.REAL : SIM_MODE;

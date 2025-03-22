@@ -25,25 +25,27 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class OpponentRobotSim extends SubsystemBase {
   /*
-   * If an opponent robot is not on the field, it is placed in a queening position for performance.
+   * If an opponent robot is not on the field, it is placed in a queening position
+   * for performance.
    */
-  public static final Pose2d[] ROBOT_QUEENING_POSITIONS =
-      new Pose2d[] {new Pose2d(-6, 0, new Rotation2d()), new Pose2d(-5, 0, new Rotation2d()),
-          new Pose2d(-4, 0, new Rotation2d()), new Pose2d(-3, 0, new Rotation2d()),
-          new Pose2d(-2, 0, new Rotation2d())};
+  public static final Pose2d[] ROBOT_QUEENING_POSITIONS = new Pose2d[] { new Pose2d(-6, 0, new Rotation2d()),
+      new Pose2d(-5, 0, new Rotation2d()),
+      new Pose2d(-4, 0, new Rotation2d()), new Pose2d(-3, 0, new Rotation2d()),
+      new Pose2d(-2, 0, new Rotation2d()) };
 
   /* The robots will be teleported to these positions when teleop begins. */
-  public static final Pose2d[] ROBOTS_STARTING_POSITIONS =
-      new Pose2d[] {new Pose2d(15, 6, Rotation2d.fromDegrees(180)),
-          new Pose2d(15, 4, Rotation2d.fromDegrees(180)),
-          new Pose2d(15, 2, Rotation2d.fromDegrees(180)), new Pose2d(1.6, 6, new Rotation2d()),
-          new Pose2d(1.6, 4, new Rotation2d())};
+  public static final Pose2d[] ROBOTS_STARTING_POSITIONS = new Pose2d[] {
+      new Pose2d(15, 6, Rotation2d.fromDegrees(180)),
+      new Pose2d(15, 4, Rotation2d.fromDegrees(180)),
+      new Pose2d(15, 2, Rotation2d.fromDegrees(180)), new Pose2d(1.6, 6, new Rotation2d()),
+      new Pose2d(1.6, 4, new Rotation2d()) };
 
   /*
-   * The drivetrain configuration for the opponent robots in the maple-sim simulation.
+   * The drivetrain configuration for the opponent robots in the maple-sim
+   * simulation.
    */
-  private static final DriveTrainSimulationConfig DRIVETRAIN_CONFIG =
-      DriveTrainSimulationConfig.Default().withRobotMass(Pounds.of(140));
+  private static final DriveTrainSimulationConfig DRIVETRAIN_CONFIG = DriveTrainSimulationConfig.Default()
+      .withRobotMass(Pounds.of(140));
 
   private final SelfControlledSwerveDriveSimulation driveSimulation;
   private final Pose2d queeningPose;
@@ -68,7 +70,8 @@ public class OpponentRobotSim extends SubsystemBase {
   }
 
   /**
-   * Joystick drive command for controlling the opponent robots. This command allows the robot to be
+   * Joystick drive command for controlling the opponent robots. This command
+   * allows the robot to be
    * driven using an Xbox controller.
    */
   public Command joystickDrive(XboxController joystick) {
@@ -87,9 +90,8 @@ public class OpponentRobotSim extends SubsystemBase {
 
     return Commands.run(() -> {
       // Calculate field-centric speed from the driver station-centric speed
-      final ChassisSpeeds fieldCentricSpeeds =
-          ChassisSpeeds.fromRobotRelativeSpeeds(joystickSpeeds.get(), FieldMirroringUtils
-              .getCurrentAllianceDriverStationFacing().plus(Rotation2d.fromDegrees(180)));
+      final ChassisSpeeds fieldCentricSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(joystickSpeeds.get(),
+          driveSimulation.getDriveTrainSimulation().getSimulatedDriveTrainPose().getRotation().unaryMinus());
       // Run the field-centric speed to control the robot's movement
       driveSimulation.runChassisSpeeds(fieldCentricSpeeds, new Translation2d(), true, true);
     }, this)

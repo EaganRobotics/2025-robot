@@ -369,7 +369,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
       }
       var droppedCoral = new ReefscapeCoralOnFly(coralPose.getTranslation().toTranslation2d(),
           Translation2d.kZero, new ChassisSpeeds(), coralPose.getRotation().toRotation2d(),
-          coralPose.getMeasureZ().plus(Meters.of(0.07)), MetersPerSecond.of(1.5),
+          coralPose.getMeasureZ().plus(Meters.of(0.07)), MetersPerSecond.of(1),
           coralPose.getRotation().getMeasureY().unaryMinus());
       SimulatedArena.getInstance().addGamePieceProjectile(droppedCoral);
     });
@@ -382,17 +382,6 @@ public class RobotContainer extends frc.lib.RobotContainer {
       var lb = humanPlayerController.leftBumper();
       var rb = humanPlayerController.rightBumper();
 
-      canDropCoral.whileTrue(Commands.run(() -> {
-        leftCoralTransform = new Transform3d(Inches.of(10),
-            SimConstants.LOADING_STATION_WIDTH.times(-humanPlayerController.getLeftX() / 2),
-            Inches.zero(), Rotation3d.kZero);
-        rightCoralTransform = new Transform3d(Inches.of(10),
-            SimConstants.LOADING_STATION_WIDTH.times(-humanPlayerController.getRightX() / 2),
-            Inches.zero(), Rotation3d.kZero);
-        simCoralPoses[1] = SimConstants.LEFT_STATION_CORAL_POSE.plus(leftCoralTransform);
-        simCoralPoses[2] = SimConstants.RIGHT_STATION_CORAL_POSE.plus(rightCoralTransform);
-      }).ignoringDisable(true));
-
       lb.and(canDropCoral).onTrue(dropCoral(true));
       rb.and(canDropCoral).onTrue(dropCoral(false));
     }
@@ -401,13 +390,20 @@ public class RobotContainer extends frc.lib.RobotContainer {
   @Override
   public void simulationPeriodic() {
 
-    Logger.recordOutput("CanDropCoral", canDropCoral);
-
-    Logger.recordOutput("MechanismPoses", mechanismPoses);
-
     if (SimConstants.CURRENT_MODE == SimConstants.Mode.SIM) {
 
+      Logger.recordOutput("CanDropCoral", canDropCoral);
+      Logger.recordOutput("MechanismPoses", mechanismPoses);
       Logger.recordOutput("SimCoralPoses", simCoralPoses);
+
+      leftCoralTransform = new Transform3d(Inches.of(10),
+          SimConstants.LOADING_STATION_WIDTH.times(-humanPlayerController.getLeftX() / 2),
+          Inches.zero(), Rotation3d.kZero);
+      rightCoralTransform = new Transform3d(Inches.of(10),
+          SimConstants.LOADING_STATION_WIDTH.times(-humanPlayerController.getRightX() / 2),
+          Inches.zero(), Rotation3d.kZero);
+      simCoralPoses[1] = SimConstants.LEFT_STATION_CORAL_POSE.plus(leftCoralTransform);
+      simCoralPoses[2] = SimConstants.RIGHT_STATION_CORAL_POSE.plus(rightCoralTransform);
     }
   }
 
