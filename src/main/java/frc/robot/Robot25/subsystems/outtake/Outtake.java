@@ -92,16 +92,20 @@ public class Outtake extends SubsystemBase {
 
   public Command autoQueueCoral3() {
     return this.runEnd(() -> {
-      Logger.recordOutput("Outtake/AutoQueuing3", true);
-      if (seesAtOutputTrigger.getAsBoolean()) {
+      Logger.recordOutput("Outtake/AutoQueuing", true);
+      if (seesAtOutputTrigger.getAsBoolean() && seesAtInputTrigger.getAsBoolean()) {
         io.setRollerOpenLoop(Volts.of(0));
-      } else {
-        io.setRollerOpenLoop(Volts.of(5));
+      } else if (!seesAtOutputTrigger.getAsBoolean() && seesAtInputTrigger.getAsBoolean()) {
+        io.setRollerOpenLoop(Volts.of(4));
+      } else if (seesAtOutputTrigger.getAsBoolean() && !seesAtInputTrigger.getAsBoolean()) {
+        io.setRollerOpenLoop(Volts.of(0));
+      } else { // !!
+        io.setRollerOpenLoop(Volts.of(6));
       }
     }, () -> {
       Logger.recordOutput("Outtake/AutoQueuing", false);
       io.setRollerOpenLoop(Volts.of(0));
-    }).withTimeout(4);
+    });
   }
 
   public Command depositCoral() {
@@ -118,10 +122,10 @@ public class Outtake extends SubsystemBase {
     }).withName("Outtake.openLoop");
   }
 
-  public final Trigger seesAtOutputTrigger = new Trigger(() -> inputs.seesCoralAtOutput).debounce(0.15,
-      DebounceType.kFalling);
-  public final Trigger seesAtInputTrigger = new Trigger(() -> inputs.seesCoralAtInput).debounce(0.15,
-      DebounceType.kFalling);
+  public final Trigger seesAtOutputTrigger =
+      new Trigger(() -> inputs.seesCoralAtOutput).debounce(0.15, DebounceType.kFalling);
+  public final Trigger seesAtInputTrigger =
+      new Trigger(() -> inputs.seesCoralAtInput).debounce(0.15, DebounceType.kFalling);
 
   // public Command specialDepositCoral() {
   // return setOpenLop(Volts.of(5));
