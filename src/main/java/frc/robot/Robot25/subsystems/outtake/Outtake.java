@@ -87,7 +87,7 @@ public class Outtake extends SubsystemBase {
     }, () -> {
       Logger.recordOutput("Outtake/AutoQueuing", false);
       io.setRollerOpenLoop(Volts.of(0));
-    }).withTimeout(1);
+    }).withTimeout(4);
   }
 
   public Command autoQueueCoral3() {
