@@ -21,8 +21,11 @@ import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
+
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,33 +43,34 @@ public class VisionIOLimelight implements VisionIO {
   private DoubleArraySubscriber megatag1Subscriber;
   private DoubleArraySubscriber megatag2Subscriber;
   private NetworkTable limelightTable;
+  private NetworkTableEntry snapshotEntry;
+  private double lastSnapshotTime = 0.0;
 
   /**
    * Creates a new VisionIOLimelight.
    *
-   * @param name The configured name of the Limelight.
-   * @param rotationSupplier Supplier for the current estimated rotation, used for MegaTag 2.
+   * @param name             The configured name of the Limelight.
+   * @param rotationSupplier Supplier for the current estimated rotation, used for
+   *                         MegaTag 2.
    */
 
   public VisionIOLimelight(String name, Supplier<Rotation2d> rotationSupplier) {
     limelightTable = NetworkTableInstance.getDefault().getTable(name);
+    snapshotEntry = limelightTable.getEntry("snapshot");
     this.rotationSupplier = rotationSupplier;
     orientationPublisher = limelightTable.getDoubleArrayTopic("robot_orientation_set").publish();
     latencySubscriber = limelightTable.getDoubleTopic("tl").subscribe(0.0);
     txSubscriber = limelightTable.getDoubleTopic("tx").subscribe(0.0);
     tySubscriber = limelightTable.getDoubleTopic("ty").subscribe(0.0);
-    megatag1Subscriber =
-        limelightTable.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[] {});
-    megatag2Subscriber =
-        limelightTable.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[] {});
+    megatag1Subscriber = limelightTable.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[] {});
+    megatag2Subscriber = limelightTable.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[] {});
   }
 
   @Override
   public void updateInputs(VisionIOInputs inputs) {
     // Update connection status based on whether an update has been seen in the last
     // 250ms
-    inputs.connected =
-        ((RobotController.getFPGATime() - latencySubscriber.getLastChange()) / 1000) < 250;
+    inputs.connected = ((RobotController.getFPGATime() - latencySubscriber.getLastChange()) / 1000) < 250;
 
     // Update target observation
     inputs.latestTargetObservation = new TargetObservation(
@@ -74,7 +78,7 @@ public class VisionIOLimelight implements VisionIO {
 
     // Update orientation for MegaTag 2
     orientationPublisher
-        .accept(new double[] {rotationSupplier.get().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0});
+        .accept(new double[] { rotationSupplier.get().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0 });
     NetworkTableInstance.getDefault().flush(); // Increases network traffic but recommended by
                                                // Limelight
 
@@ -139,6 +143,10 @@ public class VisionIOLimelight implements VisionIO {
       inputs.poseObservations[i] = poseObservations.get(i);
     }
 
+    if (poseObservations.size() > 0 && Timer.getTimestamp() - lastSnapshotTime > 5.0) {
+      snapshotEntry.setNumber(1);
+    }
+
     // Save tag IDs to inputs objects
     inputs.tagIds = new int[tagIds.size()];
     int i = 0;
@@ -153,4 +161,5 @@ public class VisionIOLimelight implements VisionIO {
         new Rotation3d(Units.degreesToRadians(rawLLArray[3]), Units.degreesToRadians(rawLLArray[4]),
             Units.degreesToRadians(rawLLArray[5])));
   }
+
 }

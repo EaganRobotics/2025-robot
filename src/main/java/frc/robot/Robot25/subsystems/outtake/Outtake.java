@@ -80,8 +80,20 @@ public class Outtake extends SubsystemBase {
       Logger.recordOutput("Outtake/AutoQueuing", true);
       if (inputs.seesCoralAtOutput) {
         io.setRollerOpenLoop(Volts.of(0));
-        // } else if (inputs.seesCoralAtInput) {
-        // io.setOpenLoop(Volts.of(6));
+      } else {
+        io.setRollerOpenLoop(Volts.of(5));
+      }
+    }, () -> {
+      Logger.recordOutput("Outtake/AutoQueuing", false);
+      io.setRollerOpenLoop(Volts.of(0));
+    }).withTimeout(1);
+  }
+
+  public Command autoQueueCoral3() {
+    return this.runEnd(() -> {
+      Logger.recordOutput("Outtake/AutoQueuing3", true);
+      if (inputs.seesCoralAtOutput) {
+        io.setRollerOpenLoop(Volts.of(0));
       } else {
         io.setRollerOpenLoop(Volts.of(5));
       }
