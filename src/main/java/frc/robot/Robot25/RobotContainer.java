@@ -148,7 +148,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
     NamedCommands.registerCommand("LeftSource2",
         DriveCommands.AutoSourceLeft(drive).withTimeout(1));
 
-    NamedCommands.registerCommand("L0", elevator.L0().andThen(outtake.autoQueueCoral2()));
+    NamedCommands.registerCommand("L0", elevator.L0()
+        .andThen(outtake.autoQueueCoral2().until(outtake.seesAtOutputTrigger.debounce(0.1))));
     NamedCommands.registerCommand("L1", elevator.L1());
     NamedCommands.registerCommand("L2", elevator.L2());
     NamedCommands.registerCommand("L3", elevator.L3());
@@ -217,10 +218,10 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
     // Due to field orientation, joystick Y (forward) controls X direction and vice
     // versa
-    drive.setDefaultCommand(
-        DriveCommands.joystickDriveAssist(drive, () -> driverController.getLeftY(),
-            () -> driverController.getLeftX(), () -> -driverController.getRightX() * .85,
-            driverController.leftTrigger(), driverController.rightTrigger(0.15).or(elevator.isAtHeight(Level.L4))));
+    drive.setDefaultCommand(DriveCommands.joystickDriveAssist(drive,
+        () -> driverController.getLeftY(), () -> driverController.getLeftX(),
+        () -> -driverController.getRightX() * .85, driverController.leftTrigger(),
+        driverController.rightTrigger(0.15).or(elevator.isAtHeight(Level.L4))));
     outtake.setDefaultCommand(outtake.autoQueueCoral().onlyWhile(elevator.isAtHeight(Level.Intake))
         .withName("RobotContainer.outtakeDefaultCommand"));
     driverController.povUpRight()
