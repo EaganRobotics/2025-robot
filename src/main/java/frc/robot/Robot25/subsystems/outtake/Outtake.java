@@ -2,6 +2,7 @@ package frc.robot.Robot25.subsystems.outtake;
 
 import static edu.wpi.first.units.Units.Volts;
 
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -55,11 +56,11 @@ public class Outtake extends SubsystemBase {
   public Command autoQueueCoral() {
     return this.runEnd(() -> {
       Logger.recordOutput("Outtake/AutoQueuing", true);
-      if (inputs.seesCoralAtOutput && inputs.seesCoralAtInput) {
+      if (seesAtOutputTrigger.getAsBoolean() && seesAtInputTrigger.getAsBoolean()) {
         io.setRollerOpenLoop(Volts.of(0));
-      } else if (!inputs.seesCoralAtOutput && inputs.seesCoralAtInput) {
+      } else if (!seesAtOutputTrigger.getAsBoolean() && seesAtInputTrigger.getAsBoolean()) {
         io.setRollerOpenLoop(Volts.of(7));
-      } else if (inputs.seesCoralAtOutput && !inputs.seesCoralAtInput) {
+      } else if (seesAtOutputTrigger.getAsBoolean() && !seesAtInputTrigger.getAsBoolean()) {
         io.setRollerOpenLoop(Volts.of(0));
       } else { // !!
         io.setRollerOpenLoop(Volts.of(8));
@@ -78,7 +79,7 @@ public class Outtake extends SubsystemBase {
   public Command autoQueueCoral2() {
     return this.runEnd(() -> {
       Logger.recordOutput("Outtake/AutoQueuing", true);
-      if (inputs.seesCoralAtOutput) {
+      if (seesAtOutputTrigger.getAsBoolean()) {
         io.setRollerOpenLoop(Volts.of(0));
       } else {
         io.setRollerOpenLoop(Volts.of(5));
@@ -92,7 +93,7 @@ public class Outtake extends SubsystemBase {
   public Command autoQueueCoral3() {
     return this.runEnd(() -> {
       Logger.recordOutput("Outtake/AutoQueuing3", true);
-      if (inputs.seesCoralAtOutput) {
+      if (seesAtOutputTrigger.getAsBoolean()) {
         io.setRollerOpenLoop(Volts.of(0));
       } else {
         io.setRollerOpenLoop(Volts.of(5));
@@ -117,8 +118,10 @@ public class Outtake extends SubsystemBase {
     }).withName("Outtake.openLoop");
   }
 
-  public final Trigger seesAtOutputTrigger = new Trigger(() -> inputs.seesCoralAtOutput);
-  public final Trigger seesAtInputTrigger = new Trigger(() -> inputs.seesCoralAtInput);
+  public final Trigger seesAtOutputTrigger = new Trigger(() -> inputs.seesCoralAtOutput).debounce(0.15,
+      DebounceType.kFalling);
+  public final Trigger seesAtInputTrigger = new Trigger(() -> inputs.seesCoralAtInput).debounce(0.15,
+      DebounceType.kFalling);
 
   // public Command specialDepositCoral() {
   // return setOpenLop(Volts.of(5));

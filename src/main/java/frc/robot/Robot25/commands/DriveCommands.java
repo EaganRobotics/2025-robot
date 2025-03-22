@@ -683,16 +683,17 @@ public class DriveCommands {
   }
 
   public static Command FullSnapperOuter(Drive drive) {
-    
+
     Set<Pose2d> visited = new HashSet<>(3);
 
     return Commands.defer(() -> {
-      Pose2d desiredPose = getClosestFullOuter(drive, Meters.of(1000), visited).orElse(Pose2d.kZero);
-      
+      Pose2d desiredPose =
+          getClosestFullOuter(drive, Meters.of(1000), visited).orElse(Pose2d.kZero);
+
       if (DriverStation.isAutonomous() && visited.contains(desiredPose)) {
         visited.add(desiredPose);
       }
-      
+
       Logger.recordOutput("SnapperPose", desiredPose);
       return snapToPosition(drive, desiredPose);
     }, Set.of(drive)).withName("DriveCommands.SourceSnapper");
@@ -832,16 +833,17 @@ public class DriveCommands {
     return desiredPose;
   };
 
-  private static Optional<Pose2d> getClosestFullOuter(Drive drive, Distance radius, Set<Pose2d> visited) {
+  private static Optional<Pose2d> getClosestFullOuter(Drive drive, Distance radius,
+      Set<Pose2d> visited) {
     Optional<Pose2d> desiredPose = Optional.empty();
     Distance minDistance = Meters.of(1000000);
     for (Pose2d pose : LL_REEF_POSITIONS_12) {
-      
+
       if (DriverStation.isAutonomous() && visited.contains(pose)) {
         Logger.recordOutput("Snapper/SkippedPose", pose);
         continue;
       }
-      
+
       double distance = drive.getPose().getTranslation().getDistance(pose.getTranslation());
       Distance distanceMeasure = Meters.of(distance);
       if (distanceMeasure.lte(radius) && distanceMeasure.lte(minDistance)) {
