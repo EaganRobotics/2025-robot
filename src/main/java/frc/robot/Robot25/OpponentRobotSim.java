@@ -51,15 +51,15 @@ public class OpponentRobotSim extends SubsystemBase {
    * simulation.
    */
   private static final DriveTrainSimulationConfig DRIVETRAIN_CONFIG = DriveTrainSimulationConfig.Default()
-      .withRobotMass(Kilograms.of(60))
-      .withSwerveModule(new SwerveModuleSimulationConfig(DCMotor.getFalcon500(1),
-          DCMotor.getFalcon500(1), 5.4,
+      .withRobotMass(Kilograms.of(56))
+      .withSwerveModule(new SwerveModuleSimulationConfig(DCMotor.getKrakenX60Foc(1),
+          DCMotor.getFalcon500(1), 6.0,
           150.0 / 7.0,
           Volts.of(0.3),
           Volts.of(0.1),
-          Inches.of(2),
+          Inches.of(2.2),
           KilogramSquareMeters.of(0.04),
-          1.15));
+          1.6));
 
   private final SelfControlledSwerveDriveSimulation driveSimulation;
   private final Pose2d queeningPose;
