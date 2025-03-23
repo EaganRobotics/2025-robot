@@ -41,22 +41,19 @@ public final class PathPlanning {
       var inner = poses.get().inner;
       var outer = poses.get().outer;
 
-      var transformToInner = inner.minus(drive.getPose());
+      var transformToOuter = outer.minus(drive.getPose());
 
       var currentPoseAndHeading =
-          new Pose2d(drive.getPose().getTranslation(), transformToInner.getRotation());
+          new Pose2d(drive.getPose().getTranslation(), transformToOuter.getRotation());
 
       // The rotation component of the pose should be the direction of travel. Do not
       // use holonomic rotation.
-      List<Waypoint> waypoints =
-          PathPlannerPath.waypointsFromPoses(currentPoseAndHeading, outer, inner);
+      List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(currentPoseAndHeading, outer);
 
       PathConstraints constraints = new PathConstraints(4.5, 6, 2 * Math.PI, 4 * Math.PI); // The
                                                                                            // constraints
                                                                                            // for
                                                                                            // this
-      var endConstraints =
-          new ConstraintsZone(0.7, 1, new PathConstraints(3, 2, 1 * Math.PI, 2 * Math.PI));
       // path.
       // PathConstraints constraints = PathConstraints.unlimitedConstraints(12.0); //
       // You can also use unlimited constraints, only limited by motor torque and
@@ -66,18 +63,18 @@ public final class PathPlanning {
       // new PathPlannerPath(waypoints, holonomicRotations, pointTowardsZones,
       // constraintZones, eventMarkers, globalConstraints, idealStartingState,
       // goalEndState, reversed)
-      PathPlannerPath path = new PathPlannerPath(waypoints, List.of(), List.of(),
-          List.of(endConstraints), List.of(), constraints, null, // The ideal starting state, this
-                                                                 // is only relevant for pre-planned
-                                                                 // paths, so can
-                                                                 // be null for on-the-fly paths.
-          new GoalEndState(0.1, inner.getRotation()), false);
+      PathPlannerPath path = new PathPlannerPath(waypoints, List.of(), List.of(), List.of(),
+          List.of(), constraints, null, // The ideal starting state, this
+                                        // is only relevant for pre-planned
+                                        // paths, so can
+                                        // be null for on-the-fly paths.
+          new GoalEndState(3, outer.getRotation()), false);
 
       // Prevent the path from being flipped if the coordinates are already correct
       path.preventFlipping = true;
 
       return AutoBuilder.followPath(path);
-    }, Set.of(drive));
+    }, Set.of(drive)).andThen(DriveCommands.FullSnapperInner(drive));
   }
 
   private static Optional<Pose2dSequence> getClosestReefPosition(Drive drive, Distance radius) {

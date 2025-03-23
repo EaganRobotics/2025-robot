@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Robot25.commands.DriveCharacterization;
 import frc.robot.Robot25.commands.DriveCommands;
+import frc.robot.Robot25.commands.PathPlanning;
 import frc.robot.Robot25.subsystems.AlgaeEater.Algae;
 import frc.robot.Robot25.subsystems.AlgaeEater.AlgaeIO;
 import frc.robot.Robot25.subsystems.AlgaeEater.AlgaeIOSim;
@@ -259,6 +260,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
             .andThen(outtake.depositCoral()).andThen(elevator.L0()));
 
     driverController.povUp().whileTrue(DriveCommands.BargeSnapper(drive));
+    driverController.povDown().whileTrue(PathPlanning.drivePathToClosestReef(drive));
 
     operatorController.leftTrigger().whileTrue(outtake.autoQueueCoralOveride());
     operatorController.rightTrigger().whileTrue(outtake.reverseCoral());
