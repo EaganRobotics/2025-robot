@@ -16,50 +16,49 @@ public final class SimDriverPractice {
   private SimDriverPractice() {}
 
   public static Command simDriverPractice(RobotContainer robotContainer,
-      Supplier<Command> resetRobotCommand) {
+      Command resetRobotCommand) {
 
-    return Commands.defer(() -> {
+    return resetRobotCommand.beforeStarting(robotContainer::resetSimulation)
+        .andThen(Commands.defer(() -> {
 
-      if (SimConstants.SIM_MODE != SimConstants.Mode.SIM) {
-        throw new IllegalStateException("SimDriverPractice can only be used in simulation mode");
-      }
+          if (SimConstants.SIM_MODE != SimConstants.Mode.SIM) {
+            throw new IllegalStateException(
+                "SimDriverPractice can only be used in simulation mode");
+          }
 
-      // CommandScheduler.getInstance().cancelAll();
-      robotContainer.resetSimulation();
+          var autoCommand = robotContainer.getAutonomousCommand().asProxy();
 
-      var autoCommand = robotContainer.getAutonomousCommand().asProxy();
+          return autoCommand.beforeStarting(() -> {
+            DriverStationSim.setDsAttached(true);
+            DriverStationSim.setEventName("Sim Driver Practice");
+            DriverStationSim.setGameSpecificMessage("Sim Driver Practice");
+            DriverStationSim.setMatchType(MatchType.Practice);
+            DriverStationSim.setMatchTime(15);
+            DriverStationSim.notifyNewData();
+            System.out.println(
+                "========================================\n|          Autonomous started          |\n========================================");
+          }).alongWith(Commands.waitSeconds(15)).withTimeout(15).andThen(() -> {
+            DriverStationSim.setTest(false);
+            DriverStationSim.setAutonomous(false);
+            DriverStationSim.setEnabled(true);
+            DriverStationSim.setMatchTime(0);
+            DriverStationSim.notifyNewData();
+            System.out.println(
+                "========================================\n|   Autonomous over - TeleOp started   |\n========================================");
 
-      return resetRobotCommand.get().andThen(autoCommand.beforeStarting(() -> {
-        DriverStationSim.setDsAttached(true);
-        DriverStationSim.setEventName("Sim Driver Practice");
-        DriverStationSim.setGameSpecificMessage("Sim Driver Practice");
-        DriverStationSim.setMatchType(MatchType.Practice);
-        DriverStationSim.setMatchTime(15);
-        DriverStationSim.notifyNewData();
-        System.out.println(
-            "========================================\n|          Autonomous started          |\n========================================");
-      }).alongWith(Commands.waitSeconds(15)).withTimeout(15).andThen(() -> {
-        DriverStationSim.setTest(false);
-        DriverStationSim.setAutonomous(false);
-        DriverStationSim.setEnabled(true);
-        DriverStationSim.setMatchTime(0);
-        DriverStationSim.notifyNewData();
-        System.out.println(
-            "========================================\n|   Autonomous over - TeleOp started   |\n========================================");
+            var teleopPeriodCommand = Commands.waitSeconds(135).beforeStarting(() -> {
+              DriverStationSim.setMatchTime(135);
+              DriverStationSim.notifyNewData();
+            }).andThen(() -> {
+              DriverStationSim.setEnabled(false);
+              DriverStationSim.setMatchTime(0);
+              DriverStationSim.notifyNewData();
+              System.out.println(
+                  "========================================\n|              TeleOp over             |\n========================================");
+            });
 
-        var teleopPeriodCommand = Commands.waitSeconds(135).beforeStarting(() -> {
-          DriverStationSim.setMatchTime(135);
-          DriverStationSim.notifyNewData();
-        }).andThen(() -> {
-          DriverStationSim.setEnabled(false);
-          DriverStationSim.setMatchTime(0);
-          DriverStationSim.notifyNewData();
-          System.out.println(
-              "========================================\n|              TeleOp over             |\n========================================");
-        });
-
-        teleopPeriodCommand.schedule();
-      }));
-    }, Set.of());
+            teleopPeriodCommand.schedule();
+          });
+        }, Set.of()));
   }
 }

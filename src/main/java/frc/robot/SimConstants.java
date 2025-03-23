@@ -50,7 +50,7 @@ public final class SimConstants {
   public static final Supplier<RobotContainer> SIM_ROBOT_SUPPLIER =
       () -> new frc.robot.Robot25.RobotContainer();
 
-  public static final Pose3d HIDDEN_CORAL_POSE =
+  public static final Pose3d QUEENED_GAMEPIECE_POSE =
       new Pose3d(-100, -100, -100, new Rotation3d(0, 0, 0));
   public static final Pose3d LEFT_STATION_CORAL_POSE = new Pose3d(0.636, 7.693, 1.265,
       new Rotation3d(Degrees.zero(), Degrees.of(35), Degrees.of(-54)));

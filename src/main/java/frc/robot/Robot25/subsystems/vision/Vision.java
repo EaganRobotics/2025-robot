@@ -59,8 +59,7 @@ public class Vision extends SubsystemBase {
   }
 
   /**
-   * Returns the X angle to the best target, which can be used for simple servoing
-   * with vision.
+   * Returns the X angle to the best target, which can be used for simple servoing with vision.
    *
    * @param cameraIndex The index of the camera to use.
    */
@@ -129,7 +128,8 @@ public class Vision extends SubsystemBase {
         }
 
         // Calculate standard deviations
-        double stdDevFactor = Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount();
+        double stdDevFactor =
+            Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount();
         double linearStdDev = linearStdDevBaseline * stdDevFactor;
         double angularStdDev = angularStdDevBaseline * stdDevFactor;
         if (observation.type() == PoseObservationType.MEGATAG_2) {

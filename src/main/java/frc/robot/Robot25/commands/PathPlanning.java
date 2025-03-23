@@ -22,8 +22,10 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Robot25.subsystems.drive.Drive;
 
 public final class PathPlanning {
-  private static final Pose2d[] OUTER_REEF_POSITIONS = DriveCommands.makeReefPositions(Inches.of(12));
-  private static final Pose2d[] INNER_REEF_POSITIONS = DriveCommands.makeReefPositions(Inches.of(0));
+  private static final Pose2d[] OUTER_REEF_POSITIONS =
+      DriveCommands.makeReefPositions(Inches.of(12));
+  private static final Pose2d[] INNER_REEF_POSITIONS =
+      DriveCommands.makeReefPositions(Inches.of(0));
 
   public static final Command drivePathToClosestReef(Drive drive) {
 
@@ -41,17 +43,20 @@ public final class PathPlanning {
 
       var transformToInner = inner.minus(drive.getPose());
 
-      var currentPoseAndHeading = new Pose2d(drive.getPose().getTranslation(), transformToInner.getRotation());
+      var currentPoseAndHeading =
+          new Pose2d(drive.getPose().getTranslation(), transformToInner.getRotation());
 
       // The rotation component of the pose should be the direction of travel. Do not
       // use holonomic rotation.
-      List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
-          currentPoseAndHeading,
-          outer,
-          inner);
+      List<Waypoint> waypoints =
+          PathPlannerPath.waypointsFromPoses(currentPoseAndHeading, outer, inner);
 
-      PathConstraints constraints = new PathConstraints(4.8, 8, 2 * Math.PI, 4 * Math.PI); // The constraints for this
-      var endConstraints = new ConstraintsZone(0.7, 1, new PathConstraints(3, 2, 1 * Math.PI, 2 * Math.PI));
+      PathConstraints constraints = new PathConstraints(4.5, 6, 2 * Math.PI, 4 * Math.PI); // The
+                                                                                           // constraints
+                                                                                           // for
+                                                                                           // this
+      var endConstraints =
+          new ConstraintsZone(0.7, 1, new PathConstraints(3, 2, 1 * Math.PI, 2 * Math.PI));
       // path.
       // PathConstraints constraints = PathConstraints.unlimitedConstraints(12.0); //
       // You can also use unlimited constraints, only limited by motor torque and
@@ -61,17 +66,12 @@ public final class PathPlanning {
       // new PathPlannerPath(waypoints, holonomicRotations, pointTowardsZones,
       // constraintZones, eventMarkers, globalConstraints, idealStartingState,
       // goalEndState, reversed)
-      PathPlannerPath path = new PathPlannerPath(
-          waypoints,
-          List.of(),
-          List.of(),
-          List.of(endConstraints),
-          List.of(),
-          constraints,
-          null, // The ideal starting state, this is only relevant for pre-planned paths, so can
-                // be null for on-the-fly paths.
-          new GoalEndState(0.1, outer.getRotation()),
-          false);
+      PathPlannerPath path = new PathPlannerPath(waypoints, List.of(), List.of(),
+          List.of(endConstraints), List.of(), constraints, null, // The ideal starting state, this
+                                                                 // is only relevant for pre-planned
+                                                                 // paths, so can
+                                                                 // be null for on-the-fly paths.
+          new GoalEndState(0.1, inner.getRotation()), false);
 
       // Prevent the path from being flipped if the coordinates are already correct
       path.preventFlipping = true;
@@ -89,7 +89,8 @@ public final class PathPlanning {
       Distance distanceMeasure = Meters.of(distance);
       if (distanceMeasure.lte(radius) && distanceMeasure.lte(minDistance)) {
         minDistance = distanceMeasure;
-        desiredPose = Optional.of(new Pose2dSequence(INNER_REEF_POSITIONS[i], OUTER_REEF_POSITIONS[i]));
+        desiredPose =
+            Optional.of(new Pose2dSequence(INNER_REEF_POSITIONS[i], OUTER_REEF_POSITIONS[i]));
       }
     }
 

@@ -264,8 +264,8 @@ public class Robot extends LoggedRobot {
   /** This function is called once when the robot is first started up. */
   @Override
   public void simulationInit() {
-    robotContainer.resetSimulation();
     robotContainer.simulationInit();
+    robotContainer.resetSimulation();
   }
 
   /** This function is called periodically whilst in simulation. */

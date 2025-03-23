@@ -30,7 +30,6 @@ public class ElevatorConstants {
   public static final Distance DRUM_RADIUS = Inches.of(1);
   public static final double GEARING = 5.0;
   public static final Distance MIN_HEIGHT = Inches.of(16.4);
-  public static final Distance INITIAL_HEIGHT = Inches.of(16.4);
   public static final Distance MAX_EXTENSION = Inches.of(80);
   public static final Mass CARRIAGE_MASS = Pounds.of(24);
   public static final LinearVelocity MAX_VELOCITY = InchesPerSecond.of(120.21); // From recalc

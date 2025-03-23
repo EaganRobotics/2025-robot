@@ -88,7 +88,7 @@ public class Drive extends SubsystemBase implements VisionConsumer {
       DriveTrainSimulationConfig.Default().withRobotMass(Kilograms.of(DriveConstants.ROBOT_MASS_KG))
           .withCustomModuleTranslations(getModuleTranslations()).withGyro(COTS.ofPigeon2())
           .withSwerveModule(new SwerveModuleSimulationConfig(DCMotor.getKrakenX60(1),
-              DCMotor.getFalcon500(1), DriveConstants.FrontLeft.DriveMotorGearRatio,
+              DCMotor.getKrakenX60(1), DriveConstants.FrontLeft.DriveMotorGearRatio,
               DriveConstants.FrontLeft.SteerMotorGearRatio,
               Volts.of(DriveConstants.FrontLeft.DriveFrictionVoltage),
               Volts.of(DriveConstants.FrontLeft.SteerFrictionVoltage),

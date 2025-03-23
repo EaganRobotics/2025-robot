@@ -18,7 +18,7 @@ public class Algae extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("Outtake", inputs);
+    Logger.processInputs("Algae", inputs);
   }
 
   public Command setOpenLoop(Voltage output) {
