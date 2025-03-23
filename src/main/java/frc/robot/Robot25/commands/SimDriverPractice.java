@@ -13,23 +13,21 @@ import frc.robot.SimConstants;
 public final class SimDriverPractice {
 
   // Private constructor to prevent instantiation
-  private SimDriverPractice() {}
+  private SimDriverPractice() {
+  }
 
   public static Command simDriverPractice(RobotContainer robotContainer,
-      Supplier<Command> resetRobotCommand) {
+      Command resetRobotCommand) {
 
-    return Commands.defer(() -> {
+    return resetRobotCommand.beforeStarting(robotContainer::resetSimulation).andThen(Commands.defer(() -> {
 
       if (SimConstants.SIM_MODE != SimConstants.Mode.SIM) {
         throw new IllegalStateException("SimDriverPractice can only be used in simulation mode");
       }
 
-      // CommandScheduler.getInstance().cancelAll();
-      robotContainer.resetSimulation();
-
       var autoCommand = robotContainer.getAutonomousCommand().asProxy();
 
-      return resetRobotCommand.get().andThen(autoCommand.beforeStarting(() -> {
+      return autoCommand.beforeStarting(() -> {
         DriverStationSim.setDsAttached(true);
         DriverStationSim.setEventName("Sim Driver Practice");
         DriverStationSim.setGameSpecificMessage("Sim Driver Practice");
@@ -59,7 +57,7 @@ public final class SimDriverPractice {
         });
 
         teleopPeriodCommand.schedule();
-      }));
-    }, Set.of());
+      });
+    }, Set.of()));
   }
 }

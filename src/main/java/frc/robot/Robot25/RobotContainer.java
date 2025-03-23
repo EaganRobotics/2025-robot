@@ -3,6 +3,9 @@
 package frc.robot.Robot25;
 
 import static edu.wpi.first.units.Units.*;
+
+import java.util.Arrays;
+
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerMotorArrangement;
@@ -62,6 +65,7 @@ import frc.robot.SimConstants;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
+import org.ironmaple.utils.FieldMirroringUtils;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -89,9 +93,10 @@ public class RobotContainer extends frc.lib.RobotContainer {
   private final LoggedDashboardChooser<Command> autoChooser;
   private final LoggedDashboardChooser<Command> testChooser;
 
-  private final Pose3d[] mechanismPoses = new Pose3d[] { Pose3d.kZero, Pose3d.kZero, Pose3d.kZero, };
+  private final Pose3d[] mechanismPoses = new Pose3d[3];
 
-  public static final Pose3d[] simCoralPoses = new Pose3d[] { Pose3d.kZero, Pose3d.kZero, Pose3d.kZero, };
+  public static final Pose3d[] simCoralPoses = new Pose3d[3];
+  public static final Pose3d[] simAlgaePoses = new Pose3d[7];
 
   public RobotContainer() {
     super(DRIVE_SIMULATION);
@@ -105,6 +110,10 @@ public class RobotContainer extends frc.lib.RobotContainer {
             "You are using an unsupported swerve configuration, which this template does not support without manual customization. The 2025 release of Phoenix supports some swerve configurations which were not available during 2025 beta testing, preventing any development and support from the AdvantageKit developers.");
       }
     }
+
+    Arrays.fill(mechanismPoses, Pose3d.kZero);
+    Arrays.fill(simCoralPoses, SimConstants.QUEENED_GAMEPIECE_POSE);
+    Arrays.fill(simAlgaePoses, SimConstants.QUEENED_GAMEPIECE_POSE);
 
     switch (SimConstants.CURRENT_MODE) {
       case REAL:
@@ -220,7 +229,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
     // Add sim driver practice
     testChooser.addDefaultOption("Sim Driver Practice",
-        SimDriverPractice.simDriverPractice(this, this::simResetRobot));
+        SimDriverPractice.simDriverPractice(this, this.simResetRobot()));
 
     // Set up SysId routines
     testChooser.addOption("Drive Wheel Radius Characterization",
@@ -312,7 +321,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
   }
 
   private Command simResetRobot() {
-    return Commands.none();
+    return elevator.L0().andThen(() -> drive.stopWithX());
   }
 
   @Override
@@ -362,10 +371,10 @@ public class RobotContainer extends frc.lib.RobotContainer {
       Pose3d coralPose;
       if (leftCoral) {
         coralPose = simCoralPoses[1];
-        simCoralPoses[1] = SimConstants.HIDDEN_CORAL_POSE;
+        simCoralPoses[1] = SimConstants.QUEENED_GAMEPIECE_POSE;
       } else {
         coralPose = simCoralPoses[2];
-        simCoralPoses[2] = SimConstants.HIDDEN_CORAL_POSE;
+        simCoralPoses[2] = SimConstants.QUEENED_GAMEPIECE_POSE;
       }
       var droppedCoral = new ReefscapeCoralOnFly(coralPose.getTranslation().toTranslation2d(),
           Translation2d.kZero, new ChassisSpeeds(), coralPose.getRotation().toRotation2d(),
@@ -395,6 +404,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
       Logger.recordOutput("CanDropCoral", canDropCoral);
       Logger.recordOutput("MechanismPoses", mechanismPoses);
       Logger.recordOutput("SimCoralPoses", simCoralPoses);
+      Logger.recordOutput("SimAlgaePoses", simAlgaePoses);
 
       leftCoralTransform = new Transform3d(Inches.of(10),
           SimConstants.LOADING_STATION_WIDTH.times(-humanPlayerController.getLeftX() / 2),
@@ -411,5 +421,11 @@ public class RobotContainer extends frc.lib.RobotContainer {
   public void resetSimulation() {
     super.resetSimulation();
     outtake.simStageCoral();
+    simAlgaePoses[1] = new Pose3d(3.811, 4.025, 1.313, Rotation3d.kZero);
+    simAlgaePoses[2] = new Pose3d(4.151, 3.437, 0.909, Rotation3d.kZero);
+    simAlgaePoses[3] = new Pose3d(4.830, 3.437, 1.313, Rotation3d.kZero);
+    simAlgaePoses[4] = new Pose3d(5.170, 4.025, 0.909, Rotation3d.kZero);
+    simAlgaePoses[5] = new Pose3d(4.830, 4.613, 1.313, Rotation3d.kZero);
+    simAlgaePoses[6] = new Pose3d(4.151, 4.613, 0.909, Rotation3d.kZero);
   }
 }
