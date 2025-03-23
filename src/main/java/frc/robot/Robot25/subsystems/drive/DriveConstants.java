@@ -24,13 +24,13 @@ public class DriveConstants {
 
   // PathPlanner and Maple Sim config constants
   public static final Distance kWheelRadius = Inches.of(2); // TODO measure often
-  public static final double ROBOT_MASS_KG = 54.431;
-  public static final double ROBOT_MOI = 5.98;
+  public static final double ROBOT_MASS_KG = 60.78;
+  public static final double ROBOT_MOI = 5.47;
   public static final double WHEEL_COF = 1.542;
   public static final double kDriveGearRatio = 6.122; // Source: MK4i swerve module page; L3 gearing
   private static final double kSteerGearRatio = 150.0 / 7.0; // Source: MK4i swerve module page
   public static final double kMaxDriveMotorRPM = 6000.0;
-  public static final LinearVelocity kSpeedAt12Volts = MetersPerSecond.of(5.22);
+  public static final LinearVelocity kSpeedAt12Volts = MetersPerSecond.of(5.21);
 
   // PID Gains for PathPlanner
   public static final PIDConstants PP_TRANSLATION_GAINS = new PIDConstants(0.001, 0.0, 0.0);
@@ -67,8 +67,8 @@ public class DriveConstants {
 
     /* Drive gains */
     public static final double DRIVE_KS = 0.0;
-    public static final double DRIVE_KV = 0.124;
-    public static final double DRIVE_KA = 0.0;
+    public static final double DRIVE_KV = 2.3;
+    public static final double DRIVE_KA = 0.22;
     public static final double DRIVE_KP = 0.1;
     public static final double DRIVE_KI = 0.0;
     public static final double DRIVE_KD = 0.0;
@@ -77,8 +77,8 @@ public class DriveConstants {
     private static final MomentOfInertia kSteerInertia = KilogramSquareMeters.of(0.04);
     private static final MomentOfInertia kDriveInertia = KilogramSquareMeters.of(0.01);
 
-    private static final Voltage kSteerFrictionVoltage = Volts.of(0.05); // suggested range 0.3 - 0.5
-    private static final Voltage kDriveFrictionVoltage = Volts.of(0.15); // suggested range 0.6 - 0.8
+    private static final Voltage kSteerFrictionVoltage = Volts.of(0.15); // suggested range 0.3 - 0.5
+    private static final Voltage kDriveFrictionVoltage = Volts.of(0.05); // suggested range 0.6 - 0.8
   }
 
   // The closed-loop output type to use for the steer motors;

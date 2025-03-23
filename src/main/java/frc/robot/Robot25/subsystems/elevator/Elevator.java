@@ -43,7 +43,7 @@ public class Elevator extends SubsystemBase {
 
   private final LoggedMechanismRoot2d mechRoot2d = mechanism2d.getRoot("Elevator Root", 1.5, 0);
   private final LoggedMechanismLigament2d elevatorMech2d = mechRoot2d
-      .append(new LoggedMechanismLigament2d("Elevator", INITIAL_HEIGHT.in(Meters), 90.0,
+      .append(new LoggedMechanismLigament2d("Elevator", MIN_HEIGHT.in(Meters), 90.0,
           50, new Color8Bit(Color.kBlue)));
   // private WantedState wantedState = WantedState.minHeight;
   // private SystemState systemState = SystemState.zeroingMinhight;
@@ -58,11 +58,11 @@ public class Elevator extends SubsystemBase {
 
   public enum Level {
 
-    // original value during W0 = L4 = 72 + 6
-
     minHeight(MIN_HEIGHT), Intake(Inches.of(16.4 + 3.5)), L1(Inches.of(18 + 14)), L2(
-        Inches.of(31.9 + 7)), L3(
-            Inches.of(47.6 + 7)), L4(Inches.of(72 + 6.25)), Algae(Inches.of(86));
+        Inches.of(31.9 + 7)),
+    L3(
+        Inches.of(47.6 + 7)),
+    L4(Inches.of(72 + 6.25)), Algae(Inches.of(86));
 
     private final Distance height;
 

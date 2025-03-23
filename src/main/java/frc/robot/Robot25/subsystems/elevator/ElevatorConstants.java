@@ -30,12 +30,11 @@ public class ElevatorConstants {
   public static final Distance DRUM_RADIUS = Inches.of(1);
   public static final double GEARING = 5.0;
   public static final Distance MIN_HEIGHT = Inches.of(16.4);
-  public static final Distance INITIAL_HEIGHT = Inches.of(16.4);
   public static final Distance MAX_EXTENSION = Inches.of(80);
   public static final Mass CARRIAGE_MASS = Pounds.of(24);
   public static final LinearVelocity MAX_VELOCITY = InchesPerSecond.of(120.21); // From recalc
-  public static final AngularAcceleration MAX_ACCELERATION =
-      RadiansPerSecondPerSecond.of(456.83 / DRUM_RADIUS.in(Inches)); // From recalc
+  public static final AngularAcceleration MAX_ACCELERATION = RadiansPerSecondPerSecond
+      .of(456.83 / DRUM_RADIUS.in(Inches)); // From recalc
   public static final Current CURRENT_LIMIT = Amps.of(40);
 
   public static final class Real {
@@ -43,15 +42,14 @@ public class ElevatorConstants {
     public static final LoggedTunableNumber kI = new LoggedTunableNumber("Tuning/Elevator/kI", 0.2);
     public static final LoggedTunableNumber kD = new LoggedTunableNumber("Tuning/Elevator/kD", 0.1);
     public static final LoggedTunableNumber kS = new LoggedTunableNumber("Tuning/Elevator/kS", 0.0);
-    public static final LoggedTunableNumber kG =
-        new LoggedTunableNumber("Tuning/Elevator/kG", 0.31); // From recalc
-    public static final LoggedTunableNumber kV =
-        new LoggedTunableNumber("Tuning/Elevator/kV", 0.1 * DRUM_RADIUS.in(Inches)); // 0.10 Vs/in
-                                                                                     // from Recalc
-    public static final LoggedTunableNumber kA =
-        new LoggedTunableNumber("Tuning/Elevator/kA", 0.004 * DRUM_RADIUS.in(Meters)); // 0.04Vs^2/m
-                                                                                       // from
-                                                                                       // Recalc
+    public static final LoggedTunableNumber kG = new LoggedTunableNumber("Tuning/Elevator/kG", 0.31); // From recalc
+    public static final LoggedTunableNumber kV = new LoggedTunableNumber("Tuning/Elevator/kV",
+        0.1 * DRUM_RADIUS.in(Inches)); // 0.10 Vs/in
+                                       // from Recalc
+    public static final LoggedTunableNumber kA = new LoggedTunableNumber("Tuning/Elevator/kA",
+        0.004 * DRUM_RADIUS.in(Meters)); // 0.04Vs^2/m
+                                         // from
+                                         // Recalc
 
     public static final double ODOMETRY_FREQUENCY = new CANBus().isNetworkFD() ? 250.0 : 100.0;
   }
