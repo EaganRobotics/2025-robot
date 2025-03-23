@@ -32,10 +32,8 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
- * This class defines the runtime mode used by AdvantageKit. The mode is always
- * "real" when running
- * on a roboRIO. Change the value of "simMode" to switch between "sim" (physics
- * sim) and "replay"
+ * This class defines the runtime mode used by AdvantageKit. The mode is always "real" when running
+ * on a roboRIO. Change the value of "simMode" to switch between "sim" (physics sim) and "replay"
  * (log replay from a file).
  */
 public final class SimConstants {
@@ -43,16 +41,17 @@ public final class SimConstants {
   /* Simulation mode, initial position, and robot container */
 
   /*
-   * This gets the value of environment variable AKIT_SIM_MODE otherwise sets
-   * SIM_MODE to Mode.SIM
+   * This gets the value of environment variable AKIT_SIM_MODE otherwise sets SIM_MODE to Mode.SIM
    */
-  public static final Mode SIM_MODE = Optional.ofNullable(System.getenv("AKIT_SIM_MODE")).map(Mode::valueOf)
-      .orElse(Mode.SIM);
+  public static final Mode SIM_MODE =
+      Optional.ofNullable(System.getenv("AKIT_SIM_MODE")).map(Mode::valueOf).orElse(Mode.SIM);
 
   public static final Pose2d SIM_INITIAL_FIELD_POSE = new Pose2d(3.28, 3.86, new Rotation2d());
-  public static final Supplier<RobotContainer> SIM_ROBOT_SUPPLIER = () -> new frc.robot.Robot25.RobotContainer();
+  public static final Supplier<RobotContainer> SIM_ROBOT_SUPPLIER =
+      () -> new frc.robot.Robot25.RobotContainer();
 
-  public static final Pose3d QUEENED_GAMEPIECE_POSE = new Pose3d(-100, -100, -100, new Rotation3d(0, 0, 0));
+  public static final Pose3d QUEENED_GAMEPIECE_POSE =
+      new Pose3d(-100, -100, -100, new Rotation3d(0, 0, 0));
   public static final Pose3d LEFT_STATION_CORAL_POSE = new Pose3d(0.636, 7.693, 1.265,
       new Rotation3d(Degrees.zero(), Degrees.of(35), Degrees.of(-54)));
   public static final Pose3d RIGHT_STATION_CORAL_POSE = new Pose3d(0.641, 0.359, 1.280,
@@ -80,7 +79,6 @@ public final class SimConstants {
     /** Replaying from a log file. */
     REPLAY("REPLAY");
 
-    Mode(String env) {
-    }
+    Mode(String env) {}
   }
 }

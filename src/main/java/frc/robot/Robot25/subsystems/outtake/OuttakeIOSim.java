@@ -48,13 +48,13 @@ public class OuttakeIOSim implements OuttakeIO {
 
   private final AbstractDriveTrainSimulation driveSim = RobotContainer.DRIVE_SIMULATION;
 
-  private final IntakeSimulation intakeSim = IntakeSimulation.InTheFrameIntake("Coral", driveSim, Inches.of(16.743),
-      IntakeSide.BACK, 1);
+  private final IntakeSimulation intakeSim =
+      IntakeSimulation.InTheFrameIntake("Coral", driveSim, Inches.of(16.743), IntakeSide.BACK, 1);
 
-  private static final Transform3d CORAL_MIDDLE_POSE = new Transform3d(Inches.of(-1.356 + 9), Inches.of(-0.012),
-      Inches.of(20.196 - 0.75),
-      new Rotation3d(Degrees.zero(), Degrees.of(34.411), Degrees.zero()))
-      .plus(new Transform3d(Inches.of(-2), Inches.zero(), Inches.zero(), Rotation3d.kZero));
+  private static final Transform3d CORAL_MIDDLE_POSE =
+      new Transform3d(Inches.of(-1.356 + 9), Inches.of(-0.012), Inches.of(20.196 - 0.75),
+          new Rotation3d(Degrees.zero(), Degrees.of(34.411), Degrees.zero()))
+          .plus(new Transform3d(Inches.of(-2), Inches.zero(), Inches.zero(), Rotation3d.kZero));
   private static final Transform3d CORAL_LOADING_POSE = CORAL_MIDDLE_POSE
       .plus(new Transform3d(Inches.of(-10), Inches.zero(), Inches.zero(), Rotation3d.kZero));
   private static final Transform3d CORAL_LOADED_POSE = CORAL_MIDDLE_POSE
@@ -69,21 +69,26 @@ public class OuttakeIOSim implements OuttakeIO {
   private final MapleMotorSim outtakeMotor;
   private boolean isClosedLoop = false;
   private Voltage outtakeAppliedVoltage = Volts.of(0);
-  private final SimpleMotorFeedforward feedForwardController = new SimpleMotorFeedforward(Sim.kS, Sim.kV, Sim.kA);
+  private final SimpleMotorFeedforward feedForwardController =
+      new SimpleMotorFeedforward(Sim.kS, Sim.kV, Sim.kA);
 
   private final FlywheelSim outtakeSim = new FlywheelSim(
       LinearSystemId.createFlywheelSystem(outtakeGearbox, 0.1, GEARING), outtakeGearbox, 0.000015);
 
-  LoggedTunableBoolean LoadSideSensor = new LoggedTunableBoolean("Tuning/Outtake/LoadSideSensor", false);
-  LoggedTunableBoolean ScoreSideSensor = new LoggedTunableBoolean("Tuning/Outtake/ScoreSideSensor", false);
+  LoggedTunableBoolean LoadSideSensor =
+      new LoggedTunableBoolean("Tuning/Outtake/LoadSideSensor", false);
+  LoggedTunableBoolean ScoreSideSensor =
+      new LoggedTunableBoolean("Tuning/Outtake/ScoreSideSensor", false);
 
   private Trigger hasGamePiece = new Trigger(LoadSideSensor::get);
-  private Trigger canGetGamePiece = hasGamePiece.negate().debounce(SimConstants.LOAD_CORAL_DELAY.in(Seconds));
+  private Trigger canGetGamePiece =
+      hasGamePiece.negate().debounce(SimConstants.LOAD_CORAL_DELAY.in(Seconds));
 
   public OuttakeIOSim() {
     outtakeMotor = new MapleMotorSim(
         new SimMotorConfigs(outtakeGearbox, GEARING, Sim.MOTOR_LOAD_MOI, Sim.FRICTION_VOLTAGE));
-    outtakeMotorController = outtakeMotor.useSimpleDCMotorController().withCurrentLimit(CURRENT_LIMIT);
+    outtakeMotorController =
+        outtakeMotor.useSimpleDCMotorController().withCurrentLimit(CURRENT_LIMIT);
   }
 
   public void simStageCoral() {
@@ -103,10 +108,11 @@ public class OuttakeIOSim implements OuttakeIO {
         height = height.plus(Inches.of(4));
         angle = Degrees.of(-70);
       }
-      var projectile = new ReefscapeCoralOnFly(driveSim.getSimulatedDriveTrainPose().getTranslation(),
-          coralTranslation, driveSim.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
-          driveSim.getSimulatedDriveTrainPose().getRotation(), height,
-          MetersPerSecond.of(output.in(Volts) / 3), angle);
+      var projectile =
+          new ReefscapeCoralOnFly(driveSim.getSimulatedDriveTrainPose().getTranslation(),
+              coralTranslation, driveSim.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
+              driveSim.getSimulatedDriveTrainPose().getRotation(), height,
+              MetersPerSecond.of(output.in(Volts) / 3), angle);
       coralPose = Optional.empty();
       CompletableFuture.runAsync(() -> {
         System.out.println("Disabling sensors");
@@ -146,10 +152,11 @@ public class OuttakeIOSim implements OuttakeIO {
     outtakeMotor.update(Seconds.of(TimedRobot.kDefaultPeriod));
     outtakeSim.update(TimedRobot.kDefaultPeriod);
 
-    var nearLoadingStation = isNearSegment(driveSim.getSimulatedDriveTrainPose(), SimConstants.BR_LOADING_STATION,
-        SimConstants.FR_LOADING_STATION, SimConstants.LOADING_STATION_TOLERANCE)
-        || isNearSegment(driveSim.getSimulatedDriveTrainPose(), SimConstants.BL_LOADING_STATION,
-            SimConstants.FL_LOADING_STATION, SimConstants.LOADING_STATION_TOLERANCE);
+    var nearLoadingStation =
+        isNearSegment(driveSim.getSimulatedDriveTrainPose(), SimConstants.BR_LOADING_STATION,
+            SimConstants.FR_LOADING_STATION, SimConstants.LOADING_STATION_TOLERANCE)
+            || isNearSegment(driveSim.getSimulatedDriveTrainPose(), SimConstants.BL_LOADING_STATION,
+                SimConstants.FL_LOADING_STATION, SimConstants.LOADING_STATION_TOLERANCE);
     Logger.recordOutput("Outtake/NearLoadingStation", nearLoadingStation);
     var joystickName = DriverStation.getJoystickName(2);
     var humanPlayerControllerConnected = joystickName != null && !joystickName.isBlank();

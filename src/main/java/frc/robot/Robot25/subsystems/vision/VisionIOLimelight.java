@@ -49,9 +49,8 @@ public class VisionIOLimelight implements VisionIO {
   /**
    * Creates a new VisionIOLimelight.
    *
-   * @param name             The configured name of the Limelight.
-   * @param rotationSupplier Supplier for the current estimated rotation, used for
-   *                         MegaTag 2.
+   * @param name The configured name of the Limelight.
+   * @param rotationSupplier Supplier for the current estimated rotation, used for MegaTag 2.
    */
 
   public VisionIOLimelight(String name, Supplier<Rotation2d> rotationSupplier) {
@@ -62,15 +61,18 @@ public class VisionIOLimelight implements VisionIO {
     latencySubscriber = limelightTable.getDoubleTopic("tl").subscribe(0.0);
     txSubscriber = limelightTable.getDoubleTopic("tx").subscribe(0.0);
     tySubscriber = limelightTable.getDoubleTopic("ty").subscribe(0.0);
-    megatag1Subscriber = limelightTable.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[] {});
-    megatag2Subscriber = limelightTable.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[] {});
+    megatag1Subscriber =
+        limelightTable.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[] {});
+    megatag2Subscriber =
+        limelightTable.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[] {});
   }
 
   @Override
   public void updateInputs(VisionIOInputs inputs) {
     // Update connection status based on whether an update has been seen in the last
     // 250ms
-    inputs.connected = ((RobotController.getFPGATime() - latencySubscriber.getLastChange()) / 1000) < 250;
+    inputs.connected =
+        ((RobotController.getFPGATime() - latencySubscriber.getLastChange()) / 1000) < 250;
 
     // Update target observation
     inputs.latestTargetObservation = new TargetObservation(
@@ -78,7 +80,7 @@ public class VisionIOLimelight implements VisionIO {
 
     // Update orientation for MegaTag 2
     orientationPublisher
-        .accept(new double[] { rotationSupplier.get().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0 });
+        .accept(new double[] {rotationSupplier.get().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0});
     NetworkTableInstance.getDefault().flush(); // Increases network traffic but recommended by
                                                // Limelight
 
