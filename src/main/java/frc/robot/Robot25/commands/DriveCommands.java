@@ -385,11 +385,32 @@ public class DriveCommands {
         .withName("DriveCommands.joystickDriveAtAngle");
   }
 
-  public static Command snapToRotation(Drive drive, Rotation2d rotation) {
-    return Commands.runOnce(() -> {
-      Logger.recordOutput("Rotation", "snap to rotation");
-      drive.setDesiredRotation(rotation);
-    }).withName("DriveCommands.snapToRotation");
+  public static Command snapToRotation(Drive drive) {
+    return Commands.run(() -> {
+
+      Pose2d desiredPose = getClosestSource(drive, Meters.of(1000)).orElse(Pose2d.kZero);
+
+      var x = xController.calculate(drive.getPose().getX(), drive.getPose().getX());
+      var y = yController.calculate(drive.getPose().getY(), drive.getPose().getY());
+      var omega = angleController.calculate(drive.getRotation().getRadians(),
+          desiredPose.getRotation().getRadians());
+
+      Logger.recordOutput("Snap/omega", omega);
+
+      // Convert to field relative speeds & send command
+      ChassisSpeeds speeds = new ChassisSpeeds(x, y, omega);
+      drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
+
+    }, drive)
+
+        // Reset PID controller when command starts
+        .beforeStarting(() -> {
+          var fieldRelativeSpeeds = drive.getFieldRelativeSpeeds();
+          angleController.reset(drive.getRotation().getRadians(),
+              fieldRelativeSpeeds.omegaRadiansPerSecond);
+          xController.reset(drive.getPose().getX(), fieldRelativeSpeeds.vxMetersPerSecond);
+          yController.reset(drive.getPose().getY(), fieldRelativeSpeeds.vyMetersPerSecond);
+        }).until(() -> angleController.atGoal()).withName("DriveCommands.snapToRotation");
   }
 
   public static Command keepRotationForward(Drive drive, DoubleSupplier xSupplier,
@@ -440,7 +461,6 @@ public class DriveCommands {
     }, Set.of(drive)).withName("DriveCommands.SourceSnapper");
 
   }
-
 
   public static Command BargeSnapper(Drive drive) {
 
@@ -514,7 +534,6 @@ public class DriveCommands {
 
   }
 
-
   public static Command FullSnapperInner(Drive drive) {
 
     return Commands.defer(() -> {
@@ -524,7 +543,6 @@ public class DriveCommands {
     }, Set.of(drive)).withName("DriveCommands.SourceSnapper");
 
   }
-
 
   private static final class Pose2dSequence {
     Pose2d inner;
@@ -542,6 +560,7 @@ public class DriveCommands {
   private static Optional<Pose2dSequence> getClosestReefPosition(Drive drive, Distance radius) {
     Optional<Pose2dSequence> desiredPose = Optional.empty();
     Distance minDistance = Meters.of(1000000);
+
     for (int i = 0; i < OUTER_REEF_POSITIONS.length; i++) {
       Pose2d pose = OUTER_REEF_POSITIONS[i];
       double distance = drive.getPose().getTranslation().getDistance(pose.getTranslation());
