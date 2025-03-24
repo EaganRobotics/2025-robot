@@ -43,6 +43,7 @@ import frc.robot.Robot25.subsystems.elevator.ElevatorIOSim;
 import frc.robot.Robot25.subsystems.elevator.ElevatorIOTalonFXNew;
 import frc.robot.Robot25.subsystems.gyro.GyroIO;
 import frc.robot.Robot25.subsystems.gyro.GyroIOPigeon2;
+import frc.robot.Robot25.simulation.OpponentRobot;
 import frc.robot.Robot25.subsystems.gyro.GyroIOSim;
 import frc.robot.Robot25.subsystems.outtake.Outtake;
 import frc.robot.Robot25.subsystems.outtake.OuttakeIO;
@@ -73,7 +74,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
       new SwerveDriveSimulation(Drive.MAPLE_SIM_CONFIG, SimConstants.SIM_INITIAL_FIELD_POSE);
 
   // Opponent Robot Simulation
-  OpponentRobotSim opponentRobotSim = new OpponentRobotSim(1);
+  OpponentRobot opponentRobotSim = new OpponentRobot(1);
 
   private final CommandXboxController driverController = new CommandXboxController(0);
   private final CommandXboxController operatorController = new CommandXboxController(1);

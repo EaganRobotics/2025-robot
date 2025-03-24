@@ -33,7 +33,6 @@ import frc.robot.Robot25.simulation.Gamepieces;
 import frc.robot.Robot25.subsystems.elevator.Elevator;
 import frc.robot.Robot25.subsystems.elevator.Elevator.Level;
 import frc.robot.Robot25.subsystems.outtake.OuttakeConstants.Sim;
-import static frc.robot.Robot25.util.Pose2dNearLine.isNearSegment;
 
 import org.ironmaple.simulation.IntakeSimulation;
 import org.ironmaple.simulation.SimulatedArena;

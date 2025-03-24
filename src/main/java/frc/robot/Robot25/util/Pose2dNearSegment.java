@@ -6,7 +6,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Distance;
 
-public final class Pose2dNearLine {
+public final class Pose2dNearSegment {
   /**
    * Returns whether the pose's translation is within 3 cm of the line segment defined by pointA and
    * pointB.

@@ -37,7 +37,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.SimConstants;
-import frc.robot.Robot25.util.Pose2dNearLine;
+import frc.robot.Robot25.util.Pose2dNearSegment;
 
 public final class Gamepieces {
 
@@ -193,9 +193,9 @@ public final class Gamepieces {
     var frontLeftLoadingStation =
         DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? FL_LOADING_STATION
             : FlippingUtil.flipFieldPosition(FL_LOADING_STATION);
-    return Pose2dNearLine.isNearSegment(drivePose, backRightLoadingStation,
+    return Pose2dNearSegment.isNearSegment(drivePose, backRightLoadingStation,
         frontRightLoadingStation, LOADING_STATION_TOLERANCE)
-        || Pose2dNearLine.isNearSegment(drivePose, backLeftLoadingStation, frontLeftLoadingStation,
+    || Pose2dNearSegment.isNearSegment(drivePose, backLeftLoadingStation, frontLeftLoadingStation,
             LOADING_STATION_TOLERANCE);
   }
 
