@@ -720,8 +720,6 @@ public class DriveCommands {
     }, Set.of(drive)).withName("DriveCommands.SourceSnapper");
 
   }
-
-
   private static final class Pose2dSequence {
     Pose2d inner;
     Pose2d outer;
