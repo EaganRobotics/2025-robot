@@ -237,7 +237,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
         drive.startIgnoringVision();
       }
     }, drive).ignoringDisable(true).withName("RobotContainer.driverZeroCommand"));
-    driverController.rightBumper().whileTrue(DriveCommands.Snapper(drive));
+    driverController.rightBumper().whileTrue(DriveCommands.FlySnappyV2(drive));
     driverController.leftBumper().whileTrue(DriveCommands.SourceSnapper(drive));
 
     driverController.x().onTrue(DriveCommands.LeftSnapper(drive));
