@@ -200,6 +200,7 @@ spotless {
   java {
     eclipse().configFile('config/eclipse-java-google-style.xml')
     targetExclude('build/**', 'src/main/java/frc/robot/BuildConstants.java')
+    removeUnusedImports()
   }
   enforceCheck = false
 }

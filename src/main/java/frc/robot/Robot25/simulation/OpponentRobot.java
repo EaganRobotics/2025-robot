@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 import com.pathplanner.lib.config.ModuleConfig;
@@ -18,6 +17,7 @@ import com.pathplanner.lib.config.PIDConstants;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SelfControlledSwerveDriveSimulation;
@@ -25,7 +25,6 @@ import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
 import org.ironmaple.utils.FieldMirroringUtils;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -67,21 +66,21 @@ public class OpponentRobot extends SubsystemBase {
   private static final DriveTrainSimulationConfig DRIVETRAIN_CONFIG =
       DriveTrainSimulationConfig.Default().withRobotMass(Kilograms.of(ROBOT_MASS_KG))
           .withSwerveModule(new SwerveModuleSimulationConfig(DCMotor.getKrakenX60(1),
-              DCMotor.getKrakenX60(1), DRIVE_REDUCTION, 150.0 / 7.0, Volts.of(0), Volts.of(0), Inches.of(WHEEL_RADIUS_IN),
-              KilogramSquareMeters.of(0.04), 1.6));
+              DCMotor.getKrakenX60(1), DRIVE_REDUCTION, 150.0 / 7.0, Volts.of(0), Volts.of(0),
+              Inches.of(WHEEL_RADIUS_IN), KilogramSquareMeters.of(0.04), 1.6));
 
   // PathPlanner configuration
-  private static final RobotConfig PP_CONFIG = new RobotConfig(
-          ROBOT_MASS_KG, // Robot mass in kg
-          ROBOT_MOI,  // Robot MOI
-          new ModuleConfig(
-                  Inches.of(WHEEL_RADIUS_IN).in(Meters), 3.5, 1.2, DCMotor.getKrakenX60(1).withReduction(DRIVE_REDUCTION), 60, 1), // Swerve module config
-          new Translation2d(0.69, 0.69) // Track length and width
+  private static final RobotConfig PP_CONFIG = new RobotConfig(ROBOT_MASS_KG, // Robot mass in kg
+      ROBOT_MOI, // Robot MOI
+      new ModuleConfig(Inches.of(WHEEL_RADIUS_IN).in(Meters), 3.5, 1.2,
+          DCMotor.getKrakenX60(1).withReduction(DRIVE_REDUCTION), 60, 1), // Swerve module config
+      new Translation2d[] {new Translation2d(0.69, 0.69), new Translation2d(0.69, -0.69),
+          new Translation2d(-0.69, 0.69), new Translation2d(-0.69, -0.69)} // Track length and width
   );
 
   // PathPlanner PID settings
   private final PPHolonomicDriveController driveController =
-          new PPHolonomicDriveController(new PIDConstants(5.0, 0.02), new PIDConstants(7.0, 0.05));
+      new PPHolonomicDriveController(new PIDConstants(5.0, 0.02), new PIDConstants(7.0, 0.05));
 
   private final SelfControlledSwerveDriveSimulation driveSimulation;
   private final Pose2d queeningPose;
@@ -100,7 +99,8 @@ public class OpponentRobot extends SubsystemBase {
 
   @Override
   public void periodic() {
-    Logger.recordOutput("Opponent/Robot" + id + "/Pose", driveSimulation.getDriveTrainSimulation().getSimulatedDriveTrainPose());
+    Logger.recordOutput("Opponent/Robot" + id + "/Pose",
+        driveSimulation.getDriveTrainSimulation().getSimulatedDriveTrainPose());
     Logger.recordOutput("Opponent/Robot" + id + "/Behavior", behavior);
   }
 
@@ -128,8 +128,8 @@ public class OpponentRobot extends SubsystemBase {
         // field
         .beforeStarting(() -> {
           driveSimulation.setSimulationWorldPose(
-            FieldMirroringUtils.toCurrentAlliancePose(ROBOTS_STARTING_POSITIONS[id - 1]));
-        behavior = "JoystickDrive";
+              FieldMirroringUtils.toCurrentAlliancePose(ROBOTS_STARTING_POSITIONS[id - 1]));
+          behavior = "JoystickDrive";
         });
   }
 
@@ -155,23 +155,16 @@ public class OpponentRobot extends SubsystemBase {
 
   /** Follow path command for opponent robots */
   private Command followPath(PathPlannerPath path) {
-      return new FollowPathCommand(
-              path,
-              driveSimulation::getActualPoseInSimulationWorld,
-              driveSimulation::getActualSpeedsRobotRelative,
-              (speeds, feedforwards) ->
-                  driveSimulation.runChassisSpeeds(speeds, new Translation2d(), false, false),
-              driveController,
-              PP_CONFIG,
-              () -> DriverStation.getAlliance()
-                  .orElse(DriverStation.Alliance.Blue)
-                  .equals(DriverStation.Alliance.Red),
-              this
-      );
+    return new FollowPathCommand(path, driveSimulation::getActualPoseInSimulationWorld,
+        driveSimulation::getActualSpeedsRobotRelative,
+        (speeds, feedforwards) -> driveSimulation.runChassisSpeeds(speeds, new Translation2d(),
+            false, false),
+        driveController, PP_CONFIG, () -> DriverStation.getAlliance()
+            .orElse(DriverStation.Alliance.Blue).equals(DriverStation.Alliance.Red),
+        this);
   }
 
   private List<OpponentRobot> otherRobots() {
-    // return opponentRobots.where(robot -> robot != this);
-    return new ArrayList<>();
+    return opponentRobots.stream().filter((robot) -> robot != this).collect(Collectors.toList());
   }
 }

@@ -32,7 +32,7 @@ public class AlgaeIOSim implements AlgaeIO {
   private static final Transform3d MANIPULATOR_POSE =
       new Transform3d(Inches.of(15.042), Inches.zero(), Inches.of(22.987), Rotation3d.kZero);
   private static final Distance MAX_ALGAE_DISTANCE = Inches.of(9.3);
-  private static final double ALGAE_LOAD_TIME = 0.3;
+  private static final double ALGAE_LOAD_TIME = 0.2;
 
   private Voltage algaeIntakeAppliedVolts = Volts.of(0.0);
 

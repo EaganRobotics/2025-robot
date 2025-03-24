@@ -10,7 +10,6 @@ import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Robot25.subsystems.outtake.OuttakeConstants.CURRENT_LIMIT;
 import static frc.robot.Robot25.subsystems.outtake.OuttakeConstants.GEARING;
 
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -21,13 +20,11 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.tunables.LoggedTunableBoolean;
-import frc.robot.SimConstants;
 import frc.robot.Robot25.RobotContainer;
 import frc.robot.Robot25.simulation.Gamepieces;
 import frc.robot.Robot25.subsystems.elevator.Elevator;
@@ -35,14 +32,12 @@ import frc.robot.Robot25.subsystems.elevator.Elevator.Level;
 import frc.robot.Robot25.subsystems.outtake.OuttakeConstants.Sim;
 
 import org.ironmaple.simulation.IntakeSimulation;
-import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.IntakeSimulation.IntakeSide;
 import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation;
 import org.ironmaple.simulation.motorsims.MapleMotorSim;
 import org.ironmaple.simulation.motorsims.SimMotorConfigs;
 import org.ironmaple.simulation.motorsims.SimulatedMotorController;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class OuttakeIOSim implements OuttakeIO {
@@ -60,7 +55,7 @@ public class OuttakeIOSim implements OuttakeIO {
       .plus(new Transform3d(Inches.of(-10), Inches.zero(), Inches.zero(), Rotation3d.kZero));
   private static final Transform3d CORAL_LOADED_POSE = CORAL_MIDDLE_POSE
       .plus(new Transform3d(Inches.of(4), Inches.zero(), Inches.zero(), Rotation3d.kZero));
-  private static final double CORAL_LOAD_TIME_SECONDS = 0.1;
+  private static final double CORAL_LOAD_TIME_SECONDS = 0.07;
 
   private static final DCMotor outtakeGearbox = DCMotor.getKrakenX60(1);
   private final SimulatedMotorController.GenericMotorController outtakeMotorController;

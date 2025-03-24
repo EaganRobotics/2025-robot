@@ -9,7 +9,6 @@ import static edu.wpi.first.units.Units.Seconds;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -67,6 +66,9 @@ public final class Gamepieces {
   public static final Pose3d ALGAE_GH_POSE = new Pose3d(5.170, 4.025, 0.909, Rotation3d.kZero);
   public static final Pose3d ALGAE_IJ_POSE = new Pose3d(4.830, 4.613, 1.313, Rotation3d.kZero);
   public static final Pose3d ALGAE_KL_POSE = new Pose3d(4.151, 4.613, 0.909, Rotation3d.kZero);
+
+  public static final Pose3d RED_NET_CENTER = new Pose3d(8.785, 1.906, 2.1, Rotation3d.kZero);
+  public static final Pose3d BLUE_NET_CENTER = flipPose3d(RED_NET_CENTER);
 
   public static final Map<String, Pose3d> CORAL_POSES = new HashMap<>();
   public static final Map<String, Pose3d> ALGAE_POSES = new HashMap<>();
@@ -147,6 +149,7 @@ public final class Gamepieces {
       Pose3d pose;
     }
 
+    var scoredKey = String.format("Scored@%.1f", Timer.getFPGATimestamp());
     var pose = ALGAE_POSES.remove(key);
     PoseContainer scoredPose = new PoseContainer();
     SimulatedArena.getInstance().addGamePieceProjectile(
@@ -155,7 +158,11 @@ public final class Gamepieces {
             scoredPose.pose = poses.getLast();
           }
         }, (poses) -> {
-        }).withHitTargetCallBack(() -> Gamepieces.setAlgae(key, scoredPose.pose)));
+        }).withHitTargetCallBack(() -> Gamepieces.setAlgae(scoredKey, scoredPose.pose))
+            .withTargetPosition(
+                () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                    ? BLUE_NET_CENTER.getTranslation()
+                    : RED_NET_CENTER.getTranslation()));
   }
 
   public static void resetField() {
@@ -195,8 +202,8 @@ public final class Gamepieces {
             : FlippingUtil.flipFieldPosition(FL_LOADING_STATION);
     return Pose2dNearSegment.isNearSegment(drivePose, backRightLoadingStation,
         frontRightLoadingStation, LOADING_STATION_TOLERANCE)
-    || Pose2dNearSegment.isNearSegment(drivePose, backLeftLoadingStation, frontLeftLoadingStation,
-            LOADING_STATION_TOLERANCE);
+        || Pose2dNearSegment.isNearSegment(drivePose, backLeftLoadingStation,
+            frontLeftLoadingStation, LOADING_STATION_TOLERANCE);
   }
 
   private static Transform3d leftCoralTransform, rightCoralTransform;

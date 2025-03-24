@@ -14,19 +14,10 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.lib.RobotContainer;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -46,7 +37,7 @@ public final class SimConstants {
   public static final Mode SIM_MODE =
       Optional.ofNullable(System.getenv("AKIT_SIM_MODE")).map(Mode::valueOf).orElse(Mode.SIM);
 
-  public static final Pose2d SIM_INITIAL_FIELD_POSE = new Pose2d(3.28, 3.86, new Rotation2d());
+  public static final Pose2d SIM_INITIAL_FIELD_POSE = new Pose2d(7.5, 6, new Rotation2d());
   public static final Supplier<RobotContainer> SIM_ROBOT_SUPPLIER =
       () -> new frc.robot.Robot25.RobotContainer();
 

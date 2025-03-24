@@ -1,7 +1,6 @@
 package frc.robot.Robot25.commands;
 
 import java.util.Set;
-import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;

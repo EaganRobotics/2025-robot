@@ -10,12 +10,14 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerMotorArrangement;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.util.FlippingUtil;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -54,6 +56,7 @@ import frc.robot.Robot25.subsystems.vision.VisionConstants;
 import frc.robot.Robot25.subsystems.vision.VisionIO;
 import frc.robot.Robot25.subsystems.vision.VisionIOLimelight;
 import frc.robot.Robot25.subsystems.vision.VisionIOPhotonVisionSim;
+import frc.robot.Robot25.util.AllianceChanged;
 import frc.robot.SimConstants;
 
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -71,7 +74,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
   // Drive simulation
   public static final SwerveDriveSimulation DRIVE_SIMULATION =
-      new SwerveDriveSimulation(Drive.MAPLE_SIM_CONFIG, SimConstants.SIM_INITIAL_FIELD_POSE);
+      new SwerveDriveSimulation(Drive.MAPLE_SIM_CONFIG, Pose2d.kZero);
 
   // Opponent Robot Simulation
   OpponentRobot opponentRobotSim = new OpponentRobot(1);
@@ -122,7 +125,6 @@ public class RobotContainer extends frc.lib.RobotContainer {
             new ModuleIOSim(DRIVE_SIMULATION.getModules()[2]),
             new ModuleIOSim(DRIVE_SIMULATION.getModules()[3]),
             DRIVE_SIMULATION::setSimulationWorldPose);
-        drive.setPose(SimConstants.SIM_INITIAL_FIELD_POSE);
 
         elevator = new Elevator(new ElevatorIOSim());
         outtake = new Outtake(new OuttakeIOSim());
@@ -204,7 +206,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
     // Add sim driver practice
     testChooser.addDefaultOption("Sim Driver Practice",
-        SimDriverPractice.simDriverPractice(this, this.simResetRobot()));
+        SimDriverPractice.simDriverPractice(this, simResetRobot()));
 
     // Set up SysId routines
     testChooser.addOption("Drive Wheel Radius Characterization",
@@ -336,7 +338,16 @@ public class RobotContainer extends frc.lib.RobotContainer {
   }
 
   @Override
-  public void simulationInit() {}
+  public void simulationInit() {
+    if (SimConstants.CURRENT_MODE == SimConstants.Mode.SIM) {
+      AllianceChanged.allianceChanged.onTrue(Commands.runOnce(() -> {
+        var pose =
+            DriverStation.getAlliance().get() == Alliance.Blue ? SimConstants.SIM_INITIAL_FIELD_POSE
+                : FlippingUtil.flipFieldPose(SimConstants.SIM_INITIAL_FIELD_POSE);
+        drive.setPose(pose);
+      }).ignoringDisable(true));
+    }
+  }
 
   @Override
   public void simulationPeriodic() {
