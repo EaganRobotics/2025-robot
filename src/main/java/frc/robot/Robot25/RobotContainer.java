@@ -224,16 +224,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
         driverController.rightTrigger(0.15).or(elevator.isAtHeight(Level.L4))));
     outtake.setDefaultCommand(outtake.autoQueueCoral().onlyWhile(elevator.isAtHeight(Level.Intake))
         .withName("RobotContainer.outtakeDefaultCommand"));
-    driverController.povUpRight()
-        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-45)));
     driverController.povRight().onTrue(DriveCommands.RightSnapper(drive));
-    driverController.povDownRight()
-        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(-135)));
-    driverController.povDownLeft()
-        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(135)));
     driverController.povLeft().onTrue(DriveCommands.LeftSnapper(drive));
-    driverController.povUpLeft()
-        .onTrue(DriveCommands.snapToRotation(drive, Rotation2d.fromDegrees(45)));
     driverController.start().onTrue(Commands.runOnce(() -> {
       drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero));
       CommandScheduler.getInstance().cancelAll(); // clear out any commands that might be stuck
