@@ -738,8 +738,8 @@ public class DriveCommands {
       var poses = getClosestReefPosition(drive, radius).orElse(Pose2dSequence.kZero);
 
       double interpolateTime =
-          drive.getPose().getTranslation().getDistance(poses.outer.getTranslation()) > 2 ? 0.75
-              : 0.25;
+          drive.getPose().getTranslation().getDistance(poses.outer.getTranslation()) > 1.5 ? 1.0
+              : 0.5;
       return flyToPosition(drive, poses.outer, poses.inner, interpolateTime);
     }, Set.of(drive)).withName("DriveCommands.FlySnapper");
   }
