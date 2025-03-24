@@ -720,30 +720,6 @@ public class DriveCommands {
     }, Set.of(drive)).withName("DriveCommands.SourceSnapper");
 
   }
-
-  public static Command FlySnappy(Drive drive) {
-    return Commands.defer(() -> {
-      Distance radius = Meters.of(1000);
-      Pose2d desiredPose = flySnapper(drive, radius).orElse(Pose2d.kZero);
-      Logger.recordOutput("flySnappy", desiredPose);
-      return snapToPosition(drive, desiredPose);
-    }, Set.of(drive)).withName("DriveCommands.FlySnapper");
-  }
-
-  public static Command FlySnappyV2(Drive drive) {
-    return Commands.defer(() -> {
-      Distance radius = Meters.of(1000);
-
-      var poses = getClosestReefPosition(drive, radius).orElse(Pose2dSequence.kZero);
-
-      double interpolateTime =
-          drive.getPose().getTranslation().getDistance(poses.outer.getTranslation()) > 1.5 ? 1.0
-              : 0.5;
-      return flyToPosition(drive, poses.outer, poses.inner, interpolateTime);
-    }, Set.of(drive)).withName("DriveCommands.FlySnapper");
-  }
-
-
   private static final class Pose2dSequence {
     Pose2d inner;
     Pose2d outer;
