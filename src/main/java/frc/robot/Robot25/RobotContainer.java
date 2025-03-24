@@ -230,8 +230,6 @@ public class RobotContainer extends frc.lib.RobotContainer {
         driverController.rightTrigger(0.15).or(elevator.isAtHeight(Level.L4))));
     outtake.setDefaultCommand(outtake.autoQueueCoral().onlyWhile(elevator.isAtHeight(Level.Intake))
         .withName("RobotContainer.outtakeDefaultCommand"));
-    driverController.povRight().onTrue(DriveCommands.RightSnapper(drive));
-    driverController.povLeft().onTrue(DriveCommands.LeftSnapper(drive));
     driverController.start().onTrue(Commands.runOnce(() -> {
       drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero));
       CommandScheduler.getInstance().cancelAll(); // clear out any commands that might be stuck
@@ -242,21 +240,24 @@ public class RobotContainer extends frc.lib.RobotContainer {
     driverController.rightBumper().whileTrue(DriveCommands.Snapper(drive));
     driverController.leftBumper().whileTrue(DriveCommands.SourceSnapper(drive));
 
-    driverController.x().whileTrue(DriveCommands.AlgaeSnapper(drive));
-    driverController.y()
+    driverController.x().onTrue(DriveCommands.LeftSnapper(drive));
+    driverController.y().whileTrue(DriveCommands.BargeSnapper(drive));
+    driverController.b().onTrue(DriveCommands.RightSnapper(drive));
+    driverController.a().whileTrue(DriveCommands.AlgaeSnapper(drive));
+
+    driverController.povLeft().onTrue(DriveCommands.snapToRotation(drive));
+    driverController.povUp()
         .whileTrue(DriveCommands.FullSnapperOuter(drive)
             .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
             .andThen(outtake.depositCoral()).andThen(elevator.L0()));
-    driverController.b()
-        .whileTrue(DriveCommands.FullSnapperOuter(drive)
-            .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L3()))
-            .andThen(outtake.depositCoral()).andThen(elevator.L0()));
-    driverController.a()
+    driverController.povRight()
         .whileTrue(DriveCommands.FullSnapperOuter(drive)
             .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L2()))
             .andThen(outtake.depositCoral()).andThen(elevator.L0()));
-
-    driverController.povUp().whileTrue(DriveCommands.BargeSnapper(drive));
+    driverController.povDown()
+        .whileTrue(DriveCommands.FullSnapperOuter(drive)
+            .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L2()))
+            .andThen(outtake.depositCoral()).andThen(elevator.L0()));
 
     operatorController.leftTrigger().whileTrue(outtake.autoQueueCoralOveride());
     operatorController.rightTrigger().whileTrue(outtake.reverseCoral());
