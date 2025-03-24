@@ -155,6 +155,9 @@ public class RobotContainer extends frc.lib.RobotContainer {
     NamedCommands.registerCommand("L3", elevator.L3());
     NamedCommands.registerCommand("L4", elevator.L4());
     NamedCommands.registerCommand("Algae", elevator.Algae());
+    NamedCommands.registerCommand("Ground", elevator.intakeHeight());
+    NamedCommands.registerCommand("Intake",
+        outtake.autoQueueCoral3().until(outtake.seesAtOutputTrigger.debounce(0.1)));
 
     NamedCommands.registerCommand("CO.ScoreFirstL4",
         DriveCommands.FullSnapperOuterAuto(drive).alongWith(elevator.L0())
@@ -188,7 +191,10 @@ public class RobotContainer extends frc.lib.RobotContainer {
             .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
             .andThen(outtake.depositCoral()).andThen(elevator.L0()));
 
-    NamedCommands.registerCommand("Exhaust", outtake.depositCoral());
+
+    NamedCommands.registerCommand("MN.3C.R1", DriveCommands.FlySnappyV2(drive));
+    NamedCommands.registerCommand("MN.3C.R2", DriveCommands.SourceSnapper(drive));
+
 
     // Set up auto routines
     autoChooser =
