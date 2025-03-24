@@ -974,8 +974,10 @@ public class DriveCommands {
           (slowModeSupplier.getAsBoolean() ? SLOW_MODE_MULTIPLIER : 1.0);
 
       // Get linear velocity
-      Translation2d linearVelocity =
-          getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+      Translation2d linearVelocity = getLinearVelocityFromJoysticks(
+          Math.copySign(xSupplier.getAsDouble() * xSupplier.getAsDouble(), xSupplier.getAsDouble()),
+          Math.copySign(ySupplier.getAsDouble() * ySupplier.getAsDouble(),
+              ySupplier.getAsDouble()));
 
       // Apply rotation deadband
       double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
