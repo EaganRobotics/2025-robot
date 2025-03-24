@@ -6,14 +6,11 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeAlgaeOnFly;
-import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -21,8 +18,8 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.SimConstants;
 import frc.robot.Robot25.RobotContainer;
+import frc.robot.Robot25.simulation.Gamepieces;
 import frc.robot.Robot25.subsystems.elevator.Elevator;
 import frc.robot.Robot25.subsystems.elevator.ElevatorConstants;
 
@@ -40,7 +37,7 @@ public class AlgaeIOSim implements AlgaeIO {
   private Voltage algaeIntakeAppliedVolts = Volts.of(0.0);
 
   private boolean hasAlgae = false;
-  private int algaeIndex = 0;
+  private String algaeKey = null;
   private double algaeLoadTime = 0;
   private Pose3d grabbedAlgaePose = null;
 
@@ -59,38 +56,35 @@ public class AlgaeIOSim implements AlgaeIO {
     // Logger.recordOutput("Algae/ManipulatorPose", manipulatorPose);
     if (!hasAlgae) {
       if (algaeIntakeAppliedVolts.lt(Volts.of(-2.0))) {
-        var algaePoseIndex = grabbableAlgaeIndex(manipulatorPose);
-        if (algaePoseIndex.isPresent()) {
-          algaeIndex = algaePoseIndex.get();
+        grabbableAlgae(manipulatorPose).ifPresent(key -> {
+          algaeKey = key;
           hasAlgae = true;
           algaeLoadTime = Timer.getFPGATimestamp();
-          grabbedAlgaePose = RobotContainer.simAlgaePoses[algaeIndex];
-          RobotContainer.simAlgaePoses[algaeIndex] = SimConstants.QUEENED_GAMEPIECE_POSE;
-        }
+          grabbedAlgaePose = Gamepieces.removeAlgae(key).get();
+        });
       }
     } else if (t < 1) {
       if (grabbedAlgaePose.minus(manipulatorPose).getTranslation().getNorm() > MAX_ALGAE_DISTANCE
           .in(Meters) || algaeIntakeAppliedVolts.gt(Volts.of(-2.0))) {
         hasAlgae = false;
-        RobotContainer.simAlgaePoses[0] = SimConstants.QUEENED_GAMEPIECE_POSE;
-        RobotContainer.simAlgaePoses[algaeIndex] = grabbedAlgaePose;
+        Gamepieces.removeAlgae("AlgaeEater");
+        Gamepieces.setAlgae(algaeKey, grabbedAlgaePose);
       } else {
         var algaePose = grabbedAlgaePose.interpolate(algaeLoadedPose, t);
-        RobotContainer.simAlgaePoses[0] = algaePose;
+        Gamepieces.setAlgae("AlgaeEater", algaePose);
       }
     } else {
-      RobotContainer.simAlgaePoses[0] = algaeLoadedPose;
+      Gamepieces.setAlgae("AlgaeEater", algaeLoadedPose);
       if (algaeIntakeAppliedVolts.gt(Volts.of(2.0))) {
         hasAlgae = false;
         var algaeTranslation = ALGAE_LOADED_POSE.getTranslation().toTranslation2d();
         var shootHeight = Elevator.getInstance().getCurrentHeight()
             .plus(MANIPULATOR_POSE.getMeasureZ()).minus(ElevatorConstants.MIN_HEIGHT);
-        var angle = Degrees.of(5);
         var projectile =
             new ReefscapeAlgaeOnFly(driveSim.getSimulatedDriveTrainPose().getTranslation(),
                 algaeTranslation, driveSim.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
                 driveSim.getSimulatedDriveTrainPose().getRotation(), shootHeight,
-                MetersPerSecond.of(algaeIntakeAppliedVolts.in(Volts) / 3), angle);
+                MetersPerSecond.of(algaeIntakeAppliedVolts.in(Volts) / 3), Degrees.of(5));
         CompletableFuture.runAsync(() -> {
           try {
             Thread.sleep(50);
@@ -98,8 +92,7 @@ public class AlgaeIOSim implements AlgaeIO {
             e.printStackTrace();
             Thread.currentThread().interrupt();
           } finally {
-            RobotContainer.simAlgaePoses[0] = SimConstants.QUEENED_GAMEPIECE_POSE;
-            SimulatedArena.getInstance().addGamePieceProjectile(projectile);
+            Gamepieces.shootAlgae("AlgaeEater", (pose) -> projectile);
           }
         });
       }
@@ -115,19 +108,19 @@ public class AlgaeIOSim implements AlgaeIO {
     algaeIntakeAppliedVolts = output;
   }
 
-  private Optional<Integer> grabbableAlgaeIndex(Pose3d manipulatorCenter) {
+  private Optional<String> grabbableAlgae(Pose3d manipulatorCenter) {
     double minDistance = MAX_ALGAE_DISTANCE.in(Meters);
-    Optional<Integer> nearestPoseIndex = Optional.empty();
+    Optional<String> nearestAlgaeKey = Optional.empty();
 
-    for (int i = 1; i < 7; i++) {
-      var p = RobotContainer.simAlgaePoses[i];
-      double distance = manipulatorCenter.getTranslation().getDistance(p.getTranslation());
+    for (var entry : Gamepieces.ALGAE_POSES.entrySet()) {
+      double distance =
+          manipulatorCenter.getTranslation().getDistance(entry.getValue().getTranslation());
       if (distance < minDistance) {
         minDistance = distance;
-        nearestPoseIndex = Optional.of(i);
+        nearestAlgaeKey = Optional.of(entry.getKey());
       }
     }
 
-    return nearestPoseIndex;
+    return nearestAlgaeKey;
   }
 }

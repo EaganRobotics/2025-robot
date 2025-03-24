@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.tunables.LoggedTunableBoolean;
 import frc.robot.SimConstants;
 import frc.robot.Robot25.RobotContainer;
+import frc.robot.Robot25.simulation.Gamepieces;
 import frc.robot.Robot25.subsystems.elevator.Elevator;
 import frc.robot.Robot25.subsystems.elevator.Elevator.Level;
 import frc.robot.Robot25.subsystems.outtake.OuttakeConstants.Sim;
@@ -42,6 +43,7 @@ import org.ironmaple.simulation.motorsims.MapleMotorSim;
 import org.ironmaple.simulation.motorsims.SimMotorConfigs;
 import org.ironmaple.simulation.motorsims.SimulatedMotorController;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class OuttakeIOSim implements OuttakeIO {
@@ -61,9 +63,6 @@ public class OuttakeIOSim implements OuttakeIO {
       .plus(new Transform3d(Inches.of(4), Inches.zero(), Inches.zero(), Rotation3d.kZero));
   private static final double CORAL_LOAD_TIME_SECONDS = 0.1;
 
-  private double loadTimeSeconds = -1;
-  private Optional<Pose3d> coralPose = Optional.empty();
-
   private static final DCMotor outtakeGearbox = DCMotor.getKrakenX60(1);
   private final SimulatedMotorController.GenericMotorController outtakeMotorController;
   private final MapleMotorSim outtakeMotor;
@@ -80,9 +79,13 @@ public class OuttakeIOSim implements OuttakeIO {
   LoggedTunableBoolean ScoreSideSensor =
       new LoggedTunableBoolean("Tuning/Outtake/ScoreSideSensor", false);
 
+  private double lastCoralLoadTimeSec = 0;
+
   private Trigger hasGamePiece = new Trigger(LoadSideSensor::get);
-  private Trigger canGetGamePiece =
-      hasGamePiece.negate().debounce(SimConstants.LOAD_CORAL_DELAY.in(Seconds));
+  private Trigger canGetGamePiece = hasGamePiece.negate().debounce(1)
+      .and(() -> Gamepieces.isNearLoadingStation(driveSim.getSimulatedDriveTrainPose())
+          && !Gamepieces.CORAL_POSES.containsKey("Outtake")
+          && outtakeAppliedVoltage.gt(Volts.of(1)));
 
   public OuttakeIOSim() {
     outtakeMotor = new MapleMotorSim(
@@ -99,7 +102,7 @@ public class OuttakeIOSim implements OuttakeIO {
   public void setOpenLoop(Voltage output) {
     outtakeAppliedVoltage = output;
     isClosedLoop = false;
-    if (output.in(Volts) > 0 && coralPose.isPresent()) {
+    if (output.in(Volts) > 0 && Gamepieces.CORAL_POSES.containsKey("Outtake")) {
       var coralTranslation = CORAL_LOADED_POSE.getTranslation().toTranslation2d();
       var height = Elevator.getInstance().getCurrentHeight();
       var angle = Degrees.of(-34.411);
@@ -113,7 +116,6 @@ public class OuttakeIOSim implements OuttakeIO {
               coralTranslation, driveSim.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
               driveSim.getSimulatedDriveTrainPose().getRotation(), height,
               MetersPerSecond.of(output.in(Volts) / 3), angle);
-      coralPose = Optional.empty();
       CompletableFuture.runAsync(() -> {
         System.out.println("Disabling sensors");
         try {
@@ -121,6 +123,7 @@ public class OuttakeIOSim implements OuttakeIO {
           LoadSideSensor.set(false);
           Thread.sleep(100);
           ScoreSideSensor.set(false);
+          Gamepieces.shootCoral("Outtake", (pose) -> projectile);
         } catch (InterruptedException e) {
           e.printStackTrace();
           LoadSideSensor.set(false);
@@ -128,7 +131,6 @@ public class OuttakeIOSim implements OuttakeIO {
           Thread.currentThread().interrupt();
         }
       });
-      SimulatedArena.getInstance().addGamePieceProjectile(projectile);
     }
   }
 
@@ -152,32 +154,26 @@ public class OuttakeIOSim implements OuttakeIO {
     outtakeMotor.update(Seconds.of(TimedRobot.kDefaultPeriod));
     outtakeSim.update(TimedRobot.kDefaultPeriod);
 
-    var nearLoadingStation =
-        isNearSegment(driveSim.getSimulatedDriveTrainPose(), SimConstants.BR_LOADING_STATION,
-            SimConstants.FR_LOADING_STATION, SimConstants.LOADING_STATION_TOLERANCE)
-            || isNearSegment(driveSim.getSimulatedDriveTrainPose(), SimConstants.BL_LOADING_STATION,
-                SimConstants.FL_LOADING_STATION, SimConstants.LOADING_STATION_TOLERANCE);
-    Logger.recordOutput("Outtake/NearLoadingStation", nearLoadingStation);
-    var joystickName = DriverStation.getJoystickName(2);
-    var humanPlayerControllerConnected = joystickName != null && !joystickName.isBlank();
-    Logger.recordOutput("HumanPlayerConnected", humanPlayerControllerConnected);
-    Logger.recordOutput("HasGamePiece", hasGamePiece);
-    Logger.recordOutput("CanGetGamePiece", canGetGamePiece);
-    if (humanPlayerControllerConnected && outtakeAppliedVoltage.in(Volts) > 0 && coralPose.isEmpty()
-        && nearLoadingStation) {
-      intakeSim.startIntake();
-    } else if (!humanPlayerControllerConnected && nearLoadingStation
-        && canGetGamePiece.getAsBoolean()) {
-      CompletableFuture.runAsync(() -> {
-        try {
-          Thread.sleep(100);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-          Thread.currentThread().interrupt();
-        } finally {
-          intakeSim.addGamePieceToIntake();
-        }
-      });
+    Logger.recordOutput("Outtake/NearLoadingStation",
+        Gamepieces.isNearLoadingStation(driveSim.getSimulatedDriveTrainPose()));
+    Logger.recordOutput("Outtake/CanGetGamePiece", canGetGamePiece.getAsBoolean());
+    Logger.recordOutput("Outtake/HasGamePiece", hasGamePiece.getAsBoolean());
+
+    if (canGetGamePiece.getAsBoolean()) {
+      if (Gamepieces.hasHumanPlayer()) {
+        intakeSim.startIntake();
+      } else {
+        CompletableFuture.runAsync(() -> {
+          try {
+            Thread.sleep(100);
+          } catch (InterruptedException e) {
+            e.printStackTrace();
+            Thread.currentThread().interrupt();
+          } finally {
+            intakeSim.addGamePieceToIntake();
+          }
+        });
+      }
     } else {
       intakeSim.stopIntake();
     }
@@ -188,21 +184,18 @@ public class OuttakeIOSim implements OuttakeIO {
             Rotation3d.kZero));
     if (intakeSim.obtainGamePieceFromIntake()) {
       LoadSideSensor.set(true);
-      coralPose = Optional.of(robotPose.plus(CORAL_LOADING_POSE));
-      loadTimeSeconds = Timer.getFPGATimestamp();
-    } else if (coralPose.isPresent()) {
-      var t = (Timer.getFPGATimestamp() - loadTimeSeconds) / CORAL_LOAD_TIME_SECONDS;
+      Gamepieces.setCoral("Outtake", robotPose.plus(CORAL_LOADING_POSE));
+      lastCoralLoadTimeSec = Timer.getFPGATimestamp();
+    } else if (Gamepieces.CORAL_POSES.containsKey("Outtake")) {
+      var t = (Timer.getFPGATimestamp() - lastCoralLoadTimeSec) / CORAL_LOAD_TIME_SECONDS;
       if (t >= 1) {
         ScoreSideSensor.set(true);
-        coralPose = Optional.of(robotPose.plus(CORAL_LOADED_POSE));
+        Gamepieces.setCoral("Outtake", robotPose.plus(CORAL_LOADED_POSE));
       } else if (t > 0 && t < 1) {
-        coralPose = Optional.of(
+        Gamepieces.setCoral("Outtake",
             robotPose.plus(CORAL_LOADING_POSE).interpolate(robotPose.plus(CORAL_LOADED_POSE), t));
       }
     }
-
-    // Record coral pose simulation output
-    RobotContainer.simCoralPoses[0] = coralPose.orElse(SimConstants.QUEENED_GAMEPIECE_POSE);
 
     // Update motor inputs
     inputs.outtakeConnected = true;

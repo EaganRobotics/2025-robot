@@ -67,10 +67,10 @@ public class DriveConstants {
 
     /* Drive gains */
     public static final double DRIVE_KS = 0.0;
-    public static final double DRIVE_KV = 2.3;
-    public static final double DRIVE_KA = 0.22;
+    public static final double DRIVE_KV = 0.124;
+    public static final double DRIVE_KA = 0.0;
     public static final double DRIVE_KP = 0.1;
-    public static final double DRIVE_KI = 0.0;
+    public static final double DRIVE_KI = 0.1;
     public static final double DRIVE_KD = 0.0;
 
     /* These are both calculated off of MK4i Swerve Module CAD */

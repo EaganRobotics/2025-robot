@@ -4,8 +4,6 @@ package frc.robot.Robot25;
 
 import static edu.wpi.first.units.Units.*;
 
-import java.util.Arrays;
-
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerMotorArrangement;
@@ -16,24 +14,19 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Robot25.commands.DriveCharacterization;
 import frc.robot.Robot25.commands.DriveCommands;
 import frc.robot.Robot25.commands.PathPlanning;
 import frc.robot.Robot25.commands.SimDriverPractice;
+import frc.robot.Robot25.simulation.Gamepieces;
 import frc.robot.Robot25.subsystems.AlgaeEater.Algae;
 import frc.robot.Robot25.subsystems.AlgaeEater.AlgaeIO;
 import frc.robot.Robot25.subsystems.AlgaeEater.AlgaeIOSim;
@@ -62,10 +55,7 @@ import frc.robot.Robot25.subsystems.vision.VisionIOLimelight;
 import frc.robot.Robot25.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.SimConstants;
 
-import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
-import org.ironmaple.utils.FieldMirroringUtils;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -87,16 +77,12 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
   private final CommandXboxController driverController = new CommandXboxController(0);
   private final CommandXboxController operatorController = new CommandXboxController(1);
-  private final CommandXboxController humanPlayerController = new CommandXboxController(2);
-  private final XboxController opponentController = new XboxController(5);
+  private final XboxController opponentController = new XboxController(4);
 
   private final LoggedDashboardChooser<Command> autoChooser;
   private final LoggedDashboardChooser<Command> testChooser;
 
-  private final Pose3d[] mechanismPoses = new Pose3d[3];
-
-  public static final Pose3d[] simCoralPoses = new Pose3d[3];
-  public static final Pose3d[] simAlgaePoses = new Pose3d[7];
+  private final Pose3d[] mechanismPoses = new Pose3d[] {Pose3d.kZero, Pose3d.kZero, Pose3d.kZero};
 
   public RobotContainer() {
     super(DRIVE_SIMULATION);
@@ -110,10 +96,6 @@ public class RobotContainer extends frc.lib.RobotContainer {
             "You are using an unsupported swerve configuration, which this template does not support without manual customization. The 2025 release of Phoenix supports some swerve configurations which were not available during 2025 beta testing, preventing any development and support from the AdvantageKit developers.");
       }
     }
-
-    Arrays.fill(mechanismPoses, Pose3d.kZero);
-    Arrays.fill(simCoralPoses, SimConstants.QUEENED_GAMEPIECE_POSE);
-    Arrays.fill(simAlgaePoses, SimConstants.QUEENED_GAMEPIECE_POSE);
 
     switch (SimConstants.CURRENT_MODE) {
       case REAL:
@@ -352,73 +334,23 @@ public class RobotContainer extends frc.lib.RobotContainer {
     mechanismPoses[2] = elevatorPoses[2];
   }
 
-  private Transform3d leftCoralTransform, rightCoralTransform;
-  private double lastDropTimeSec = 0;
-  private Trigger canDropCoral = new Trigger(
-      () -> Timer.getFPGATimestamp() - lastDropTimeSec > SimConstants.LOAD_CORAL_DELAY.in(Seconds));
-
-  private Command dropCoral(boolean leftCoral) {
-    return Commands.runOnce(() -> {
-      lastDropTimeSec = Timer.getFPGATimestamp();
-      System.out.println("Dropping " + (leftCoral ? "left" : "right") + " coral");
-      Pose3d coralPose;
-      if (leftCoral) {
-        coralPose = simCoralPoses[1];
-        simCoralPoses[1] = SimConstants.QUEENED_GAMEPIECE_POSE;
-      } else {
-        coralPose = simCoralPoses[2];
-        simCoralPoses[2] = SimConstants.QUEENED_GAMEPIECE_POSE;
-      }
-      var droppedCoral = new ReefscapeCoralOnFly(coralPose.getTranslation().toTranslation2d(),
-          Translation2d.kZero, new ChassisSpeeds(), coralPose.getRotation().toRotation2d(),
-          coralPose.getMeasureZ().plus(Meters.of(0.07)), MetersPerSecond.of(1),
-          coralPose.getRotation().getMeasureY().unaryMinus());
-      SimulatedArena.getInstance().addGamePieceProjectile(droppedCoral);
-    });
-  }
-
   @Override
-  public void simulationInit() {
-    if (SimConstants.CURRENT_MODE == SimConstants.Mode.SIM) {
-
-      var lb = humanPlayerController.leftBumper();
-      var rb = humanPlayerController.rightBumper();
-
-      lb.and(canDropCoral).onTrue(dropCoral(true));
-      rb.and(canDropCoral).onTrue(dropCoral(false));
-    }
-  }
+  public void simulationInit() {}
 
   @Override
   public void simulationPeriodic() {
-
     if (SimConstants.CURRENT_MODE == SimConstants.Mode.SIM) {
-
-      Logger.recordOutput("CanDropCoral", canDropCoral);
       Logger.recordOutput("MechanismPoses", mechanismPoses);
-      Logger.recordOutput("SimCoralPoses", simCoralPoses);
-      Logger.recordOutput("SimAlgaePoses", simAlgaePoses);
-
-      leftCoralTransform = new Transform3d(Inches.of(10),
-          SimConstants.LOADING_STATION_WIDTH.times(-humanPlayerController.getLeftX() / 2),
-          Inches.zero(), Rotation3d.kZero);
-      rightCoralTransform = new Transform3d(Inches.of(10),
-          SimConstants.LOADING_STATION_WIDTH.times(-humanPlayerController.getRightX() / 2),
-          Inches.zero(), Rotation3d.kZero);
-      simCoralPoses[1] = SimConstants.LEFT_STATION_CORAL_POSE.plus(leftCoralTransform);
-      simCoralPoses[2] = SimConstants.RIGHT_STATION_CORAL_POSE.plus(rightCoralTransform);
+      Gamepieces.periodic();
     }
   }
 
   @Override
   public void resetSimulation() {
-    super.resetSimulation();
-    outtake.simStageCoral();
-    simAlgaePoses[1] = new Pose3d(3.811, 4.025, 1.313, Rotation3d.kZero);
-    simAlgaePoses[2] = new Pose3d(4.151, 3.437, 0.909, Rotation3d.kZero);
-    simAlgaePoses[3] = new Pose3d(4.830, 3.437, 1.313, Rotation3d.kZero);
-    simAlgaePoses[4] = new Pose3d(5.170, 4.025, 0.909, Rotation3d.kZero);
-    simAlgaePoses[5] = new Pose3d(4.830, 4.613, 1.313, Rotation3d.kZero);
-    simAlgaePoses[6] = new Pose3d(4.151, 4.613, 0.909, Rotation3d.kZero);
+    if (SimConstants.CURRENT_MODE == SimConstants.Mode.SIM) {
+      super.resetSimulation();
+      outtake.simStageCoral();
+      Gamepieces.resetField();
+    }
   }
 }
