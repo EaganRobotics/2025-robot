@@ -28,6 +28,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.lib.tunables.LoggedTunableNumber;
@@ -721,6 +722,28 @@ public class DriveCommands {
 
   }
 
+  public static Command FlySnappy(Drive drive) {
+    return Commands.defer(() -> {
+      Distance radius = Meters.of(1000);
+      Pose2d desiredPose = flySnapper(drive, radius).orElse(Pose2d.kZero);
+      Logger.recordOutput("flySnappy", desiredPose);
+      return snapToPosition(drive, desiredPose);
+    }, Set.of(drive)).withName("DriveCommands.FlySnapper");
+  }
+
+  public static Command FlySnappyV2(Drive drive) {
+    return Commands.defer(() -> {
+      Distance radius = Meters.of(1000);
+
+      var poses = getClosestReefPosition(drive, radius).orElse(Pose2dSequence.kZero);
+
+      double interpolateTime =
+          drive.getPose().getTranslation().getDistance(poses.outer.getTranslation()) > 1.5 ? 1.0
+              : 0.5;
+      return flyToPosition(drive, poses.outer, poses.inner, interpolateTime);
+    }, Set.of(drive)).withName("DriveCommands.FlySnapper");
+  }
+
 
   private static final class Pose2dSequence {
     Pose2d inner;
@@ -873,7 +896,7 @@ public class DriveCommands {
   private static Optional<Pose2d> getClosestFullInner(Drive drive, Distance radius) {
     Optional<Pose2d> desiredPose = Optional.empty();
     Distance minDistance = Meters.of(1000000);
-    for (Pose2d pose : LL_REEF_POSITIONS) {
+    for (Pose2d pose : INNER_REEF_POSITIONS) {
       double distance = drive.getPose().getTranslation().getDistance(pose.getTranslation());
       Distance distanceMeasure = Meters.of(distance);
       if (distanceMeasure.lte(radius) && distanceMeasure.lte(minDistance)) {
@@ -884,6 +907,25 @@ public class DriveCommands {
 
     return desiredPose;
   };
+
+  private static Optional<Pose2d> flySnapper(Drive drive, Distance radius) {
+    Optional<Pose2d> desiredPose = Optional.empty();
+    Distance minDistance = Meters.of(1000000);
+    Pose2d currentPose = drive.getPose();
+
+    for (Pose2d pose : INNER_REEF_POSITIONS) {
+      double distance = currentPose.getTranslation().getDistance(pose.getTranslation());
+      Distance distanceMeasure = Meters.of(distance);
+
+      if (distanceMeasure.lte(radius) && distanceMeasure.lte(minDistance)) {
+        minDistance = distanceMeasure;
+        double t = Math.min(1, 1);
+        desiredPose = Optional.of(currentPose.interpolate(pose, t));
+      }
+    }
+
+    return desiredPose;
+  }
 
   private static Optional<Pose2dSequence> getClosestAuto(Drive drive, Distance radius) {
     Optional<Pose2dSequence> desiredPose = Optional.empty();
@@ -918,6 +960,49 @@ public class DriveCommands {
 
   // return desiredPose;
   // };
+
+
+  public static Command flyToPosition(Drive drive, Pose2d reefOuterPose, Pose2d reefInnerPose,
+      double interpolateTime) {
+    return Commands.defer(() -> {
+
+      double startTime = Timer.getFPGATimestamp();
+
+      return Commands.run(() -> {
+
+
+        double elapsedTime = (Timer.getFPGATimestamp() - startTime);
+
+        double t = Math.min(1.0, elapsedTime / interpolateTime);
+
+
+        Pose2d desiredPose = reefOuterPose.interpolate(reefInnerPose, t);
+
+        var x = xController.calculate(drive.getPose().getX(), desiredPose.getX());
+        var y = yController.calculate(drive.getPose().getY(), desiredPose.getY());
+        var omega = angleController.calculate(drive.getRotation().getRadians(),
+            desiredPose.getRotation().getRadians());
+
+
+        ChassisSpeeds speeds = new ChassisSpeeds(x, y, omega);
+        drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
+
+      }, drive)
+
+          .beforeStarting(() -> {
+            var fieldRelativeSpeeds = drive.getFieldRelativeSpeeds();
+            angleController.reset(drive.getRotation().getRadians(),
+                fieldRelativeSpeeds.omegaRadiansPerSecond);
+            xController.reset(drive.getPose().getX(), fieldRelativeSpeeds.vxMetersPerSecond);
+            yController.reset(drive.getPose().getY(), fieldRelativeSpeeds.vyMetersPerSecond);
+          })
+
+          .until(() -> angleController.atGoal() && xController.atGoal() && yController.atGoal())
+          .withName("DriveCommands.snapToReefPosition");
+
+    }, Set.of(drive));
+  }
+
 
   public static Command snapToPosition(Drive drive, Pose2d desiredPosition) {
     return Commands.run(() -> {
@@ -974,10 +1059,8 @@ public class DriveCommands {
           (slowModeSupplier.getAsBoolean() ? SLOW_MODE_MULTIPLIER : 1.0);
 
       // Get linear velocity
-      Translation2d linearVelocity = getLinearVelocityFromJoysticks(
-          Math.copySign(xSupplier.getAsDouble() * xSupplier.getAsDouble(), xSupplier.getAsDouble()),
-          Math.copySign(ySupplier.getAsDouble() * ySupplier.getAsDouble(),
-              ySupplier.getAsDouble()));
+      Translation2d linearVelocity =
+          getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
 
       // Apply rotation deadband
       double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);

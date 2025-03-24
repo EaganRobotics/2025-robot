@@ -152,7 +152,7 @@ public final class Gamepieces {
     SimulatedArena.getInstance().addGamePieceProjectile(
         projectileSupplier.apply(pose).withProjectileTrajectoryDisplayCallBack((poses) -> {
           if (poses.size() > 0) {
-            scoredPose.pose = poses.getLast();
+            // scoredPose.pose = poses.getLast();
           }
         }, (poses) -> {
         }).withHitTargetCallBack(() -> Gamepieces.setAlgae(key, scoredPose.pose)));
