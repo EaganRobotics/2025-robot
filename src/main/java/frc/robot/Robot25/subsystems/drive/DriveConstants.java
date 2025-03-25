@@ -33,7 +33,7 @@ public class DriveConstants {
   public static final LinearVelocity kSpeedAt12Volts = MetersPerSecond.of(5.22);
 
   // PID Gains for PathPlanner
-  public static final PIDConstants PP_TRANSLATION_GAINS = new PIDConstants(1, 0.0, 0.0);
+  public static final PIDConstants PP_TRANSLATION_GAINS = new PIDConstants(0.5, 0.0, 0.0);
   public static final PIDConstants PP_ROTATION_GAINS = new PIDConstants(2.0, 0.0, 0.3);
 
   /* These Gains constants only affect real hardware */
