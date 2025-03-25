@@ -16,9 +16,9 @@
     "CO.3C.Autos"
   ],
   "defaultMaxVel": 4.0,
-  "defaultMaxAccel": 6.0,
+  "defaultMaxAccel": 4.0,
   "defaultMaxAngVel": 360.0,
-  "defaultMaxAngAccel": 360.0,
+  "defaultMaxAngAccel": 180.0,
   "defaultNominalVoltage": 12.0,
   "robotMass": 54.431,
   "robotMOI": 5.98,
