@@ -191,10 +191,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
             .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
             .andThen(outtake.depositCoral()).andThen(elevator.L0()));
 
-
     NamedCommands.registerCommand("MN.3C.R1", DriveCommands.FlySnappyV2(drive));
     NamedCommands.registerCommand("MN.3C.R2", DriveCommands.SourceSnapper(drive));
-
 
     // Set up auto routines
     autoChooser =
@@ -228,8 +226,9 @@ public class RobotContainer extends frc.lib.RobotContainer {
         () -> driverController.getLeftY(), () -> driverController.getLeftX(),
         () -> -driverController.getRightX() * .85, driverController.leftTrigger(),
         driverController.rightTrigger(0.15).or(elevator.isAtHeight(Level.L4))));
-    outtake.setDefaultCommand(outtake.autoQueueCoral(true).onlyWhile(elevator.isAtHeight(Level.Intake))
-        .withName("RobotContainer.outtakeDefaultCommand"));
+    outtake
+        .setDefaultCommand(outtake.autoQueueCoral(true).onlyWhile(elevator.isAtHeight(Level.Intake))
+            .withName("RobotContainer.outtakeDefaultCommand"));
     driverController.start().onTrue(Commands.runOnce(() -> {
       drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero));
       CommandScheduler.getInstance().cancelAll(); // clear out any commands that might be stuck
@@ -275,8 +274,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
     operatorController.povRight().whileTrue(algae.setOpenLoop(Volts.of(10)));
     operatorController.povLeft().whileTrue(algae.setOpenLoop(Volts.of(-6)));
     operatorController.povDown().onTrue(algae.setOpenLoop(Volts.of(10)));
-    operatorController.povUp().onTrue(algae.setOpenLoop(Volts.of(-6)))
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ;
+    operatorController.povUp().onTrue(algae.setOpenLoop(Volts.of(-6)));
 
     operatorController.axisMagnitudeGreaterThan(1, 0.1)
         .whileTrue(outtake.openLoop(operatorController::getLeftY));
