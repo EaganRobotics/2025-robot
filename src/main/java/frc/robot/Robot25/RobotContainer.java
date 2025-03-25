@@ -261,8 +261,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
     operatorController.leftTrigger().whileTrue(outtake.autoQueueCoralOveride());
     operatorController.rightTrigger().whileTrue(outtake.reverseCoral());
-    operatorController.povDown().onTrue(elevator.downLevel());
-    operatorController.povUp().onTrue(elevator.upLevel());
+    // operatorController.povDown().onTrue(elevator.downLevel());
+    // operatorController.povUp().onTrue(elevator.upLevel());
     operatorController.start().onTrue(elevator.zeroElevator());
     operatorController.back().onTrue(elevator.zeroElevator());
     operatorController.leftBumper().onTrue(outtake.depositCoral().andThen(elevator.intakeHeight())
@@ -274,6 +274,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
     operatorController.y().onTrue(elevator.L4());
     operatorController.povRight().whileTrue(algae.setOpenLoop(Volts.of(10)));
     operatorController.povLeft().whileTrue(algae.setOpenLoop(Volts.of(-6)));
+    operatorController.povDown().onTrue(algae.setOpenLoop(Volts.of(10)));
+    operatorController.povUp().onTrue(algae.setOpenLoop(Volts.of(-6)));
 
     operatorController.axisMagnitudeGreaterThan(1, 0.1)
         .whileTrue(outtake.openLoop(operatorController::getLeftY));
