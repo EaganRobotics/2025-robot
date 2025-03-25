@@ -57,7 +57,7 @@ public class Outtake extends SubsystemBase {
     return this.runEnd(() -> {
       Logger.recordOutput("Outtake/AutoQueuing", true);
       if (seesAtOutputTrigger.getAsBoolean() && seesAtInputTrigger.getAsBoolean()) {
-        io.setRollerOpenLoop(Volts.of(7));
+        io.setRollerOpenLoop(Volts.of(4));
       } else if (!seesAtOutputTrigger.getAsBoolean() && seesAtInputTrigger.getAsBoolean()) {
         io.setRollerOpenLoop(Volts.of(7));
       } else if (seesAtOutputTrigger.getAsBoolean() && !seesAtInputTrigger.getAsBoolean()) {
