@@ -170,7 +170,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
             .andThen(outtake.depositCoral())
             .andThen(DriveCommands.FullSnapperOuter(drive).alongWith(elevator.L0())));
     NamedCommands.registerCommand("CO.LoadCoral", DriveCommands.SourceSnapper(drive).withTimeout(2)
-        .andThen(outtake.autoQueueCoral().until(outtake.seesAtOutputTrigger.debounce(0.1))));
+        .andThen(outtake.autoQueueCoral(false).until(outtake.seesAtOutputTrigger.debounce(0.1))));
 
     NamedCommands.registerCommand("Maybe1",
         DriveCommands.FullSnapperOuter(drive).alongWith(elevator.L0())
@@ -228,7 +228,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
         () -> driverController.getLeftY(), () -> driverController.getLeftX(),
         () -> -driverController.getRightX() * .85, driverController.leftTrigger(),
         driverController.rightTrigger(0.15).or(elevator.isAtHeight(Level.L4))));
-    outtake.setDefaultCommand(outtake.autoQueueCoral().onlyWhile(elevator.isAtHeight(Level.Intake))
+    outtake.setDefaultCommand(outtake.autoQueueCoral(true).onlyWhile(elevator.isAtHeight(Level.Intake))
         .withName("RobotContainer.outtakeDefaultCommand"));
     driverController.start().onTrue(Commands.runOnce(() -> {
       drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero));
