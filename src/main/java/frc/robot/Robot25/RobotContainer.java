@@ -97,8 +97,9 @@ public class RobotContainer extends frc.lib.RobotContainer {
         elevator = new Elevator(new ElevatorIOTalonFXNew());
         outtake = new Outtake(new OuttakeIOTalonFX());
         vision = new Vision(drive,
-            new VisionIOLimelight("limelight-front", () -> drive.getPose().getRotation()),
-            new VisionIOLimelight("limelight-back", () -> drive.getPose().getRotation()));
+            new VisionIOLimelight("limelight-front", () -> drive.getPose().getRotation())
+        // new VisionIOLimelight("limelight-back", () -> drive.getPose().getRotation())
+        );
         algae = new Algae(new AlgaeIOTalonFX());
         break;
       case SIM:

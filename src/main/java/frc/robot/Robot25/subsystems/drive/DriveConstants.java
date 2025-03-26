@@ -14,10 +14,8 @@ import edu.wpi.first.units.measure.*;
 public class DriveConstants {
 
   // Stator current limits
-  public static final Current DRIVE_CURRENT_LIMIT = Amps.of(60); // TODO consider raising to 70 or
-                                                                 // 80 amps
-  public static final Current TURN_CURRENT_LIMIT = Amps.of(40); // TODO consider lowering to about
-                                                                // 40 amps
+  public static final Current DRIVE_CURRENT_LIMIT = Amps.of(60);
+  public static final Current TURN_CURRENT_LIMIT = Amps.of(40);
 
   // The stator current at which the wheels start to slip;
   private static final Current kSlipCurrent = Amps.of(120.0); // TODO measure this
@@ -26,7 +24,7 @@ public class DriveConstants {
   public static final Distance kWheelRadius = Inches.of(1.891); // TODO measure often
   public static final double ROBOT_MASS_KG = 60.78;
   public static final double ROBOT_MOI = 5.4;
-  public static final double WHEEL_COF = 1.2;
+  public static final double WHEEL_COF = 1.45;
   public static final double kDriveGearRatio = 6.122; // Source: MK4i swerve module page; L3 gearing
   private static final double kSteerGearRatio = 150.0 / 7.0; // Source: MK4i swerve module page
   public static final double kMaxDriveMotorRPM = 6000.0;
@@ -134,7 +132,7 @@ public class DriveConstants {
   private static final int kFrontLeftDriveMotorId = 18;
   private static final int kFrontLeftSteerMotorId = 17;
   private static final int kFrontLeftEncoderId = 1;
-  private static final Angle kFrontLeftEncoderOffset = Rotations.of(0.135);
+  private static final Angle kFrontLeftEncoderOffset = Rotations.of(0);
   private static final boolean kFrontLeftSteerMotorInverted = true;
   private static final boolean kFrontLeftEncoderInverted = false;
   private static final Distance kFrontLeftXPos = Inches.of(10.375);
@@ -144,7 +142,7 @@ public class DriveConstants {
   private static final int kFrontRightDriveMotorId = 14;
   private static final int kFrontRightSteerMotorId = 13;
   private static final int kFrontRightEncoderId = 2;
-  private static final Angle kFrontRightEncoderOffset = Rotations.of(.493);
+  private static final Angle kFrontRightEncoderOffset = Rotations.of(0);
   private static final boolean kFrontRightSteerMotorInverted = true;
   private static final boolean kFrontRightEncoderInverted = false;
   private static final Distance kFrontRightXPos = Inches.of(10.375);
@@ -154,7 +152,7 @@ public class DriveConstants {
   private static final int kBackLeftDriveMotorId = 12;
   private static final int kBackLeftSteerMotorId = 11;
   private static final int kBackLeftEncoderId = 0;
-  private static final Angle kBackLeftEncoderOffset = Rotations.of(0.526);
+  private static final Angle kBackLeftEncoderOffset = Rotations.of(0.0);
   private static final boolean kBackLeftSteerMotorInverted = true;
   private static final boolean kBackLeftEncoderInverted = false;
   private static final Distance kBackLeftXPos = Inches.of(-10.375);
@@ -164,7 +162,7 @@ public class DriveConstants {
   private static final int kBackRightDriveMotorId = 16;
   private static final int kBackRightSteerMotorId = 15;
   private static final int kBackRightEncoderId = 3;
-  private static final Angle kBackRightEncoderOffset = Rotations.of(0.730);
+  private static final Angle kBackRightEncoderOffset = Rotations.of(0.0);
   private static final boolean kBackRightSteerMotorInverted = true;
   private static final boolean kBackRightEncoderInverted = false;
   private static final Distance kBackRightXPos = Inches.of(-10.375);
