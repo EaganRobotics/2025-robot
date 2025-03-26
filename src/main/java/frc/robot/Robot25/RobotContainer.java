@@ -248,24 +248,23 @@ public class RobotContainer extends frc.lib.RobotContainer {
     driverController.rightBumper().whileTrue(DriveCommands.FlySnappyV2(drive));
     driverController.leftBumper().whileTrue(DriveCommands.SourceSnapper(drive));
 
-    driverController.x().onTrue(DriveCommands.snapToRotation(drive));
-    driverController.y().whileTrue(DriveCommands.BargeSnapper(drive));
+    driverController.x().whileTrue(DriveCommands.AlgaeSnapper(drive));
+    driverController.y().whileTrue(DriveCommands.FullSnapperOuter(drive)
+        .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
+        .andThen(outtake.depositCoral()).andThen(elevator.L0()));
     driverController.b().whileTrue(DriveCommands.FullSnapperOuter(drive)
+        .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L3()))
+        .andThen(outtake.depositCoral()).andThen(elevator.L0()));
+    driverController.a().whileTrue(DriveCommands.FullSnapperOuter(drive)
         .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L2()))
         .andThen(outtake.depositCoral()).andThen(elevator.L0()));
-    driverController.a().whileTrue(DriveCommands.AlgaeSnapper(drive));
 
-    driverController.povLeft().onTrue(DriveCommands.LeftSnapper(drive));
-    driverController.povUp()
-        .whileTrue(DriveCommands.FullSnapperOuter(drive)
-            .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
-            .andThen(outtake.depositCoral()).andThen(elevator.L0()));
-    driverController.povRight().onTrue(DriveCommands.RightSnapper(drive));
+    driverController.povLeft().onTrue(DriveCommands.FlySnappyV2Left(drive));
+    driverController.povUp().whileTrue(DriveCommands.BargeSnapper(drive));
 
-    driverController.povDown()
-        .whileTrue(DriveCommands.FullSnapperOuter(drive)
-            .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L2()))
-            .andThen(outtake.depositCoral()).andThen(elevator.L0()));
+    driverController.povRight().onTrue(DriveCommands.FlySnappyV2Right(drive));
+
+    driverController.povDown().onTrue(DriveCommands.snapToRotation(drive));
 
     operatorController.leftTrigger().whileTrue(outtake.autoQueueCoralOveride());
     operatorController.rightTrigger().whileTrue(outtake.reverseCoral());

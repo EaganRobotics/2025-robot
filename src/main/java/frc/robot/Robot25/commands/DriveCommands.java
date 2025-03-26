@@ -394,7 +394,7 @@ public class DriveCommands {
   }
 
   private static final Pose2d[] OUTER_REEF_POSITIONS = makeReefPositions(Inches.of(12));
-  private static final Pose2d[] FLY_REEF_POSITIONS = makeReefPositions(Inches.of(18));
+  private static final Pose2d[] FLY_REEF_POSITIONS = makeReefPositions(Inches.of(12));
   private static final Pose2d[] INNER_REEF_POSITIONS = makeReefPositions(Inches.of(0));
   private static final Pose2d[] OUTER_ALGAE_POSITIONS = makeAlgaePositions(Inches.of(15));
   private static final Pose2d[] INNER_ALGAE_POSITIONS = makeAlgaePositions(Inches.of(0));
@@ -643,8 +643,6 @@ public class DriveCommands {
 
   }
 
-  
-
   public static Command BargeSnapper(Drive drive) {
 
     return Commands.defer(() -> {
@@ -753,6 +751,30 @@ public class DriveCommands {
     }, Set.of(drive)).withName("DriveCommands.FlySnapper");
   }
 
+  public static Command FlySnappyV2Left(Drive drive) {
+    return Commands.defer(() -> {
+      Distance radius = Meters.of(1000);
+
+      var poses = getClosestLeftPosition(drive, radius).orElse(Pose2dSequence.kZero);
+
+      double interpolateTime = drive.getPose().getTranslation().getDistance(poses.outer.getTranslation()) > 1.5 ? 1.5
+          : 0.75;
+      return flyToPosition(drive, poses.outer, poses.inner, interpolateTime);
+    }, Set.of(drive)).withName("DriveCommands.FlySnapper");
+  }
+
+  public static Command FlySnappyV2Right(Drive drive) {
+    return Commands.defer(() -> {
+      Distance radius = Meters.of(1000);
+
+      var poses = getClosestRightPosition(drive, radius).orElse(Pose2dSequence.kZero);
+
+      double interpolateTime = drive.getPose().getTranslation().getDistance(poses.outer.getTranslation()) > 1.5 ? 1.5
+          : 0.75;
+      return flyToPosition(drive, poses.outer, poses.inner, interpolateTime);
+    }, Set.of(drive)).withName("DriveCommands.FlySnapper");
+  }
+
   private static final class Pose2dSequence {
     Pose2d inner;
     Pose2d outer;
@@ -785,13 +807,13 @@ public class DriveCommands {
   private static Optional<Pose2dSequence> getClosestFlyer(Drive drive, Distance radius) {
     Optional<Pose2dSequence> desiredPose = Optional.empty();
     Distance minDistance = Meters.of(1000000);
-    for (int i = 0; i < OUTER_REEF_POSITIONS.length; i++) {
-      Pose2d pose = OUTER_REEF_POSITIONS[i];
+    for (int i = 0; i < FLY_REEF_POSITIONS.length; i++) {
+      Pose2d pose = FLY_REEF_POSITIONS[i];
       double distance = drive.getPose().getTranslation().getDistance(pose.getTranslation());
       Distance distanceMeasure = Meters.of(distance);
       if (distanceMeasure.lte(radius) && distanceMeasure.lte(minDistance)) {
         minDistance = distanceMeasure;
-        desiredPose = Optional.of(new Pose2dSequence(INNER_REEF_POSITIONS[i], OUTER_REEF_POSITIONS[i]));
+        desiredPose = Optional.of(new Pose2dSequence(INNER_REEF_POSITIONS[i], FLY_REEF_POSITIONS[i]));
       }
     }
 
