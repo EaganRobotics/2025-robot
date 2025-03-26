@@ -237,7 +237,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
         () -> -driverController.getRightX() * .85, driverController.leftTrigger(),
         driverController.rightTrigger(0.15).or(elevator.isAtHeight(Level.L4))));
     outtake
-        .setDefaultCommand(outtake.autoQueueCoral(true).onlyWhile(elevator.isAtHeight(Level.Intake))
+        .setDefaultCommand(outtake.autoQueueCoral(false).onlyWhile(elevator.isAtHeight(Level.Intake))
             .withName("RobotContainer.outtakeDefaultCommand"));
     driverController.start().onTrue(Commands.runOnce(() -> {
       drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero));

@@ -63,7 +63,7 @@ public class Outtake extends SubsystemBase {
           io.setRollerOpenLoop(Volts.of(0));
         }
       } else if (!seesAtOutputTrigger.getAsBoolean() && seesAtInputTrigger.getAsBoolean()) {
-        io.setRollerOpenLoop(Volts.of(5));
+        io.setRollerOpenLoop(Volts.of(6));
       } else if (seesAtOutputTrigger.getAsBoolean() && !seesAtInputTrigger.getAsBoolean()) {
         io.setRollerOpenLoop(Volts.of(0));
       } else { // !!
