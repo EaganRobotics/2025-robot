@@ -15,6 +15,8 @@ public class Outtake extends SubsystemBase {
   private final OuttakeIO io;
   private final OuttakeIOInputsAutoLogged inputs = new OuttakeIOInputsAutoLogged();
 
+  private boolean shouldHaveCoral = true;
+
   public Outtake(OuttakeIO io) {
     this.io = io;
   }
@@ -56,18 +58,21 @@ public class Outtake extends SubsystemBase {
   public Command autoQueueCoral(boolean queuePartiallyOut) {
     return this.runEnd(() -> {
       Logger.recordOutput("Outtake/AutoQueuing", true);
-      if (seesAtOutputTrigger.getAsBoolean() && seesAtInputTrigger.getAsBoolean()) {
-        if (queuePartiallyOut) {
-          io.setRollerOpenLoop(Volts.of(3));
-        } else {
+      if (shouldHaveCoral == false) {
+        if (seesAtOutputTrigger.getAsBoolean() && seesAtInputTrigger.getAsBoolean()) {
+          if (queuePartiallyOut) {
+            io.setRollerOpenLoop(Volts.of(3));
+          } else {
+            io.setRollerOpenLoop(Volts.of(0));
+          }
+        } else if (!seesAtOutputTrigger.getAsBoolean() && seesAtInputTrigger.getAsBoolean()) {
+          io.setRollerOpenLoop(Volts.of(6));
+        } else if (seesAtOutputTrigger.getAsBoolean() && !seesAtInputTrigger.getAsBoolean()) {
           io.setRollerOpenLoop(Volts.of(0));
+          shouldHaveCoral = true;
+        } else { // !!
+          io.setRollerOpenLoop(Volts.of(7));
         }
-      } else if (!seesAtOutputTrigger.getAsBoolean() && seesAtInputTrigger.getAsBoolean()) {
-        io.setRollerOpenLoop(Volts.of(6));
-      } else if (seesAtOutputTrigger.getAsBoolean() && !seesAtInputTrigger.getAsBoolean()) {
-        io.setRollerOpenLoop(Volts.of(0));
-      } else { // !!
-        io.setRollerOpenLoop(Volts.of(7));
       }
     }, () -> {
       Logger.recordOutput("Outtake/AutoQueuing", false);
@@ -114,7 +119,8 @@ public class Outtake extends SubsystemBase {
 
   public Command depositCoral() {
     return setOpenLoop(Volts.of(6)).until(seesAtOutputTrigger.negate().debounce(0.1))
-        .withTimeout(1);
+        .withTimeout(1).andThen(() -> shouldHaveCoral = false);
+
   }
 
   public Command openLoop(DoubleSupplier speed) {
