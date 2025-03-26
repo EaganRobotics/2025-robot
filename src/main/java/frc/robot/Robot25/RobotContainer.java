@@ -204,6 +204,13 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
     NamedCommands.registerCommand("MN.3C.R1", DriveCommands.FlySnappyV2(drive));
     NamedCommands.registerCommand("MN.3C.R2", DriveCommands.SourceSnapper(drive));
+    NamedCommands.registerCommand("MN.1C.M1", DriveCommands.BargeSnapper(drive));
+
+    NamedCommands.registerCommand("AlgaeIntake", algae.setOpenLoop(Volts.of(-6)).withTimeout(3));
+    NamedCommands.registerCommand("AlgaeOuttake", algae.setOpenLoop(Volts.of(10)).withTimeout(1));
+    NamedCommands.registerCommand("AlgaeHeight", elevator.openLoop(() -> 1).withTimeout(3));
+    NamedCommands.registerCommand("AlgaeSnap", DriveCommands.AlgaeSnapper(drive));
+    NamedCommands.registerCommand("BargeHeight", elevator.Algae());
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser("AL.0C.1M"));
