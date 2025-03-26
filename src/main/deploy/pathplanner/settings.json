@@ -15,7 +15,7 @@
     "Calibration",
     "CO.3C.Autos"
   ],
-  "defaultMaxVel": 3.0,
+  "defaultMaxVel": 3.5,
   "defaultMaxAccel": 5.0,
   "defaultMaxAngVel": 360.0,
   "defaultMaxAngAccel": 180.0,
