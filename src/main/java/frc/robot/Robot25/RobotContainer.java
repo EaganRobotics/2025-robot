@@ -168,7 +168,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
     NamedCommands.registerCommand("Algae", elevator.Algae());
     NamedCommands.registerCommand("Ground", elevator.intakeHeight());
     NamedCommands.registerCommand("Intake",
-        outtake.autoQueueCoral3().until(outtake.seesAtInputTrigger.debounce(0.1)));
+        outtake.autoQueueCoral3().until(outtake.seesAtOutputTrigger.debounce(0.1)));
 
     NamedCommands.registerCommand("CO.ScoreFirstL4",
         DriveCommands.FullSnapperOuterAuto(drive).alongWith(elevator.L0())
