@@ -9,18 +9,6 @@
           "data": {
             "pathName": "7m tst"
           }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "L3"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "L1"
-          }
         }
       ]
     }

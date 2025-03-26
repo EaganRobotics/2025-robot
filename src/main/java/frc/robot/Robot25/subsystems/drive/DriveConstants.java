@@ -23,10 +23,10 @@ public class DriveConstants {
   private static final Current kSlipCurrent = Amps.of(120.0); // TODO measure this
 
   // PathPlanner and Maple Sim config constants
-  public static final Distance kWheelRadius = Inches.of(2); // TODO measure often
-  public static final double ROBOT_MASS_KG = 54.431;
-  public static final double ROBOT_MOI = 5.98;
-  public static final double WHEEL_COF = 1.542;
+  public static final Distance kWheelRadius = Inches.of(1.891); // TODO measure often
+  public static final double ROBOT_MASS_KG = 60.78;
+  public static final double ROBOT_MOI = 5.4;
+  public static final double WHEEL_COF = 1.2;
   public static final double kDriveGearRatio = 6.122; // Source: MK4i swerve module page; L3 gearing
   private static final double kSteerGearRatio = 150.0 / 7.0; // Source: MK4i swerve module page
   public static final double kMaxDriveMotorRPM = 6000.0;
@@ -49,7 +49,7 @@ public class DriveConstants {
     // output type specified by SwerveModuleConstants.DriveMotorClosedLoopOutput
     public static final Slot0Configs DRIVE_GAINS = new Slot0Configs().withKP(2.8444 * METERS_TO_ROTATIONS)
         .withKI(0 * METERS_TO_ROTATIONS)
-        .withKD(0 * METERS_TO_ROTATIONS).withKS(0.065599).withKV(2.2267 * METERS_TO_ROTATIONS)
+        .withKD(0 * METERS_TO_ROTATIONS).withKS(0.19598).withKV(0.77537)
         .withKA(0.058183 * METERS_TO_ROTATIONS);
 
   }
