@@ -354,7 +354,7 @@ public class DriveCommands {
         new Pose2d(Inches.of(Right_Loading_Station_X + 5.5),
             Inches.of(Right_Loading_Station_Y + 5.5), Rotation2d.fromDegrees(55)),
         new Pose2d(Inches.of(Left_Loading_Station_X - 1.5), Inches.of(Left_Loading_Station_Y + 1.5),
-            Rotation2d.fromDegrees(-55)).plus(new Transform2d(Inches.of(6), Inches.zero(), Rotation2d.kZero)),
+            Rotation2d.fromDegrees(-55)).plus(new Transform2d(Inches.of(6.5), Inches.zero(), Rotation2d.kZero)),
         new Pose2d(Inches.of(Right_Loading_Station_X + 5.5 + 623.825 - 8 - 6 - 2),
             Inches.of(Right_Loading_Station_Y + 5.5 + 3 + 6 + 2), Rotation2d.fromDegrees(125)),
         new Pose2d(Inches.of(Left_Loading_Station_X - 1.5 + 623.825 - 10),
