@@ -63,7 +63,7 @@ public class Outtake extends SubsystemBase {
           io.setRollerOpenLoop(Volts.of(0));
         }
       } else if (!seesAtOutputTrigger.getAsBoolean() && seesAtInputTrigger.getAsBoolean()) {
-        io.setRollerOpenLoop(Volts.of(6));
+        io.setRollerOpenLoop(Volts.of(5));
       } else if (seesAtOutputTrigger.getAsBoolean() && !seesAtInputTrigger.getAsBoolean()) {
         io.setRollerOpenLoop(Volts.of(0));
       } else { // !!
@@ -126,9 +126,9 @@ public class Outtake extends SubsystemBase {
     }).withName("Outtake.openLoop");
   }
 
-  public final Trigger seesAtOutputTrigger = new Trigger(() -> inputs.seesCoralAtOutput).debounce(0.025,
+  public final Trigger seesAtOutputTrigger = new Trigger(() -> inputs.seesCoralAtOutput).debounce(0.15,
       DebounceType.kFalling);
-  public final Trigger seesAtInputTrigger = new Trigger(() -> inputs.seesCoralAtInput).debounce(0.025,
+  public final Trigger seesAtInputTrigger = new Trigger(() -> inputs.seesCoralAtInput).debounce(0.10,
       DebounceType.kFalling);
 
   // public Command specialDepositCoral() {
