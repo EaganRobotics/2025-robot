@@ -203,7 +203,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
             .andThen(outtake.depositCoral()).andThen(elevator.L0()));
 
     NamedCommands.registerCommand("MN.3C.R1", DriveCommands.FlySnappyV2(drive));
-    NamedCommands.registerCommand("MN.3C.R2", DriveCommands.SourceSnapper(drive));
+    NamedCommands.registerCommand("MN.3C.R2",
+        DriveCommands.SourceSnapper(drive).until(outtake.seesAtInputTrigger.debounce(0.1)));
     NamedCommands.registerCommand("MN.1C.M1", DriveCommands.BargeSnapper(drive));
 
     NamedCommands.registerCommand("AlgaeIntake", algae.setOpenLoop(Volts.of(-6)).withTimeout(3));
