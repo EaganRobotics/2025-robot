@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "Ground"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "7m tst"
