@@ -128,7 +128,7 @@ public class Outtake extends SubsystemBase {
   }
 
   public final Trigger seesAtOutputTrigger =
-      new Trigger(() -> inputs.seesCoralAtOutput).debounce(0.15, DebounceType.kFalling);
+      new Trigger(() -> inputs.seesCoralAtOutput).debounce(0.1, DebounceType.kFalling);
   public final Trigger seesAtInputTrigger =
       new Trigger(() -> inputs.seesCoralAtInput).debounce(0.15, DebounceType.kFalling);
 

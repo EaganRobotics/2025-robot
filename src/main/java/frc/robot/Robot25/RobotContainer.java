@@ -248,20 +248,20 @@ public class RobotContainer extends frc.lib.RobotContainer {
     driverController.rightBumper().whileTrue(DriveCommands.FlySnappyV2(drive));
     driverController.leftBumper().whileTrue(DriveCommands.SourceSnapper(drive));
 
-    driverController.x().onTrue(DriveCommands.LeftSnapper(drive));
+    driverController.x().onTrue(DriveCommands.snapToRotation(drive));
     driverController.y().whileTrue(DriveCommands.BargeSnapper(drive));
-    driverController.b().onTrue(DriveCommands.RightSnapper(drive));
+    driverController.b().whileTrue(DriveCommands.FullSnapperOuter(drive)
+        .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L2()))
+        .andThen(outtake.depositCoral()).andThen(elevator.L0()));
     driverController.a().whileTrue(DriveCommands.AlgaeSnapper(drive));
 
-    driverController.povLeft().onTrue(DriveCommands.snapToRotation(drive));
+    driverController.povLeft().onTrue(DriveCommands.LeftSnapper(drive));
     driverController.povUp()
         .whileTrue(DriveCommands.FullSnapperOuter(drive)
             .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
             .andThen(outtake.depositCoral()).andThen(elevator.L0()));
-    driverController.povRight()
-        .whileTrue(DriveCommands.FullSnapperOuter(drive)
-            .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L2()))
-            .andThen(outtake.depositCoral()).andThen(elevator.L0()));
+    driverController.povRight().onTrue(DriveCommands.RightSnapper(drive));
+
     driverController.povDown()
         .whileTrue(DriveCommands.FullSnapperOuter(drive)
             .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L2()))
