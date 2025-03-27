@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.lib.RobotContainer;
 import frc.lib.RobotInstance;
 import frc.lib.replay.WPILogReadMACAddress;
+import frc.robot.Robot25.commands.DriveCommands;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -102,7 +103,8 @@ public class Robot extends LoggedRobot {
         // Replaying a log, set up replay source
         setUseTiming(false); // Run as fast as possible
         String logPath = LogFileUtil.findReplayLog();
-        macAddress = WPILogReadMACAddress.get(logPath);
+        // macAddress = WPILogReadMACAddress.get(logPath);
+        macAddress = "00-80-2F-36-FD-D6";
         Logger.setReplaySource(new WPILOGReader(logPath));
         Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
         break;
@@ -161,6 +163,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void robotPeriodic() {
     // Switch thread to high priority to improve loop timing
+    // TODO: AKit recommends you remove this unless you know your loop times are <0.02s
     Threads.setCurrentThreadPriority(true, 99);
 
     // Runs the Scheduler. This is responsible for polling buttons, adding
@@ -171,6 +174,7 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().run();
 
     // Return to normal thread priority
+    // TODO: This too (AKit)
     Threads.setCurrentThreadPriority(false, 10);
 
     robotContainer.robotPeriodic();

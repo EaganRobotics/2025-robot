@@ -2,6 +2,7 @@ package frc.robot.Robot25.subsystems.outtake;
 
 import static edu.wpi.first.units.Units.Volts;
 
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -13,6 +14,8 @@ import org.littletonrobotics.junction.Logger;
 public class Outtake extends SubsystemBase {
   private final OuttakeIO io;
   private final OuttakeIOInputsAutoLogged inputs = new OuttakeIOInputsAutoLogged();
+
+  private boolean shouldHaveCoral = true;
 
   public Outtake(OuttakeIO io) {
     this.io = io;
@@ -52,17 +55,24 @@ public class Outtake extends SubsystemBase {
     }).withTimeout(2);
   }
 
-  public Command autoQueueCoral() {
+  public Command autoQueueCoral(boolean queuePartiallyOut) {
     return this.runEnd(() -> {
       Logger.recordOutput("Outtake/AutoQueuing", true);
-      if (inputs.seesCoralAtOutput && inputs.seesCoralAtInput) {
-        io.setRollerOpenLoop(Volts.of(0));
-      } else if (!inputs.seesCoralAtOutput && inputs.seesCoralAtInput) {
-        io.setRollerOpenLoop(Volts.of(7));
-      } else if (inputs.seesCoralAtOutput && !inputs.seesCoralAtInput) {
-        io.setRollerOpenLoop(Volts.of(0));
-      } else { // !!
-        io.setRollerOpenLoop(Volts.of(8));
+      if (shouldHaveCoral == false) {
+        if (seesAtOutputTrigger.getAsBoolean() && seesAtInputTrigger.getAsBoolean()) {
+          if (queuePartiallyOut) {
+            io.setRollerOpenLoop(Volts.of(3));
+          } else {
+            io.setRollerOpenLoop(Volts.of(0));
+          }
+        } else if (!seesAtOutputTrigger.getAsBoolean() && seesAtInputTrigger.getAsBoolean()) {
+          io.setRollerOpenLoop(Volts.of(6));
+        } else if (seesAtOutputTrigger.getAsBoolean() && !seesAtInputTrigger.getAsBoolean()) {
+          io.setRollerOpenLoop(Volts.of(0));
+          shouldHaveCoral = true;
+        } else { // !!
+          io.setRollerOpenLoop(Volts.of(7));
+        }
       }
     }, () -> {
       Logger.recordOutput("Outtake/AutoQueuing", false);
@@ -80,20 +90,45 @@ public class Outtake extends SubsystemBase {
       Logger.recordOutput("Outtake/AutoQueuing", true);
       if (inputs.seesCoralAtOutput) {
         io.setRollerOpenLoop(Volts.of(0));
-        // } else if (inputs.seesCoralAtInput) {
-        // io.setOpenLoop(Volts.of(6));
       } else {
         io.setRollerOpenLoop(Volts.of(5));
       }
     }, () -> {
       Logger.recordOutput("Outtake/AutoQueuing", false);
       io.setRollerOpenLoop(Volts.of(0));
-    }).withTimeout(4);
+    }).withTimeout(1);
   }
 
+  public Command autoQueueCoral3() {
+    return this.runEnd(() -> {
+      Logger.recordOutput("Outtake/AutoQueuing", true);
+      if (inputs.seesCoralAtOutput && inputs.seesCoralAtInput) {
+        io.setRollerOpenLoop(Volts.of(0));
+      } else if (!inputs.seesCoralAtOutput && inputs.seesCoralAtInput) {
+        io.setRollerOpenLoop(Volts.of(5));
+      } else if (inputs.seesCoralAtOutput && !inputs.seesCoralAtInput) {
+        io.setRollerOpenLoop(Volts.of(0));
+      } else { // !!
+        io.setRollerOpenLoop(Volts.of(6));
+      }
+    }, () -> {
+      Logger.recordOutput("Outtake/AutoQueuing", false);
+      io.setRollerOpenLoop(Volts.of(0));
+    }).withTimeout(2.5);
+  }
+
+  /**
+   * Investigating this function: - look if timeout or sensor is ending the function - see if we are
+   * applying output but still not scoring, lineup with video
+   *
+   * TODO: get rid of debouce on until() call since we recently added a falling (true -> false)
+   * debounce to the trigger anyway
+   */
   public Command depositCoral() {
-    return setOpenLoop(Volts.of(6)).until(seesAtOutputTrigger.negate().debounce(0.1))
-        .withTimeout(1);
+    return setOpenLoop(Volts.of(6)).until(seesAtOutputTrigger.negate().debounce(0.1)).withTimeout(1)
+        .andThen(() -> shouldHaveCoral = false);
+    // return setOpenLoop(Volts.of(6)).until(seesAtOutputTrigger.negate())
+    // .withTimeout(1).andThen(() -> shouldHaveCoral = false);
   }
 
   public Command openLoop(DoubleSupplier speed) {
@@ -105,8 +140,10 @@ public class Outtake extends SubsystemBase {
     }).withName("Outtake.openLoop");
   }
 
-  public final Trigger seesAtOutputTrigger = new Trigger(() -> inputs.seesCoralAtOutput);
-  public final Trigger seesAtInputTrigger = new Trigger(() -> inputs.seesCoralAtInput);
+  public final Trigger seesAtOutputTrigger =
+      new Trigger(() -> inputs.seesCoralAtOutput).debounce(0.15, DebounceType.kFalling);
+  public final Trigger seesAtInputTrigger =
+      new Trigger(() -> inputs.seesCoralAtInput).debounce(0.10, DebounceType.kFalling);
 
   // public Command specialDepositCoral() {
   // return setOpenLop(Volts.of(5));

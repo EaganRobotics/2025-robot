@@ -5,15 +5,22 @@
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "L0"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "AL.2C.L.Path"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "L0"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "MN.1C.M1"
+                }
+              }
+            ]
           }
         },
         {
@@ -23,13 +30,13 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Auto1"
+                  "name": "L4"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "L4"
+                  "name": "MN.3C.R1"
                 }
               }
             ]
@@ -48,13 +55,32 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "LeftSource"
+                  "name": "L2"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "L0"
+                  "name": "AlgaeSnap"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "AlgaeIntake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "AlgaeHeight"
                 }
               }
             ]
@@ -65,24 +91,31 @@
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "path",
                 "data": {
-                  "name": "Align2"
+                  "pathName": "MN.1C.M2"
                 }
               },
               {
-                "type": "named",
+                "type": "parallel",
                 "data": {
-                  "name": "L4"
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 1.0
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Ground"
+                      }
+                    }
+                  ]
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Exhaust"
           }
         },
         {
@@ -92,22 +125,28 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "L0"
+                  "name": "MN.1C.M1"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "LeftSource"
+                  "name": "BargeHeight"
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlgaeOuttake"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "AL.2C.Autos",
+  "folder": null,
   "choreoAuto": false
 }
