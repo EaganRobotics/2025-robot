@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Robot25.commands.DriveCharacterization;
 import frc.robot.Robot25.commands.DriveCommands;
+import frc.robot.Robot25.commands.DriveCommands.ReefPositions;
 import frc.robot.Robot25.subsystems.AlgaeEater.Algae;
 import frc.robot.Robot25.subsystems.AlgaeEater.AlgaeIO;
 import frc.robot.Robot25.subsystems.AlgaeEater.AlgaeIOSim;
@@ -195,6 +196,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
     NamedCommands.registerCommand("MN.3C.R1", DriveCommands.FlySnappyV2(drive));
     NamedCommands.registerCommand("MN.3C.R2", DriveCommands.SourceSnapper(drive));
+
     NamedCommands.registerCommand("MN.1C.M1", DriveCommands.BargeSnapper(drive));
 
     NamedCommands.registerCommand("AlgaeIntake", algae.setOpenLoop(Volts.of(-6)).withTimeout(3));
@@ -203,6 +205,30 @@ public class RobotContainer extends frc.lib.RobotContainer {
     NamedCommands.registerCommand("AlgaeSnap", DriveCommands.AlgaeSnapper(drive).withTimeout(3));
     NamedCommands.registerCommand("BargeHeight", elevator.Algae());
 
+    NamedCommands.registerCommand("SnapReef.A",
+        DriveCommands.FlySnappyV2Named(drive, ReefPositions.A));
+    NamedCommands.registerCommand("SnapReef.B",
+        DriveCommands.FlySnappyV2Named(drive, ReefPositions.B));
+    NamedCommands.registerCommand("SnapReef.C",
+        DriveCommands.FlySnappyV2Named(drive, ReefPositions.C));
+    NamedCommands.registerCommand("SnapReef.D",
+        DriveCommands.FlySnappyV2Named(drive, ReefPositions.D));
+    NamedCommands.registerCommand("SnapReef.E",
+        DriveCommands.FlySnappyV2Named(drive, ReefPositions.E));
+    NamedCommands.registerCommand("SnapReef.F",
+        DriveCommands.FlySnappyV2Named(drive, ReefPositions.F));
+    NamedCommands.registerCommand("SnapReef.G",
+        DriveCommands.FlySnappyV2Named(drive, ReefPositions.G));
+    NamedCommands.registerCommand("SnapReef.H",
+        DriveCommands.FlySnappyV2Named(drive, ReefPositions.H));
+    NamedCommands.registerCommand("SnapReef.I",
+        DriveCommands.FlySnappyV2Named(drive, ReefPositions.I));
+    NamedCommands.registerCommand("SnapReef.J",
+        DriveCommands.FlySnappyV2Named(drive, ReefPositions.J));
+    NamedCommands.registerCommand("SnapReef.K",
+        DriveCommands.FlySnappyV2Named(drive, ReefPositions.K));
+    NamedCommands.registerCommand("SnapReef.L",
+        DriveCommands.FlySnappyV2Named(drive, ReefPositions.L));
     // Set up auto routines
     autoChooser =
         new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser("AL.0C.1M"));

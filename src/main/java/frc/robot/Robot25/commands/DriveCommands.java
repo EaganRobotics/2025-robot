@@ -126,24 +126,6 @@ public class DriveCommands {
             Rotation2d.fromDegrees(300)).transformBy(REEF_BRANCH_TO_ROBOT),
 
         new Pose2d(
-            RED_REEF_CENTER.plus(new Translation2d(Inches.of(-20.738000), Inches.of(6.482000))),
-            Rotation2d.kZero).transformBy(REEF_BRANCH_TO_ROBOT),
-        new Pose2d(
-            RED_REEF_CENTER.plus(new Translation2d(Inches.of(-20.738000), Inches.of(-6.482000))),
-            Rotation2d.kZero).transformBy(REEF_BRANCH_TO_ROBOT),
-        new Pose2d(
-            RED_REEF_CENTER.plus(new Translation2d(Inches.of(-15.982577), Inches.of(-14.718635))),
-            Rotation2d.fromDegrees(60)).transformBy(REEF_BRANCH_TO_ROBOT),
-        new Pose2d(
-            RED_REEF_CENTER.plus(new Translation2d(Inches.of(-4.755423), Inches.of(-21.200635))),
-            Rotation2d.fromDegrees(60)).transformBy(REEF_BRANCH_TO_ROBOT),
-        new Pose2d(
-            RED_REEF_CENTER.plus(new Translation2d(Inches.of(4.755423), Inches.of(-21.200635))),
-            Rotation2d.fromDegrees(120)).transformBy(REEF_BRANCH_TO_ROBOT),
-        new Pose2d(
-            RED_REEF_CENTER.plus(new Translation2d(Inches.of(15.982577), Inches.of(-14.718635))),
-            Rotation2d.fromDegrees(120)).transformBy(REEF_BRANCH_TO_ROBOT),
-        new Pose2d(
             RED_REEF_CENTER.plus(new Translation2d(Inches.of(20.738000), Inches.of(-6.482000))),
             Rotation2d.fromDegrees(180)).transformBy(REEF_BRANCH_TO_ROBOT),
         new Pose2d(
@@ -160,7 +142,25 @@ public class DriveCommands {
             Rotation2d.fromDegrees(300)).transformBy(REEF_BRANCH_TO_ROBOT),
         new Pose2d(
             RED_REEF_CENTER.plus(new Translation2d(Inches.of(-15.982577), Inches.of(14.718635))),
-            Rotation2d.fromDegrees(300)).transformBy(REEF_BRANCH_TO_ROBOT),};
+            Rotation2d.fromDegrees(300)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            RED_REEF_CENTER.plus(new Translation2d(Inches.of(-20.738000), Inches.of(6.482000))),
+            Rotation2d.kZero).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            RED_REEF_CENTER.plus(new Translation2d(Inches.of(-20.738000), Inches.of(-6.482000))),
+            Rotation2d.kZero).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            RED_REEF_CENTER.plus(new Translation2d(Inches.of(-15.982577), Inches.of(-14.718635))),
+            Rotation2d.fromDegrees(60)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            RED_REEF_CENTER.plus(new Translation2d(Inches.of(-4.755423), Inches.of(-21.200635))),
+            Rotation2d.fromDegrees(60)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            RED_REEF_CENTER.plus(new Translation2d(Inches.of(4.755423), Inches.of(-21.200635))),
+            Rotation2d.fromDegrees(120)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            RED_REEF_CENTER.plus(new Translation2d(Inches.of(15.982577), Inches.of(-14.718635))),
+            Rotation2d.fromDegrees(120)).transformBy(REEF_BRANCH_TO_ROBOT),};
   }
 
   public static Pose2d[] makeRightReefPositions(Distance reefOffset) {
@@ -352,14 +352,18 @@ public class DriveCommands {
     return new Pose2d[] {
 
         new Pose2d(Inches.of(Right_Loading_Station_X + 5.5),
-            Inches.of(Right_Loading_Station_Y + 5.5), Rotation2d.fromDegrees(55)),
+            Inches.of(Right_Loading_Station_Y + 5.5), Rotation2d.fromDegrees(55))
+            .plus(new Transform2d(sourceOffset, Inches.of(0), Rotation2d.kZero)),
         new Pose2d(Inches.of(Left_Loading_Station_X - 1.5), Inches.of(Left_Loading_Station_Y + 1.5),
-            Rotation2d.fromDegrees(-50))
-            .plus(new Transform2d(Inches.of(6), Inches.of(-14), Rotation2d.kZero)),
+            Rotation2d.fromDegrees(-55))
+            .plus(new Transform2d(sourceOffset, Inches.of(0), Rotation2d.kZero)).plus(
+                new Transform2d(Inches.of(2).plus(sourceOffset), Inches.of(-14), Rotation2d.kZero)),
         new Pose2d(Inches.of(Right_Loading_Station_X + 5.5 + 623.825 - 8 - 6 - 2),
-            Inches.of(Right_Loading_Station_Y + 5.5 + 3 + 6 + 2), Rotation2d.fromDegrees(125)),
+            Inches.of(Right_Loading_Station_Y + 5.5 + 3 + 6 + 2), Rotation2d.fromDegrees(125))
+            .plus(new Transform2d(sourceOffset, Inches.of(0), Rotation2d.kZero)),
         new Pose2d(Inches.of(Left_Loading_Station_X - 1.5 + 623.825 - 10),
-            Inches.of(Left_Loading_Station_Y + 1.5 - 4.5), Rotation2d.fromDegrees(-125))};
+            Inches.of(Left_Loading_Station_Y + 1.5 - 4.5), Rotation2d.fromDegrees(-125))
+            .plus(new Transform2d(sourceOffset, Inches.of(0), Rotation2d.kZero))};
 
   }
 
@@ -763,6 +767,84 @@ public class DriveCommands {
     }, Set.of(drive)).withName("DriveCommands.FlySnapper");
   }
 
+  public enum ReefPositions {
+    A, B, C, D, E, F, G, H, I, J, K, L
+  }
+
+  public static Command FlySnappyV2Named(Drive drive, ReefPositions reefPositions) {
+    return Commands.defer(() -> {
+      Distance radius = Meters.of(1000);
+
+      Pose2d inner, outer;
+
+      // TODO: instead maintain two separate lists of RED and BLUE reef positions
+      // The `+12` is to index on the red half of the reef positions
+      var redOrBlue = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? 0 : 12;
+
+      switch (reefPositions) {
+        case A:
+          inner = INNER_REEF_POSITIONS[0 + redOrBlue];
+          outer = OUTER_REEF_POSITIONS[0 + redOrBlue];
+          break;
+        case B:
+          inner = INNER_REEF_POSITIONS[1 + redOrBlue];
+          outer = OUTER_REEF_POSITIONS[1 + redOrBlue];
+          break;
+        case C:
+          inner = INNER_REEF_POSITIONS[2 + redOrBlue];
+          outer = OUTER_REEF_POSITIONS[2 + redOrBlue];
+          break;
+        case D:
+          inner = INNER_REEF_POSITIONS[3 + redOrBlue];
+          outer = OUTER_REEF_POSITIONS[3 + redOrBlue];
+          break;
+        case E:
+          inner = INNER_REEF_POSITIONS[4 + redOrBlue];
+          outer = OUTER_REEF_POSITIONS[4 + redOrBlue];
+          break;
+        case F:
+          inner = INNER_REEF_POSITIONS[5 + redOrBlue];
+          outer = OUTER_REEF_POSITIONS[5 + redOrBlue];
+          break;
+        case G:
+          inner = INNER_REEF_POSITIONS[6 + redOrBlue];
+          outer = OUTER_REEF_POSITIONS[6 + redOrBlue];
+          break;
+        case H:
+          inner = INNER_REEF_POSITIONS[7 + redOrBlue];
+          outer = OUTER_REEF_POSITIONS[7 + redOrBlue];
+          break;
+        case I:
+          inner = INNER_REEF_POSITIONS[8 + redOrBlue];
+          outer = OUTER_REEF_POSITIONS[8 + redOrBlue];
+          break;
+        case J:
+          inner = INNER_REEF_POSITIONS[9 + redOrBlue];
+          outer = OUTER_REEF_POSITIONS[9 + redOrBlue];
+          break;
+        case K:
+          inner = INNER_REEF_POSITIONS[10 + redOrBlue];
+          outer = OUTER_REEF_POSITIONS[10 + redOrBlue];
+          break;
+        case L:
+          inner = INNER_REEF_POSITIONS[11 + redOrBlue];
+          outer = OUTER_REEF_POSITIONS[11 + redOrBlue];
+          break;
+        default:
+          System.out.println("Invalid case. This should not happen");
+          var poses = getClosestFlyer(drive, radius).orElse(Pose2dSequence.kZero);
+          inner = poses.inner;
+          outer = poses.outer;
+          break;
+      }
+      // var poses = getClosestFlyer(drive, radius).orElse(Pose2dSequence.kZero);
+
+      double interpolateTime =
+          drive.getPose().getTranslation().getDistance(outer.getTranslation()) > 1.5 ? 1.5 : 0.75;
+      return flyToPosition(drive, outer, inner, interpolateTime);
+    }, Set.of(drive)).withName("DriveCommands.FlySnapper");
+  }
+
   public static Command FlySnappyV2Left(Drive drive) {
     return Commands.defer(() -> {
       Distance radius = Meters.of(1000);
@@ -918,7 +1000,7 @@ public class DriveCommands {
 
   private static Optional<Pose2d> getClosestSource(Drive drive, Distance radius) {
     Optional<Pose2d> desiredPose = Optional.empty();
-    Distance minDistance = Meters.of(1000000);
+    Distance minDistance = Meters.of(100000000);
     for (Pose2d pose : SOURCE_POSITIONS) {
       double distance = drive.getPose().getTranslation().getDistance(pose.getTranslation());
       Distance distanceMeasure = Meters.of(distance);

@@ -117,10 +117,18 @@ public class Outtake extends SubsystemBase {
     }).withTimeout(2.5);
   }
 
+  /**
+   * Investigating this function: - look if timeout or sensor is ending the function - see if we are
+   * applying output but still not scoring, lineup with video
+   *
+   * TODO: get rid of debouce on until() call since we recently added a falling (true -> false)
+   * debounce to the trigger anyway
+   */
   public Command depositCoral() {
     return setOpenLoop(Volts.of(6)).until(seesAtOutputTrigger.negate().debounce(0.1)).withTimeout(1)
         .andThen(() -> shouldHaveCoral = false);
-
+    // return setOpenLoop(Volts.of(6)).until(seesAtOutputTrigger.negate())
+    // .withTimeout(1).andThen(() -> shouldHaveCoral = false);
   }
 
   public Command openLoop(DoubleSupplier speed) {
