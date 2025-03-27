@@ -55,8 +55,7 @@ public class DriveCommands {
   /// Auto snap to position distance
   private static final Distance SNAPPY_RADIUS = Inches.of(12);
 
-  private static final double INCHES_FROM_REEF = 16.75 + 11.757361 - 6;
-  // private static final double INCHES_FROM_REEF = 16.75 + 11.757361 - 0.5; // old limelight-front
+  private static final double INCHES_FROM_REEF = 16.75 + 11.757361 - 0.5;
   private static final double REEF_CENTER_X_INCHES = 176.745545;
   private static final double REEF_CENTER_Y_INCHES = 158.500907;
 
