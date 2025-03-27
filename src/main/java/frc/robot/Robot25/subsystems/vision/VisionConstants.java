@@ -24,7 +24,8 @@ import edu.wpi.first.math.geometry.Transform3d;
 
 public class VisionConstants {
   // AprilTag layout
-  public static AprilTagFieldLayout aprilTagLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+  public static AprilTagFieldLayout aprilTagLayout =
+      AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
   // Camera names, must match names configured on coprocessor
   public static String limelightFrontName = "limelight-front";
@@ -34,11 +35,12 @@ public class VisionConstants {
   // (Not used by Limelight, configure in web UI instead)
   public static Transform3d limelightFrontTransform = new Transform3d(-0.120, 0.2262, 0.3178,
       new Rotation3d(Degrees.of(0), Degrees.of(0), Degrees.of(-20)));
-  public static Transform3d limelightBackTransform = new Transform3d(-0.1895, 0.0508, 0.6493,
-      new Rotation3d(0.0, 0, Math.PI));
+  public static Transform3d limelightBackTransform =
+      new Transform3d(-0.1895, 0.0508, 0.6493, new Rotation3d(0.0, 0, Math.PI));
 
-  public static Transform3d newlimelightfrontTransform = new Transform3d(Inches.of(4), Inches.of(10.5),
-      Inches.of(9.413), new Rotation3d(Degrees.of(0), Degree.of(20), Degree.of(-30)));
+  public static Transform3d newlimelightfrontTransform =
+      new Transform3d(Inches.of(4), Inches.of(10.5), Inches.of(9.413),
+          new Rotation3d(Degrees.of(0), Degree.of(20), Degree.of(-30)));
 
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.3;
@@ -51,7 +53,7 @@ public class VisionConstants {
 
   // Standard deviation multipliers for each camera
   // (Adjust to trust some cameras more than others)
-  public static double[] cameraStdDevFactors = new double[] { 1.0, // Camera 0
+  public static double[] cameraStdDevFactors = new double[] {1.0, // Camera 0
       1.0 // Camera 1
   };
 

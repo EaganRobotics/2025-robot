@@ -21,21 +21,22 @@ public class OuttakeIOTalonFX implements OuttakeIO {
   final int outtakeWheelDiameter = 5;
   final int outtakeRollerDiameter = 4;
 
-  private static final TalonFXConfiguration outtakeConfig = new TalonFXConfiguration()
-      .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(15).withStatorCurrentLimitEnable(true));
+  private static final TalonFXConfiguration outtakeConfig =
+      new TalonFXConfiguration().withCurrentLimits(
+          new CurrentLimitsConfigs().withStatorCurrentLimit(15).withStatorCurrentLimitEnable(true));
 
   DigitalInputWrapper inputSensor = new DigitalInputWrapper(5, "LoadSideSensor", true);
   DigitalInputWrapper outputSensor = new DigitalInputWrapper(0, "ScoreSideSensor", true);
 
   public OuttakeIOTalonFX() {
-    outtakeTalonFX = new TalonFXWrapper(motorID, "Outtake", true, NeutralModeValue.Brake, 1, 0, 0, 0,
-        RotationsPerSecondPerSecond.of(0), RotationsPerSecond.of(0),
-        false, false, Rotations.of(0), Rotations.of(0), null, Units.Seconds.of(1),
-        Units.Amps.of(15), Units.RotationsPerSecond.of(1));
-    outtakeRollerFX = new TalonFXWrapper(rollerID, "Outtake", true, NeutralModeValue.Brake, 1, 0, 0, 0,
-        RotationsPerSecondPerSecond.of(0), RotationsPerSecond.of(0),
-        false, false, Rotations.of(0), Rotations.of(0), null, Units.Seconds.of(1),
-        Units.Amps.of(15), Units.RotationsPerSecond.of(1));
+    outtakeTalonFX = new TalonFXWrapper(motorID, "Outtake", true, NeutralModeValue.Brake, 1, 0, 0,
+        0, RotationsPerSecondPerSecond.of(0), RotationsPerSecond.of(0), false, false,
+        Rotations.of(0), Rotations.of(0), null, Units.Seconds.of(1), Units.Amps.of(15),
+        Units.RotationsPerSecond.of(1));
+    outtakeRollerFX = new TalonFXWrapper(rollerID, "Outtake", true, NeutralModeValue.Brake, 1, 0, 0,
+        0, RotationsPerSecondPerSecond.of(0), RotationsPerSecond.of(0), false, false,
+        Rotations.of(0), Rotations.of(0), null, Units.Seconds.of(1), Units.Amps.of(15),
+        Units.RotationsPerSecond.of(1));
   }
 
   @Override

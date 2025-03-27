@@ -129,7 +129,6 @@ public class Outtake extends SubsystemBase {
         .withTimeout(1).andThen(() -> shouldHaveCoral = false);
     // return setOpenLoop(Volts.of(6)).until(seesAtOutputTrigger.negate())
     //     .withTimeout(1).andThen(() -> shouldHaveCoral = false);
-
   }
 
   public Command openLoop(DoubleSupplier speed) {
@@ -141,10 +140,10 @@ public class Outtake extends SubsystemBase {
     }).withName("Outtake.openLoop");
   }
 
-  public final Trigger seesAtOutputTrigger = new Trigger(() -> inputs.seesCoralAtOutput).debounce(0.15,
-      DebounceType.kFalling);
-  public final Trigger seesAtInputTrigger = new Trigger(() -> inputs.seesCoralAtInput).debounce(0.10,
-      DebounceType.kFalling);
+  public final Trigger seesAtOutputTrigger =
+      new Trigger(() -> inputs.seesCoralAtOutput).debounce(0.15, DebounceType.kFalling);
+  public final Trigger seesAtInputTrigger =
+      new Trigger(() -> inputs.seesCoralAtInput).debounce(0.10, DebounceType.kFalling);
 
   // public Command specialDepositCoral() {
   // return setOpenLop(Volts.of(5));
