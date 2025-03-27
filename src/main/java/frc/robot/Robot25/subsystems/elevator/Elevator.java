@@ -54,7 +54,7 @@ public class Elevator extends SubsystemBase {
     minHeight(MIN_HEIGHT), Intake(Inches.of(16.4 + 3.5)), L1(Inches.of(18 + 14)), L2(
         Inches.of(38.66)),
     L3(
-        Inches.of(53.19)),
+        Inches.of(54.5)),
     L4(Inches.of(78.25)), Barge(Inches.of(82));
 
     private final Distance height;
