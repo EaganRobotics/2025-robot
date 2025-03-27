@@ -209,8 +209,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
 
     NamedCommands.registerCommand("AlgaeIntake", algae.setOpenLoop(Volts.of(-6)).withTimeout(3));
     NamedCommands.registerCommand("AlgaeOuttake", algae.setOpenLoop(Volts.of(10)).withTimeout(1));
-    NamedCommands.registerCommand("AlgaeHeight", elevator.openLoop(() -> -.5).withTimeout(3));
-    NamedCommands.registerCommand("AlgaeSnap", DriveCommands.AlgaeSnapper(drive));
+    NamedCommands.registerCommand("AlgaeHeight", elevator.openLoop(() -> .5).withTimeout(3));
+    NamedCommands.registerCommand("AlgaeSnap", DriveCommands.AlgaeSnapper(drive).withTimeout(3));
     NamedCommands.registerCommand("BargeHeight", elevator.Algae());
 
     // Set up auto routines
