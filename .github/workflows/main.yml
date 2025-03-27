@@ -89,6 +89,7 @@ jobs:
 
   test:
     needs: build
+    if: false # disable since we don't test right now
     name: Test
     runs-on: ubuntu-22.04
     container: wpilib/roborio-cross-ubuntu:2025-22.04
