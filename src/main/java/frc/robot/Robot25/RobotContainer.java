@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Robot25.commands.DriveCharacterization;
 import frc.robot.Robot25.commands.DriveCommands;
+import frc.robot.Robot25.commands.DriveCommands.ReefPositions;
 import frc.robot.Robot25.subsystems.AlgaeEater.Algae;
 import frc.robot.Robot25.subsystems.AlgaeEater.AlgaeIO;
 import frc.robot.Robot25.subsystems.AlgaeEater.AlgaeIOSim;
@@ -63,21 +64,21 @@ public class RobotContainer extends frc.lib.RobotContainer {
   private final Algae algae;
 
   // Drive simulation
-  private static final SwerveDriveSimulation driveSimulation = new SwerveDriveSimulation(Drive.MAPLE_SIM_CONFIG,
-      SimConstants.SIM_INITIAL_FIELD_POSE);
+  private static final SwerveDriveSimulation driveSimulation =
+      new SwerveDriveSimulation(Drive.MAPLE_SIM_CONFIG, SimConstants.SIM_INITIAL_FIELD_POSE);
   private final CommandXboxController driverController = new CommandXboxController(0);
   private final CommandXboxController operatorController = new CommandXboxController(1);
 
   private final LoggedDashboardChooser<Command> autoChooser;
 
   @AutoLogOutput
-  public final Pose3d[] mechanismPoses = new Pose3d[] { Pose3d.kZero, Pose3d.kZero, Pose3d.kZero, };
+  public final Pose3d[] mechanismPoses = new Pose3d[] {Pose3d.kZero, Pose3d.kZero, Pose3d.kZero,};
 
   public RobotContainer() {
     super(driveSimulation);
     // Check for valid swerve config
-    var modules = new SwerveModuleConstants[] { DriveConstants.FrontLeft, DriveConstants.FrontRight,
-        DriveConstants.BackLeft, DriveConstants.BackRight, };
+    var modules = new SwerveModuleConstants[] {DriveConstants.FrontLeft, DriveConstants.FrontRight,
+        DriveConstants.BackLeft, DriveConstants.BackRight,};
     for (var constants : modules) {
       if (constants.DriveMotorType != DriveMotorArrangement.TalonFX_Integrated
           || constants.SteerMotorType != SteerMotorArrangement.TalonFX_Integrated) {
@@ -122,24 +123,15 @@ public class RobotContainer extends frc.lib.RobotContainer {
         break;
       default:
         // Replayed robot, disable IO implementations
-        drive = new Drive(new GyroIO() {
-        }, new ModuleIO() {
-        }, new ModuleIO() {
-        }, new ModuleIO() {
-        },
-            new ModuleIO() {
-            }, driveSimulation::setSimulationWorldPose);
+        drive = new Drive(new GyroIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {},
+            new ModuleIO() {}, driveSimulation::setSimulationWorldPose);
 
-        elevator = new Elevator(new ElevatorIO() {
-        });
+        elevator = new Elevator(new ElevatorIO() {});
 
-        outtake = new Outtake(new OuttakeIO() {
-        });
+        outtake = new Outtake(new OuttakeIO() {});
 
-        vision = new Vision(drive, new VisionIO() {
-        });
-        algae = new Algae(new AlgaeIO() {
-        });
+        vision = new Vision(drive, new VisionIO() {});
+        algae = new Algae(new AlgaeIO() {});
         break;
     }
 
@@ -203,8 +195,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
             .andThen(outtake.depositCoral()).andThen(elevator.L0()));
 
     NamedCommands.registerCommand("MN.3C.R1", DriveCommands.FlySnappyV2(drive));
-    NamedCommands.registerCommand("MN.3C.R2",
-        DriveCommands.SourceSnapper(drive));
+    NamedCommands.registerCommand("MN.3C.R2", DriveCommands.SourceSnapper(drive));
+
     NamedCommands.registerCommand("MN.1C.M1", DriveCommands.BargeSnapper(drive));
 
     NamedCommands.registerCommand("AlgaeIntake", algae.setOpenLoop(Volts.of(-6)).withTimeout(3));
@@ -213,8 +205,33 @@ public class RobotContainer extends frc.lib.RobotContainer {
     NamedCommands.registerCommand("AlgaeSnap", DriveCommands.AlgaeSnapper(drive).withTimeout(3));
     NamedCommands.registerCommand("BargeHeight", elevator.Algae());
 
+    NamedCommands.registerCommand("SnapReef.A",
+        DriveCommands.FlySnappyV2Named(drive, ReefPositions.A));
+    NamedCommands.registerCommand("SnapReef.B",
+        DriveCommands.FlySnappyV2Named(drive, ReefPositions.B));
+    NamedCommands.registerCommand("SnapReef.C",
+        DriveCommands.FlySnappyV2Named(drive, ReefPositions.C));
+    NamedCommands.registerCommand("SnapReef.D",
+        DriveCommands.FlySnappyV2Named(drive, ReefPositions.D));
+    NamedCommands.registerCommand("SnapReef.E",
+        DriveCommands.FlySnappyV2Named(drive, ReefPositions.E));
+    NamedCommands.registerCommand("SnapReef.F",
+        DriveCommands.FlySnappyV2Named(drive, ReefPositions.F));
+    NamedCommands.registerCommand("SnapReef.G",
+        DriveCommands.FlySnappyV2Named(drive, ReefPositions.G));
+    NamedCommands.registerCommand("SnapReef.H",
+        DriveCommands.FlySnappyV2Named(drive, ReefPositions.H));
+    NamedCommands.registerCommand("SnapReef.I",
+        DriveCommands.FlySnappyV2Named(drive, ReefPositions.I));
+    NamedCommands.registerCommand("SnapReef.J",
+        DriveCommands.FlySnappyV2Named(drive, ReefPositions.J));
+    NamedCommands.registerCommand("SnapReef.K",
+        DriveCommands.FlySnappyV2Named(drive, ReefPositions.K));
+    NamedCommands.registerCommand("SnapReef.L",
+        DriveCommands.FlySnappyV2Named(drive, ReefPositions.L));
     // Set up auto routines
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser("AL.0C.1M"));
+    autoChooser =
+        new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser("AL.0C.1M"));
 
     autoChooser.addOption("Static Drive Voltage", Commands.run(() -> drive.driveOpenLoop(10)));
     autoChooser.addOption("Static Turn Voltage", Commands.run(() -> drive.TurnOpenLoop(10)));
@@ -244,8 +261,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
         () -> driverController.getLeftY(), () -> driverController.getLeftX(),
         () -> -driverController.getRightX() * .85, driverController.leftTrigger(),
         driverController.rightTrigger(0.15).or(elevator.isAtHeight(Level.L4))));
-    outtake
-        .setDefaultCommand(outtake.autoQueueCoral(false).onlyWhile(elevator.isAtHeight(Level.Intake))
+    outtake.setDefaultCommand(
+        outtake.autoQueueCoral(false).onlyWhile(elevator.isAtHeight(Level.Intake))
             .withName("RobotContainer.outtakeDefaultCommand"));
     driverController.start().onTrue(Commands.runOnce(() -> {
       drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero));
@@ -258,15 +275,18 @@ public class RobotContainer extends frc.lib.RobotContainer {
     driverController.leftBumper().whileTrue(DriveCommands.FLYSnappySource(drive));
 
     driverController.x().whileTrue(DriveCommands.AlgaeSnapper(drive));
-    driverController.y().whileTrue(DriveCommands.FullSnapperOuter(drive)
-        .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
-        .andThen(outtake.depositCoral()).andThen(elevator.L0()));
-    driverController.b().whileTrue(DriveCommands.FullSnapperOuter(drive)
-        .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L3()))
-        .andThen(outtake.depositCoral()).andThen(elevator.L0()));
-    driverController.a().whileTrue(DriveCommands.FullSnapperOuter(drive)
-        .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L2()))
-        .andThen(outtake.depositCoral()).andThen(elevator.L0()));
+    driverController.y()
+        .whileTrue(DriveCommands.FullSnapperOuter(drive)
+            .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))
+            .andThen(outtake.depositCoral()).andThen(elevator.L0()));
+    driverController.b()
+        .whileTrue(DriveCommands.FullSnapperOuter(drive)
+            .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L3()))
+            .andThen(outtake.depositCoral()).andThen(elevator.L0()));
+    driverController.a()
+        .whileTrue(DriveCommands.FullSnapperOuter(drive)
+            .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L2()))
+            .andThen(outtake.depositCoral()).andThen(elevator.L0()));
 
     driverController.povLeft().onTrue(DriveCommands.FlySnappyV2Left(drive));
     driverController.povUp().whileTrue(DriveCommands.BargeSnapper(drive));
@@ -309,8 +329,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
   }
 
   @Override
-  public void disabledInit() {
-  }
+  public void disabledInit() {}
 
   @Override
   public void disabledPeriodic() {
@@ -333,6 +352,5 @@ public class RobotContainer extends frc.lib.RobotContainer {
   }
 
   @Override
-  public void simulationPeriodic() {
-  }
+  public void simulationPeriodic() {}
 }

@@ -36,7 +36,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "MN.3C.R1"
+                  "name": "SnapReef.J"
                 }
               }
             ]
@@ -99,13 +99,13 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "MN.3C.R1"
+                  "name": "L4"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "L4"
+                  "name": "SnapReef.L"
                 }
               }
             ]
@@ -168,13 +168,13 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "MN.3C.R1"
+                  "name": "L4"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "L4"
+                  "name": "SnapReef.K"
                 }
               }
             ]
