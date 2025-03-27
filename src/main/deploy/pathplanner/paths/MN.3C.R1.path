@@ -45,7 +45,7 @@
     "rotation": 120.411
   },
   "reversed": false,
-  "folder": null,
+  "folder": "MN.Paths",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 135.0

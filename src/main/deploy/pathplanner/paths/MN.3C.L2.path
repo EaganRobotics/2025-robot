@@ -20,7 +20,7 @@
         "y": 6.60875
       },
       "prevControl": {
-        "x": 1.6867500000000002,
+        "x": 1.68675,
         "y": 5.5264999999999995
       },
       "nextControl": null,
@@ -45,7 +45,7 @@
     "rotation": -55.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "MN.Paths",
   "idealStartingState": {
     "velocity": 0,
     "rotation": -119.99999999999999

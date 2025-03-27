@@ -4,8 +4,9 @@
   "holonomicMode": true,
   "pathFolders": [
     "AL.Paths",
+    "CO.Paths",
     "Calibrate Paths",
-    "CO.Paths"
+    "MN.Paths"
   ],
   "autoFolders": [
     "AL.0C.Autos",
