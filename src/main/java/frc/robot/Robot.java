@@ -162,9 +162,8 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
-    Logger.recordOutput("ReefPose1", DriveCommands.INNER_REEF_POSITIONS[12]);
-    Logger.recordOutput("ReefPose2", DriveCommands.INNER_REEF_POSITIONS[13]);
     // Switch thread to high priority to improve loop timing
+    // TODO: AKit recommends you remove this unless you know your loop times are <0.02s
     Threads.setCurrentThreadPriority(true, 99);
 
     // Runs the Scheduler. This is responsible for polling buttons, adding
@@ -175,6 +174,7 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().run();
 
     // Return to normal thread priority
+    // TODO: This too (AKit)
     Threads.setCurrentThreadPriority(false, 10);
 
     robotContainer.robotPeriodic();
