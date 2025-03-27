@@ -400,7 +400,7 @@ public class DriveCommands {
 
   private static final Pose2d[] OUTER_REEF_POSITIONS = makeReefPositions(Inches.of(12));
   private static final Pose2d[] FLY_REEF_POSITIONS = makeReefPositions(Inches.of(12));
-  public static final Pose2d[] INNER_REEF_POSITIONS = makeReefPositions(Inches.of(0));
+  private static final Pose2d[] INNER_REEF_POSITIONS = makeReefPositions(Inches.of(0));
   private static final Pose2d[] OUTER_ALGAE_POSITIONS = makeAlgaePositions(Inches.of(15));
   private static final Pose2d[] INNER_ALGAE_POSITIONS = makeAlgaePositions(Inches.of(0));
   private static final Pose2d[] BARGE_POSITIONS = makeBargePositions(Inches.of(0));
@@ -777,6 +777,8 @@ public class DriveCommands {
 
       Pose2d inner, outer;
 
+      // TODO: instead maintain two separate lists of RED and BLUE reef positions
+      // The `+12` is to index on the red half of the reef positions
       var redOrBlue = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? 0 : 12;
 
       switch (reefPositions) {
