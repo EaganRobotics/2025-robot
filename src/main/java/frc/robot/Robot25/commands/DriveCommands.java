@@ -352,13 +352,17 @@ public class DriveCommands {
     return new Pose2d[] {
 
         new Pose2d(Inches.of(Right_Loading_Station_X + 5.5),
-            Inches.of(Right_Loading_Station_Y + 5.5), Rotation2d.fromDegrees(55)),
+            Inches.of(Right_Loading_Station_Y + 5.5), Rotation2d.fromDegrees(55))
+            .plus(new Transform2d(sourceOffset, Inches.of(0), Rotation2d.kZero)),
         new Pose2d(Inches.of(Left_Loading_Station_X - 1.5), Inches.of(Left_Loading_Station_Y + 1.5),
-            Rotation2d.fromDegrees(-50)).plus(new Transform2d(Inches.of(6), Inches.of(-14), Rotation2d.kZero)),
+            Rotation2d.fromDegrees(-55))
+            .plus(new Transform2d(Inches.of(2).plus(sourceOffset), Inches.of(-14), Rotation2d.kZero)),
         new Pose2d(Inches.of(Right_Loading_Station_X + 5.5 + 623.825 - 8 - 6 - 2),
-            Inches.of(Right_Loading_Station_Y + 5.5 + 3 + 6 + 2), Rotation2d.fromDegrees(125)),
+            Inches.of(Right_Loading_Station_Y + 5.5 + 3 + 6 + 2), Rotation2d.fromDegrees(125))
+            .plus(new Transform2d(sourceOffset, Inches.of(0), Rotation2d.kZero)),
         new Pose2d(Inches.of(Left_Loading_Station_X - 1.5 + 623.825 - 10),
-            Inches.of(Left_Loading_Station_Y + 1.5 - 4.5), Rotation2d.fromDegrees(-125)) };
+            Inches.of(Left_Loading_Station_Y + 1.5 - 4.5), Rotation2d.fromDegrees(-125))
+            .plus(new Transform2d(sourceOffset, Inches.of(0), Rotation2d.kZero)) };
 
   }
 
@@ -899,7 +903,7 @@ public class DriveCommands {
 
   private static Optional<Pose2d> getClosestSource(Drive drive, Distance radius) {
     Optional<Pose2d> desiredPose = Optional.empty();
-    Distance minDistance = Meters.of(1000000);
+    Distance minDistance = Meters.of(100000000);
     for (Pose2d pose : SOURCE_POSITIONS) {
       double distance = drive.getPose().getTranslation().getDistance(pose.getTranslation());
       Distance distanceMeasure = Meters.of(distance);
