@@ -41,9 +41,8 @@ public class Vision extends SubsystemBase {
     this.consumer = consumer;
     this.io = io;
 
-    // this dose nothing except stop a crash/freeze
-    Logger.recordOutput("vision/FixFreeze",
-        new TargetObservation(new Rotation2d((int) Math.PI), new Rotation2d(1)));
+    // This does nothing except stop a crash/freeze
+    aprilTagLayout.getTagPose(0);
 
     // Initialize inputs
     this.inputs = new VisionIOInputsAutoLogged[io.length];
@@ -57,11 +56,6 @@ public class Vision extends SubsystemBase {
       disconnectedAlerts[i] = new Alert(
           "Vision camera " + Integer.toString(i) + " is disconnected.", AlertType.kWarning);
     }
-  }
-
-  private Rotation2d Rotation2d(int i) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'Rotation2d'");
   }
 
   /**

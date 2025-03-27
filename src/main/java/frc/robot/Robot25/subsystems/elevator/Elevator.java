@@ -52,10 +52,8 @@ public class Elevator extends SubsystemBase {
 
     // original value during W0 = L4 = 72 + 6
 
-
     minHeight(MIN_HEIGHT), Intake(Inches.of(16.4 + 3.5)), L1(Inches.of(18 + 14)), L2(
-        Inches.of(31.9 + 7)), L3(Inches.of(47.6 + 7)), L4(Inches.of(72 + 6.25));
-
+        Inches.of(38.66)), L3(Inches.of(53.19)), L4(Inches.of(78.25)), Barge(Inches.of(82));
 
     private final Distance height;
 
@@ -226,6 +224,10 @@ public class Elevator extends SubsystemBase {
     return goToLevel(Level.L4);
   }
 
+  public Command Algae() {
+    return goToLevel(Level.Barge);
+  }
+
   public Command upLevel() {
     return this.runOnce(() -> {
       desiredLevel = desiredLevel.up();
@@ -294,7 +296,6 @@ public class Elevator extends SubsystemBase {
   public Trigger isAtHeight(Level desiredLevel) {
 
     return isAtGoal().and(() -> desiredLevel == this.desiredLevel);
-
 
   }
 

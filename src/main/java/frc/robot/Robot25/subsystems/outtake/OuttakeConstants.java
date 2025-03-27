@@ -10,7 +10,7 @@ import static edu.wpi.first.units.Units.Volts;
 
 public class OuttakeConstants {
   public static final double GEARING = 5.0;
-  public static final Current CURRENT_LIMIT = Amps.of(40);
+  public static final Current CURRENT_LIMIT = Amps.of(20);
 
   public static final class Sim {
     public static final double kP = 4.0; // 5

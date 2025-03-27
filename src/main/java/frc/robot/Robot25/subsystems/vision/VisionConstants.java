@@ -13,7 +13,10 @@
 
 package frc.robot.Robot25.subsystems.vision;
 
+import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -30,10 +33,14 @@ public class VisionConstants {
 
   // Robot to camera transforms
   // (Not used by Limelight, configure in web UI instead)
-  public static Transform3d limelightFrontTransform = new Transform3d(0.2262, 0.120, 0.3178,
+  public static Transform3d limelightFrontTransform = new Transform3d(-0.120, 0.2262, 0.3178,
       new Rotation3d(Degrees.of(0), Degrees.of(0), Degrees.of(-20)));
   public static Transform3d limelightBackTransform =
-      new Transform3d(0.0508, 0.1895, 0.6493, new Rotation3d(0.0, 0, Math.PI));
+      new Transform3d(-0.1895, 0.0508, 0.6493, new Rotation3d(0.0, 0, Math.PI));
+
+  public static Transform3d newlimelightfrontTransform =
+      new Transform3d(Inches.of(4), Inches.of(10.5), Inches.of(9.413),
+          new Rotation3d(Degrees.of(0), Degree.of(20), Degree.of(-30)));
 
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.3;

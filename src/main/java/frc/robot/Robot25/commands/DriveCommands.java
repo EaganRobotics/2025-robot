@@ -28,10 +28,13 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.lib.tunables.LoggedTunableNumber;
 import frc.robot.Robot25.subsystems.drive.Drive;
+
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
@@ -40,13 +43,13 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
-  private static final double SLOW_MODE_MULTIPLIER = 0.5;
-  private static final double DEADBAND = 0.06;
+  private static final double SLOW_MODE_MULTIPLIER = 0.2;
+  private static final double DEADBAND = 0.05;
   private static final double ANGLE_MAX_VELOCITY = 8.0;
   private static final double ANGLE_MAX_ACCELERATION = 20.0;
   private static final double ANGLE_TOLERANCE = Degrees.of(1).in(Radians);
   private static final double POSITION_MAX_VELOCITY = 4.5;
-  private static final double POSITION_MAX_ACCELERATION = 8.9;
+  private static final double POSITION_MAX_ACCELERATION = 6;
   private static final double POSITION_TOLERANCE = Inches.of(1).in(Meters);
 
   /// Auto snap to position distance
@@ -157,6 +160,159 @@ public class DriveCommands {
             Rotation2d.fromDegrees(300)).transformBy(REEF_BRANCH_TO_ROBOT),
         new Pose2d(
             RED_REEF_CENTER.plus(new Translation2d(Inches.of(-15.982577), Inches.of(14.718635))),
+            Rotation2d.fromDegrees(300)).transformBy(REEF_BRANCH_TO_ROBOT),};
+  }
+
+  public static Pose2d[] makeRightReefPositions(Distance reefOffset) {
+    Transform2d REEF_BRANCH_TO_ROBOT = new Transform2d(
+        Inches.of(-INCHES_FROM_REEF).minus(reefOffset), Inches.zero(), Rotation2d.kZero);
+    return new Pose2d[] {
+        new Pose2d(
+            BLUE_REEF_CENTER.plus(new Translation2d(Inches.of(-20.738000), Inches.of(-6.482000))),
+            Rotation2d.kZero).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            BLUE_REEF_CENTER.plus(new Translation2d(Inches.of(-4.755423), Inches.of(-21.200635))),
+            Rotation2d.fromDegrees(60)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            BLUE_REEF_CENTER.plus(new Translation2d(Inches.of(15.982577), Inches.of(-14.718635))),
+            Rotation2d.fromDegrees(120)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            BLUE_REEF_CENTER.plus(new Translation2d(Inches.of(20.738000), Inches.of(6.482000))),
+            Rotation2d.fromDegrees(180)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            BLUE_REEF_CENTER.plus(new Translation2d(Inches.of(4.755423), Inches.of(21.200635))),
+            Rotation2d.fromDegrees(240)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            BLUE_REEF_CENTER.plus(new Translation2d(Inches.of(-15.982577), Inches.of(14.718635))),
+            Rotation2d.fromDegrees(300)).transformBy(REEF_BRANCH_TO_ROBOT),
+
+        new Pose2d(
+            RED_REEF_CENTER.plus(new Translation2d(Inches.of(-20.738000), Inches.of(-6.482000))),
+            Rotation2d.kZero).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            RED_REEF_CENTER.plus(new Translation2d(Inches.of(-4.755423), Inches.of(-21.200635))),
+            Rotation2d.fromDegrees(60)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            RED_REEF_CENTER.plus(new Translation2d(Inches.of(15.982577), Inches.of(-14.718635))),
+            Rotation2d.fromDegrees(120)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            RED_REEF_CENTER.plus(new Translation2d(Inches.of(20.738000), Inches.of(6.482000))),
+            Rotation2d.fromDegrees(180)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            RED_REEF_CENTER.plus(new Translation2d(Inches.of(4.755423), Inches.of(21.200635))),
+            Rotation2d.fromDegrees(240)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            RED_REEF_CENTER.plus(new Translation2d(Inches.of(-15.982577), Inches.of(14.718635))),
+            Rotation2d.fromDegrees(300)).transformBy(REEF_BRANCH_TO_ROBOT),};
+  }
+
+  public static Pose2d[] makeLeftReefPositions(Distance reefOffset) {
+    Transform2d REEF_BRANCH_TO_ROBOT = new Transform2d(
+        Inches.of(-INCHES_FROM_REEF).minus(reefOffset), Inches.zero(), Rotation2d.kZero);
+    return new Pose2d[] {
+        new Pose2d(
+            BLUE_REEF_CENTER.plus(new Translation2d(Inches.of(-20.738000), Inches.of(6.482000))),
+            Rotation2d.kZero).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            BLUE_REEF_CENTER.plus(new Translation2d(Inches.of(-15.982577), Inches.of(-14.718635))),
+            Rotation2d.fromDegrees(60)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            BLUE_REEF_CENTER.plus(new Translation2d(Inches.of(4.755423), Inches.of(-21.200635))),
+            Rotation2d.fromDegrees(120)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            BLUE_REEF_CENTER.plus(new Translation2d(Inches.of(20.738000), Inches.of(-6.482000))),
+            Rotation2d.fromDegrees(180)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            BLUE_REEF_CENTER.plus(new Translation2d(Inches.of(15.982577), Inches.of(14.718635))),
+            Rotation2d.fromDegrees(240)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            BLUE_REEF_CENTER.plus(new Translation2d(Inches.of(-4.755423), Inches.of(21.200635))),
+            Rotation2d.fromDegrees(300)).transformBy(REEF_BRANCH_TO_ROBOT),
+
+        new Pose2d(
+            RED_REEF_CENTER.plus(new Translation2d(Inches.of(-20.738000), Inches.of(6.482000))),
+            Rotation2d.kZero).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            RED_REEF_CENTER.plus(new Translation2d(Inches.of(-15.982577), Inches.of(-14.718635))),
+            Rotation2d.fromDegrees(60)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            RED_REEF_CENTER.plus(new Translation2d(Inches.of(4.755423), Inches.of(-21.200635))),
+            Rotation2d.fromDegrees(120)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            RED_REEF_CENTER.plus(new Translation2d(Inches.of(20.738000), Inches.of(-6.482000))),
+            Rotation2d.fromDegrees(180)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            RED_REEF_CENTER.plus(new Translation2d(Inches.of(15.982577), Inches.of(14.718635))),
+            Rotation2d.fromDegrees(240)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            RED_REEF_CENTER.plus(new Translation2d(Inches.of(-4.755423), Inches.of(21.200635))),
+            Rotation2d.fromDegrees(300)).transformBy(REEF_BRANCH_TO_ROBOT),};
+  }
+
+  public static Pose2d[] makeLLReefPositions(Distance reefOffset) {
+    Transform2d REEF_BRANCH_TO_ROBOT = new Transform2d(
+        Inches.of(-INCHES_FROM_REEF).minus(reefOffset), Inches.zero(), Rotation2d.kZero);
+    return new Pose2d[] {
+        new Pose2d(
+            BLUE_REEF_CENTER.plus(new Translation2d(Inches.of(-20.738000), Inches.of(6.482000))),
+            Rotation2d.kZero).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            BLUE_REEF_CENTER.plus(new Translation2d(Inches.of(-20.738000), Inches.of(-6.482000))),
+            Rotation2d.kZero).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            BLUE_REEF_CENTER.plus(new Translation2d(Inches.of(-15.982577), Inches.of(-14.718635))),
+            Rotation2d.fromDegrees(60)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            BLUE_REEF_CENTER.plus(new Translation2d(Inches.of(-4.755423), Inches.of(-21.200635))),
+            Rotation2d.fromDegrees(60)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            BLUE_REEF_CENTER.plus(new Translation2d(Inches.of(4.755423), Inches.of(-21.200635))),
+            Rotation2d.fromDegrees(120)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            BLUE_REEF_CENTER.plus(new Translation2d(Inches.of(15.982577), Inches.of(-14.718635))),
+            Rotation2d.fromDegrees(120)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            BLUE_REEF_CENTER.plus(new Translation2d(Inches.of(15.982577), Inches.of(14.718635))),
+            Rotation2d.fromDegrees(240)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            BLUE_REEF_CENTER.plus(new Translation2d(Inches.of(4.755423), Inches.of(21.200635))),
+            Rotation2d.fromDegrees(240)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            BLUE_REEF_CENTER.plus(new Translation2d(Inches.of(-4.755423), Inches.of(21.200635))),
+            Rotation2d.fromDegrees(300)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            BLUE_REEF_CENTER.plus(new Translation2d(Inches.of(-15.982577), Inches.of(14.718635))),
+            Rotation2d.fromDegrees(300)).transformBy(REEF_BRANCH_TO_ROBOT),
+
+        new Pose2d(
+            RED_REEF_CENTER.plus(new Translation2d(Inches.of(-15.982577), Inches.of(-14.718635))),
+            Rotation2d.fromDegrees(60)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            RED_REEF_CENTER.plus(new Translation2d(Inches.of(-4.755423), Inches.of(-21.200635))),
+            Rotation2d.fromDegrees(60)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            RED_REEF_CENTER.plus(new Translation2d(Inches.of(4.755423), Inches.of(-21.200635))),
+            Rotation2d.fromDegrees(120)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            RED_REEF_CENTER.plus(new Translation2d(Inches.of(15.982577), Inches.of(-14.718635))),
+            Rotation2d.fromDegrees(120)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            RED_REEF_CENTER.plus(new Translation2d(Inches.of(20.738000), Inches.of(-6.482000))),
+            Rotation2d.fromDegrees(180)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            RED_REEF_CENTER.plus(new Translation2d(Inches.of(20.738000), Inches.of(6.482000))),
+            Rotation2d.fromDegrees(180)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            RED_REEF_CENTER.plus(new Translation2d(Inches.of(15.982577), Inches.of(14.718635))),
+            Rotation2d.fromDegrees(240)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            RED_REEF_CENTER.plus(new Translation2d(Inches.of(4.755423), Inches.of(21.200635))),
+            Rotation2d.fromDegrees(240)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            RED_REEF_CENTER.plus(new Translation2d(Inches.of(-4.755423), Inches.of(21.200635))),
+            Rotation2d.fromDegrees(300)).transformBy(REEF_BRANCH_TO_ROBOT),
+        new Pose2d(
+            RED_REEF_CENTER.plus(new Translation2d(Inches.of(-15.982577), Inches.of(14.718635))),
             Rotation2d.fromDegrees(300)).transformBy(REEF_BRANCH_TO_ROBOT),
 
     };
@@ -192,13 +348,14 @@ public class DriveCommands {
         new Pose2d(RED_REEF_CENTER, Rotation2d.fromDegrees(240)).transformBy(BACK_LEFT_TO_ROBOT),};
   }
 
-  public static Pose2d[] makeSourcePositions() {
+  public static Pose2d[] makeSourcePositions(Distance sourceOffset) {
     return new Pose2d[] {
 
         new Pose2d(Inches.of(Right_Loading_Station_X + 5.5),
             Inches.of(Right_Loading_Station_Y + 5.5), Rotation2d.fromDegrees(55)),
         new Pose2d(Inches.of(Left_Loading_Station_X - 1.5), Inches.of(Left_Loading_Station_Y + 1.5),
-            Rotation2d.fromDegrees(-55)),
+            Rotation2d.fromDegrees(-50))
+            .plus(new Transform2d(Inches.of(6), Inches.of(-14), Rotation2d.kZero)),
         new Pose2d(Inches.of(Right_Loading_Station_X + 5.5 + 623.825 - 8 - 6 - 2),
             Inches.of(Right_Loading_Station_Y + 5.5 + 3 + 6 + 2), Rotation2d.fromDegrees(125)),
         new Pose2d(Inches.of(Left_Loading_Station_X - 1.5 + 623.825 - 10),
@@ -238,13 +395,21 @@ public class DriveCommands {
   }
 
   private static final Pose2d[] OUTER_REEF_POSITIONS = makeReefPositions(Inches.of(12));
+  private static final Pose2d[] FLY_REEF_POSITIONS = makeReefPositions(Inches.of(12));
   private static final Pose2d[] INNER_REEF_POSITIONS = makeReefPositions(Inches.of(0));
   private static final Pose2d[] OUTER_ALGAE_POSITIONS = makeAlgaePositions(Inches.of(15));
   private static final Pose2d[] INNER_ALGAE_POSITIONS = makeAlgaePositions(Inches.of(0));
   private static final Pose2d[] BARGE_POSITIONS = makeBargePositions(Inches.of(0));
   private static final Pose2d[] AUTO_POSITIONS = makeAutoPositions(Inches.of(0));
   private static final Pose2d[] AUTO_POSITIONS_12 = makeAutoPositions(Inches.of(12));
-  private static final Pose2d[] SOURCE_POSITIONS = makeSourcePositions();
+  private static final Pose2d[] SOURCE_POSITIONS = makeSourcePositions(Inches.of(0));
+  private static final Pose2d[] SOURCE_POSITIONS_12 = makeSourcePositions(Inches.of(-12));
+  private static final Pose2d[] LL_REEF_POSITIONS_12 = makeLLReefPositions(Inches.of(12));
+  private static final Pose2d[] LL_REEF_POSITIONS = makeLLReefPositions(Inches.of(0));
+  private static final Pose2d[] LEFT_REEF_POSITIONS = makeLeftReefPositions(Inches.of(0));
+  private static final Pose2d[] LEFT_REEF_POSITION_12 = makeLeftReefPositions(Inches.of(12));
+  private static final Pose2d[] RIGHT_REEF_POSITIONS = makeRightReefPositions(Inches.of(0));
+  private static final Pose2d[] RIGHT_REEF_POSITION_12 = makeRightReefPositions(Inches.of(12));
 
   private static final LoggedTunableNumber ANGLE_KP =
       new LoggedTunableNumber("Tuning/SnapToPosition/Angle_kP", 7.0);
@@ -385,11 +550,32 @@ public class DriveCommands {
         .withName("DriveCommands.joystickDriveAtAngle");
   }
 
-  public static Command snapToRotation(Drive drive, Rotation2d rotation) {
-    return Commands.runOnce(() -> {
-      Logger.recordOutput("Rotation", "snap to rotation");
-      drive.setDesiredRotation(rotation);
-    }).withName("DriveCommands.snapToRotation");
+  public static Command snapToRotation(Drive drive) {
+    return Commands.run(() -> {
+
+      Pose2d desiredPose = getClosestSource(drive, Meters.of(1000)).orElse(Pose2d.kZero);
+
+      var x = xController.calculate(drive.getPose().getX(), drive.getPose().getX());
+      var y = yController.calculate(drive.getPose().getY(), drive.getPose().getY());
+      var omega = angleController.calculate(drive.getRotation().getRadians(),
+          desiredPose.getRotation().getRadians());
+
+      Logger.recordOutput("Snap/omega", omega);
+
+      // Convert to field relative speeds & send command
+      ChassisSpeeds speeds = new ChassisSpeeds(x, y, omega);
+      drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
+
+    }, drive)
+
+        // Reset PID controller when command starts
+        .beforeStarting(() -> {
+          var fieldRelativeSpeeds = drive.getFieldRelativeSpeeds();
+          angleController.reset(drive.getRotation().getRadians(),
+              fieldRelativeSpeeds.omegaRadiansPerSecond);
+          xController.reset(drive.getPose().getX(), fieldRelativeSpeeds.vxMetersPerSecond);
+          yController.reset(drive.getPose().getY(), fieldRelativeSpeeds.vyMetersPerSecond);
+        }).until(() -> angleController.atGoal()).withName("DriveCommands.snapToRotation");
   }
 
   public static Command keepRotationForward(Drive drive, DoubleSupplier xSupplier,
@@ -419,6 +605,30 @@ public class DriveCommands {
 
   }
 
+  public static Command LeftSnapper(Drive drive) {
+
+    return Commands.defer(() -> {
+      Pose2dSequence desiredPose =
+          getClosestLeftPosition(drive, Meters.of(1000)).orElse(Pose2dSequence.kZero);
+      Logger.recordOutput("SnapperPose", desiredPose.outer);
+      return snapToPosition(drive, desiredPose.outer)
+          .andThen(snapToPosition(drive, desiredPose.inner));
+    }, Set.of(drive)).withName("DriveCommands.Snapper");
+
+  }
+
+  public static Command RightSnapper(Drive drive) {
+
+    return Commands.defer(() -> {
+      Pose2dSequence desiredPose =
+          getClosestRightPosition(drive, Meters.of(1000)).orElse(Pose2dSequence.kZero);
+      Logger.recordOutput("SnapperPose", desiredPose.outer);
+      return snapToPosition(drive, desiredPose.outer)
+          .andThen(snapToPosition(drive, desiredPose.inner));
+    }, Set.of(drive)).withName("DriveCommands.Snapper");
+
+  }
+
   public static Command AlgaeSnapper(Drive drive) {
 
     return Commands.defer(() -> {
@@ -440,7 +650,6 @@ public class DriveCommands {
     }, Set.of(drive)).withName("DriveCommands.SourceSnapper");
 
   }
-
 
   public static Command BargeSnapper(Drive drive) {
 
@@ -496,8 +705,16 @@ public class DriveCommands {
 
   public static Command FullSnapperOuter(Drive drive) {
 
+    Set<Pose2d> visited = new HashSet<>(3);
+
     return Commands.defer(() -> {
-      Pose2d desiredPose = getClosestFullOuter(drive, Meters.of(1000)).orElse(Pose2d.kZero);
+      Pose2d desiredPose =
+          getClosestFullOuter(drive, Meters.of(1000), visited).orElse(Pose2d.kZero);
+
+      if (DriverStation.isAutonomous() && visited.contains(desiredPose)) {
+        visited.add(desiredPose);
+      }
+
       Logger.recordOutput("SnapperPose", desiredPose);
       return snapToPosition(drive, desiredPose);
     }, Set.of(drive)).withName("DriveCommands.SourceSnapper");
@@ -514,7 +731,6 @@ public class DriveCommands {
 
   }
 
-
   public static Command FullSnapperInner(Drive drive) {
 
     return Commands.defer(() -> {
@@ -525,6 +741,66 @@ public class DriveCommands {
 
   }
 
+  public static Command FlySnappy(Drive drive) {
+    return Commands.defer(() -> {
+      Distance radius = Meters.of(1000);
+      Pose2d desiredPose = flySnapper(drive, radius).orElse(Pose2d.kZero);
+      Logger.recordOutput("flySnappy", desiredPose);
+      return snapToPosition(drive, desiredPose);
+    }, Set.of(drive)).withName("DriveCommands.FlySnapper");
+  }
+
+  public static Command FlySnappyV2(Drive drive) {
+    return Commands.defer(() -> {
+      Distance radius = Meters.of(1000);
+
+      var poses = getClosestFlyer(drive, radius).orElse(Pose2dSequence.kZero);
+
+      double interpolateTime =
+          drive.getPose().getTranslation().getDistance(poses.outer.getTranslation()) > 1.5 ? 1.5
+              : 0.75;
+      return flyToPosition(drive, poses.outer, poses.inner, interpolateTime);
+    }, Set.of(drive)).withName("DriveCommands.FlySnapper");
+  }
+
+  public static Command FlySnappyV2Left(Drive drive) {
+    return Commands.defer(() -> {
+      Distance radius = Meters.of(1000);
+
+      var poses = getClosestLeftPosition(drive, radius).orElse(Pose2dSequence.kZero);
+
+      double interpolateTime =
+          drive.getPose().getTranslation().getDistance(poses.outer.getTranslation()) > 1.5 ? 1.5
+              : 0.75;
+      return flyToPosition(drive, poses.outer, poses.inner, interpolateTime);
+    }, Set.of(drive)).withName("DriveCommands.FlySnapper");
+  }
+
+  public static Command FlySnappyV2Right(Drive drive) {
+    return Commands.defer(() -> {
+      Distance radius = Meters.of(1000);
+
+      var poses = getClosestRightPosition(drive, radius).orElse(Pose2dSequence.kZero);
+
+      double interpolateTime =
+          drive.getPose().getTranslation().getDistance(poses.outer.getTranslation()) > 1.5 ? 1.5
+              : 0.75;
+      return flyToPosition(drive, poses.outer, poses.inner, interpolateTime);
+    }, Set.of(drive)).withName("DriveCommands.FlySnapper");
+  }
+
+  public static Command FLYSnappySource(Drive drive) {
+    return Commands.defer(() -> {
+      Distance radius = Meters.of(1000);
+
+      var poses = sourceClosestInterpolation(drive, radius).orElse(Pose2dSequence.kZero);
+
+      double interpolateTime =
+          drive.getPose().getTranslation().getDistance(poses.outer.getTranslation()) > 1.5 ? 1.5
+              : 0.75;
+      return flyToPosition(drive, poses.outer, poses.inner, interpolateTime);
+    }, Set.of(drive)).withName("DriveCommands.FlySnapper");
+  }
 
   private static final class Pose2dSequence {
     Pose2d inner;
@@ -550,6 +826,73 @@ public class DriveCommands {
         minDistance = distanceMeasure;
         desiredPose =
             Optional.of(new Pose2dSequence(INNER_REEF_POSITIONS[i], OUTER_REEF_POSITIONS[i]));
+      }
+    }
+
+    return desiredPose;
+  };
+
+  private static Optional<Pose2dSequence> sourceClosestInterpolation(Drive drive, Distance radius) {
+    Optional<Pose2dSequence> desiredPose = Optional.empty();
+    Distance minDistance = Meters.of(1000000);
+    for (int i = 0; i < SOURCE_POSITIONS_12.length; i++) {
+      Pose2d pose = SOURCE_POSITIONS_12[i];
+      double distance = drive.getPose().getTranslation().getDistance(pose.getTranslation());
+      Distance distanceMeasure = Meters.of(distance);
+      if (distanceMeasure.lte(radius) && distanceMeasure.lte(minDistance)) {
+        minDistance = distanceMeasure;
+        desiredPose = Optional.of(new Pose2dSequence(SOURCE_POSITIONS[i], SOURCE_POSITIONS_12[i]));
+      }
+    }
+
+    return desiredPose;
+  };
+
+  private static Optional<Pose2dSequence> getClosestFlyer(Drive drive, Distance radius) {
+    Optional<Pose2dSequence> desiredPose = Optional.empty();
+    Distance minDistance = Meters.of(1000000);
+    for (int i = 0; i < FLY_REEF_POSITIONS.length; i++) {
+      Pose2d pose = FLY_REEF_POSITIONS[i];
+      double distance = drive.getPose().getTranslation().getDistance(pose.getTranslation());
+      Distance distanceMeasure = Meters.of(distance);
+      if (distanceMeasure.lte(radius) && distanceMeasure.lte(minDistance)) {
+        minDistance = distanceMeasure;
+        desiredPose =
+            Optional.of(new Pose2dSequence(INNER_REEF_POSITIONS[i], FLY_REEF_POSITIONS[i]));
+      }
+    }
+
+    return desiredPose;
+  };
+
+  private static Optional<Pose2dSequence> getClosestLeftPosition(Drive drive, Distance radius) {
+    Optional<Pose2dSequence> desiredPose = Optional.empty();
+    Distance minDistance = Meters.of(1000000);
+    for (int i = 0; i < LEFT_REEF_POSITION_12.length; i++) {
+      Pose2d pose = LEFT_REEF_POSITION_12[i];
+      double distance = drive.getPose().getTranslation().getDistance(pose.getTranslation());
+      Distance distanceMeasure = Meters.of(distance);
+      if (distanceMeasure.lte(radius) && distanceMeasure.lte(minDistance)) {
+        minDistance = distanceMeasure;
+        desiredPose =
+            Optional.of(new Pose2dSequence(LEFT_REEF_POSITIONS[i], LEFT_REEF_POSITION_12[i]));
+      }
+    }
+
+    return desiredPose;
+  };
+
+  private static Optional<Pose2dSequence> getClosestRightPosition(Drive drive, Distance radius) {
+    Optional<Pose2dSequence> desiredPose = Optional.empty();
+    Distance minDistance = Meters.of(1000000);
+    for (int i = 0; i < RIGHT_REEF_POSITION_12.length; i++) {
+      Pose2d pose = RIGHT_REEF_POSITION_12[i];
+      double distance = drive.getPose().getTranslation().getDistance(pose.getTranslation());
+      Distance distanceMeasure = Meters.of(distance);
+      if (distanceMeasure.lte(radius) && distanceMeasure.lte(minDistance)) {
+        minDistance = distanceMeasure;
+        desiredPose =
+            Optional.of(new Pose2dSequence(RIGHT_REEF_POSITIONS[i], RIGHT_REEF_POSITION_12[i]));
       }
     }
 
@@ -603,10 +946,17 @@ public class DriveCommands {
     return desiredPose;
   };
 
-  private static Optional<Pose2d> getClosestFullOuter(Drive drive, Distance radius) {
+  private static Optional<Pose2d> getClosestFullOuter(Drive drive, Distance radius,
+      Set<Pose2d> visited) {
     Optional<Pose2d> desiredPose = Optional.empty();
     Distance minDistance = Meters.of(1000000);
-    for (Pose2d pose : OUTER_REEF_POSITIONS) {
+    for (Pose2d pose : LL_REEF_POSITIONS_12) {
+
+      if (DriverStation.isAutonomous() && visited.contains(pose)) {
+        Logger.recordOutput("Snapper/SkippedPose", pose);
+        continue;
+      }
+
       double distance = drive.getPose().getTranslation().getDistance(pose.getTranslation());
       Distance distanceMeasure = Meters.of(distance);
       if (distanceMeasure.lte(radius) && distanceMeasure.lte(minDistance)) {
@@ -621,7 +971,7 @@ public class DriveCommands {
   private static Optional<Pose2d> getClosestFullOuterAuto(Drive drive, Distance radius) {
     Optional<Pose2d> desiredPose = Optional.empty();
     Distance minDistance = Meters.of(1000000);
-    for (Pose2d pose : AUTO_POSITIONS) {
+    for (Pose2d pose : AUTO_POSITIONS_12) {
       double distance = drive.getPose().getTranslation().getDistance(pose.getTranslation());
       Distance distanceMeasure = Meters.of(distance);
       if (distanceMeasure.lte(radius) && distanceMeasure.lte(minDistance)) {
@@ -647,6 +997,25 @@ public class DriveCommands {
 
     return desiredPose;
   };
+
+  private static Optional<Pose2d> flySnapper(Drive drive, Distance radius) {
+    Optional<Pose2d> desiredPose = Optional.empty();
+    Distance minDistance = Meters.of(1000000);
+    Pose2d currentPose = drive.getPose();
+
+    for (Pose2d pose : INNER_REEF_POSITIONS) {
+      double distance = currentPose.getTranslation().getDistance(pose.getTranslation());
+      Distance distanceMeasure = Meters.of(distance);
+
+      if (distanceMeasure.lte(radius) && distanceMeasure.lte(minDistance)) {
+        minDistance = distanceMeasure;
+        double t = Math.min(1, 1);
+        desiredPose = Optional.of(currentPose.interpolate(pose, t));
+      }
+    }
+
+    return desiredPose;
+  }
 
   private static Optional<Pose2dSequence> getClosestAuto(Drive drive, Distance radius) {
     Optional<Pose2dSequence> desiredPose = Optional.empty();
@@ -681,6 +1050,44 @@ public class DriveCommands {
 
   // return desiredPose;
   // };
+
+  public static Command flyToPosition(Drive drive, Pose2d reefOuterPose, Pose2d reefInnerPose,
+      double interpolateTime) {
+    return Commands.defer(() -> {
+
+      double startTime = Timer.getFPGATimestamp();
+
+      return Commands.run(() -> {
+
+        double elapsedTime = (Timer.getFPGATimestamp() - startTime);
+
+        double t = Math.min(1.0, elapsedTime / interpolateTime);
+
+        Pose2d desiredPose = reefOuterPose.interpolate(reefInnerPose, t);
+
+        var x = xController.calculate(drive.getPose().getX(), desiredPose.getX());
+        var y = yController.calculate(drive.getPose().getY(), desiredPose.getY());
+        var omega = angleController.calculate(drive.getRotation().getRadians(),
+            desiredPose.getRotation().getRadians());
+
+        ChassisSpeeds speeds = new ChassisSpeeds(x, y, omega);
+        drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
+
+      }, drive)
+
+          .beforeStarting(() -> {
+            var fieldRelativeSpeeds = drive.getFieldRelativeSpeeds();
+            angleController.reset(drive.getRotation().getRadians(),
+                fieldRelativeSpeeds.omegaRadiansPerSecond);
+            xController.reset(drive.getPose().getX(), fieldRelativeSpeeds.vxMetersPerSecond);
+            yController.reset(drive.getPose().getY(), fieldRelativeSpeeds.vyMetersPerSecond);
+          })
+
+          .until(() -> angleController.atGoal() && xController.atGoal() && yController.atGoal())
+          .withName("DriveCommands.snapToReefPosition");
+
+    }, Set.of(drive));
+  }
 
   public static Command snapToPosition(Drive drive, Pose2d desiredPosition) {
     return Commands.run(() -> {
@@ -737,8 +1144,10 @@ public class DriveCommands {
           (slowModeSupplier.getAsBoolean() ? SLOW_MODE_MULTIPLIER : 1.0);
 
       // Get linear velocity
-      Translation2d linearVelocity =
-          getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+      Translation2d linearVelocity = getLinearVelocityFromJoysticks(
+          Math.copySign(xSupplier.getAsDouble() * xSupplier.getAsDouble(), xSupplier.getAsDouble()),
+          Math.copySign(ySupplier.getAsDouble() * ySupplier.getAsDouble(),
+              ySupplier.getAsDouble()));
 
       // Apply rotation deadband
       double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);

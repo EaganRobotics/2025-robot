@@ -21,8 +21,11 @@ import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
+
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,6 +43,8 @@ public class VisionIOLimelight implements VisionIO {
   private DoubleArraySubscriber megatag1Subscriber;
   private DoubleArraySubscriber megatag2Subscriber;
   private NetworkTable limelightTable;
+  private NetworkTableEntry snapshotEntry;
+  private double lastSnapshotTime = 0.0;
 
   /**
    * Creates a new VisionIOLimelight.
@@ -50,6 +55,7 @@ public class VisionIOLimelight implements VisionIO {
 
   public VisionIOLimelight(String name, Supplier<Rotation2d> rotationSupplier) {
     limelightTable = NetworkTableInstance.getDefault().getTable(name);
+    snapshotEntry = limelightTable.getEntry("snapshot");
     this.rotationSupplier = rotationSupplier;
     orientationPublisher = limelightTable.getDoubleArrayTopic("robot_orientation_set").publish();
     latencySubscriber = limelightTable.getDoubleTopic("tl").subscribe(0.0);
@@ -139,6 +145,10 @@ public class VisionIOLimelight implements VisionIO {
       inputs.poseObservations[i] = poseObservations.get(i);
     }
 
+    if (poseObservations.size() > 0 && Timer.getTimestamp() - lastSnapshotTime > 5.0) {
+      snapshotEntry.setNumber(1);
+    }
+
     // Save tag IDs to inputs objects
     inputs.tagIds = new int[tagIds.size()];
     int i = 0;
@@ -153,4 +163,5 @@ public class VisionIOLimelight implements VisionIO {
         new Rotation3d(Units.degreesToRadians(rawLLArray[3]), Units.degreesToRadians(rawLLArray[4]),
             Units.degreesToRadians(rawLLArray[5])));
   }
+
 }
