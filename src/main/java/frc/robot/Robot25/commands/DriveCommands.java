@@ -829,8 +829,10 @@ public class DriveCommands {
           outer = OUTER_REEF_POSITIONS[11 + redOrBlue];
           break;
         default:
-          inner = INNER_REEF_POSITIONS[(int) (Math.random() * 12)];
-          outer = OUTER_REEF_POSITIONS[(int) (Math.random() * 12)];
+          System.out.println("Invalid case. This should not happen");
+          var poses = getClosestFlyer(drive, radius).orElse(Pose2dSequence.kZero);
+          inner = poses.inner;
+          outer = poses.outer;
           break;
       }
       // var poses = getClosestFlyer(drive, radius).orElse(Pose2dSequence.kZero);
