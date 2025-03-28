@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.lib.RobotContainer;
 import frc.lib.RobotInstance;
 import frc.lib.replay.WPILogReadMACAddress;
+import frc.robot.Robot25.commands.DriveCommands;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -161,6 +162,8 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
+    Logger.recordOutput("ReefPose1", DriveCommands.INNER_REEF_POSITIONS[12]);
+    Logger.recordOutput("ReefPose2", DriveCommands.INNER_REEF_POSITIONS[13]);
     // Switch thread to high priority to improve loop timing
     Threads.setCurrentThreadPriority(true, 99);
 
