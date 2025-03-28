@@ -118,7 +118,7 @@ public class Outtake extends SubsystemBase {
   }
 
   public Command depositCoral() {
-    return setOpenLoop(Volts.of(6)).until(seesAtOutputTrigger.negate().debounce(0.1))
+    return setOpenLoop(Volts.of(6)).until(seesAtOutputTrigger.negate().debounce(0.1).and(seesAtInputTrigger.negate()))
         .withTimeout(1).andThen(() -> shouldHaveCoral = false);
 
   }
