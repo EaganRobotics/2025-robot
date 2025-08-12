@@ -245,7 +245,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
     driverController.b().onTrue(DriveCommands.RightSnapper(drive));
     driverController.a().whileTrue(DriveCommands.AlgaeSnapper(drive));
 
-    driverController.povLeft().onTrue(DriveCommands.snapToRotation(drive));
+    driverController.povLeft().onTrue(DriveCommands.snapToSourceRotation(drive));
     driverController.povUp()
         .whileTrue(DriveCommands.FullSnapperOuter(drive)
             .andThen(DriveCommands.FullSnapperInner(drive).alongWith(elevator.L4()))

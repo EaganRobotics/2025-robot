@@ -28,6 +28,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -47,6 +48,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Robot25.subsystems.gyro.GyroIO;
 import frc.robot.Robot25.subsystems.gyro.GyroIOInputsAutoLogged;
+import frc.robot.Robot25.subsystems.gyro.GyroIOSim;
 import frc.robot.Robot25.subsystems.vision.Vision.VisionConsumer;
 import frc.robot.Robot25.util.LocalADStarAK;
 import frc.robot.SimConstants;
@@ -56,6 +58,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
 import org.ironmaple.simulation.drivesims.COTS;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -120,6 +123,7 @@ public class Drive extends SubsystemBase implements VisionConsumer {
 
   public Drive(GyroIO gyroIO, ModuleIO flModuleIO, ModuleIO frModuleIO, ModuleIO blModuleIO,
       ModuleIO brModuleIO, Consumer<Pose2d> setSimulatedPoseCallback) {
+
     this.gyroIO = gyroIO;
     modules[0] = new Module(flModuleIO, 0, DriveConstants.FrontLeft);
     modules[1] = new Module(frModuleIO, 1, DriveConstants.FrontRight);
@@ -157,6 +161,12 @@ public class Drive extends SubsystemBase implements VisionConsumer {
 
   @Override
   public void periodic() {
+
+    // Logger.recordOutput("TrajectoryTransformation",
+    // new Pose2d(drive.getPose().getTranslation(),
+    // new Rotation2d(-drive.getFieldRelativeSpeeds().vyMetersPerSecond,
+    // drive.getFieldRelativeSpeeds().vxMetersPerSecond)));
+
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);

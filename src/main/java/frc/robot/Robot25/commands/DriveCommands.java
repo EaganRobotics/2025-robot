@@ -27,6 +27,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -549,10 +550,38 @@ public class DriveCommands {
         .withName("DriveCommands.joystickDriveAtAngle");
   }
 
-  public static Command snapToRotation(Drive drive) {
+  public static Command snapToSourceRotation(Drive drive) {
     return Commands.run(() -> {
 
       Pose2d desiredPose = getClosestSource(drive, Meters.of(1000)).orElse(Pose2d.kZero);
+
+      var x = xController.calculate(drive.getPose().getX(), drive.getPose().getX());
+      var y = yController.calculate(drive.getPose().getY(), drive.getPose().getY());
+      var omega = angleController.calculate(drive.getRotation().getRadians(),
+          desiredPose.getRotation().getRadians());
+
+      Logger.recordOutput("Snap/omega", omega);
+
+      // Convert to field relative speeds & send command
+      ChassisSpeeds speeds = new ChassisSpeeds(x, y, omega);
+      drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
+
+    }, drive)
+
+        // Reset PID controller when command starts
+        .beforeStarting(() -> {
+          var fieldRelativeSpeeds = drive.getFieldRelativeSpeeds();
+          angleController.reset(drive.getRotation().getRadians(),
+              fieldRelativeSpeeds.omegaRadiansPerSecond);
+          xController.reset(drive.getPose().getX(), fieldRelativeSpeeds.vxMetersPerSecond);
+          yController.reset(drive.getPose().getY(), fieldRelativeSpeeds.vyMetersPerSecond);
+        }).until(() -> angleController.atGoal()).withName("DriveCommands.snapToSourceRotation");
+  }
+
+  public static Command snapToRotation(Drive drive, Rotation2d rotation) {
+    return Commands.run(() -> {
+
+      Pose2d desiredPose = new Pose2d(drive.getPose().getX(), drive.getPose().getY(), rotation);
 
       var x = xController.calculate(drive.getPose().getX(), drive.getPose().getX());
       var y = yController.calculate(drive.getPose().getY(), drive.getPose().getY());
@@ -765,7 +794,6 @@ public class DriveCommands {
     }, Set.of(drive)).withName("DriveCommands.FlySnapper");
   }
 
-
   private static final class Pose2dSequence {
     Pose2d inner;
     Pose2d outer;
@@ -780,11 +808,21 @@ public class DriveCommands {
   }
 
   private static Optional<Pose2dSequence> getClosestReefPosition(Drive drive, Distance radius) {
+    ChassisSpeeds speed = drive.getFieldRelativeSpeeds();
+
+    var rotation = new Rotation2d(-speed.vyMetersPerSecond, speed.vxMetersPerSecond);
+    var translation =
+        new Transform2d(speed.vxMetersPerSecond, speed.vyMetersPerSecond, Rotation2d.kZero);
+    var newPose = new Pose2d(drive.getPose().getTranslation(), rotation).plus(translation.times(1));
+    Logger.recordOutput("Snapper/NewPose", newPose);
+    Logger.recordOutput("Snapper/CurrentPose", drive.getPose());
+
     Optional<Pose2dSequence> desiredPose = Optional.empty();
     Distance minDistance = Meters.of(1000000);
+
     for (int i = 0; i < OUTER_REEF_POSITIONS.length; i++) {
       Pose2d pose = OUTER_REEF_POSITIONS[i];
-      double distance = drive.getPose().getTranslation().getDistance(pose.getTranslation());
+      double distance = newPose.getTranslation().getDistance(pose.getTranslation());
       Distance distanceMeasure = Meters.of(distance);
       if (distanceMeasure.lte(radius) && distanceMeasure.lte(minDistance)) {
         minDistance = distanceMeasure;
