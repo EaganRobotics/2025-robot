@@ -353,17 +353,18 @@ public class DriveCommands {
 
         new Pose2d(Inches.of(Right_Loading_Station_X + 5.5),
             Inches.of(Right_Loading_Station_Y + 5.5), Rotation2d.fromDegrees(55))
-            .plus(new Transform2d(sourceOffset, Inches.of(0), Rotation2d.kZero)),
+                .plus(new Transform2d(sourceOffset, Inches.of(0), Rotation2d.kZero)),
         new Pose2d(Inches.of(Left_Loading_Station_X - 1.5), Inches.of(Left_Loading_Station_Y + 1.5),
             Rotation2d.fromDegrees(-55))
-            .plus(new Transform2d(sourceOffset, Inches.of(0), Rotation2d.kZero)).plus(
-                new Transform2d(Inches.of(2).plus(sourceOffset), Inches.of(-14), Rotation2d.kZero)),
+                .plus(new Transform2d(sourceOffset, Inches.of(0), Rotation2d.kZero))
+                .plus(new Transform2d(Inches.of(2).plus(sourceOffset), Inches.of(-14),
+                    Rotation2d.kZero)),
         new Pose2d(Inches.of(Right_Loading_Station_X + 5.5 + 623.825 - 8 - 6 - 2),
             Inches.of(Right_Loading_Station_Y + 5.5 + 3 + 6 + 2), Rotation2d.fromDegrees(125))
-            .plus(new Transform2d(sourceOffset, Inches.of(0), Rotation2d.kZero)),
+                .plus(new Transform2d(sourceOffset, Inches.of(0), Rotation2d.kZero)),
         new Pose2d(Inches.of(Left_Loading_Station_X - 1.5 + 623.825 - 10),
             Inches.of(Left_Loading_Station_Y + 1.5 - 4.5), Rotation2d.fromDegrees(-125))
-            .plus(new Transform2d(sourceOffset, Inches.of(0), Rotation2d.kZero))};
+                .plus(new Transform2d(sourceOffset, Inches.of(0), Rotation2d.kZero))};
 
   }
 
@@ -1370,19 +1371,14 @@ public class DriveCommands {
   public static Command testCommand(Drive drive) {
     return Commands.defer(() -> {
       var POSE = drive.getPose();
-      return Commands.sequence(
-        goTo(drive, POSE, 1, 0, Rotation2d.kCCW_90deg),
-        goTo(drive, POSE, 1, 1, Rotation2d.k180deg),
-        goTo(drive, POSE, 0, 1, Rotation2d.kCW_90deg), 
-        goTo(drive, POSE, 0, 0, Rotation2d.kZero)
-      );
-
+      return Commands.sequence(goTo(drive, POSE, 1, 0, Rotation2d.kCCW_90deg),
+          goTo(drive, POSE, 1, 1, Rotation2d.k180deg),
+          goTo(drive, POSE, 0, 1, Rotation2d.kCW_90deg), goTo(drive, POSE, 0, 0, Rotation2d.kZero));
     }, Set.of(drive));
   }
 
   private static Command goTo(Drive drive, Pose2d POSE, int x, int y, Rotation2d r) {
-    return DriveCommands.snapToPosition(drive,
-        POSE.plus(new Transform2d(x, y, r)));
+    return DriveCommands.snapToPosition(drive, POSE.plus(new Transform2d(x, y, r)));
   }
 
 }
