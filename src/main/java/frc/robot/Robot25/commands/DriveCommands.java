@@ -1366,4 +1366,23 @@ public class DriveCommands {
           yController.reset(drive.getPose().getY(), fieldRelativeSpeeds.vyMetersPerSecond);
         });
   }
+
+  public static Command testCommand(Drive drive) {
+    return Commands.defer(() -> {
+      var POSE = drive.getPose();
+      return Commands.sequence(
+        goTo(drive, POSE, 1, 0, Rotation2d.kCCW_90deg),
+        goTo(drive, POSE, 1, 1, Rotation2d.k180deg),
+        goTo(drive, POSE, 0, 1, Rotation2d.kCW_90deg), 
+        goTo(drive, POSE, 0, 0, Rotation2d.kZero)
+      );
+
+    }, Set.of(drive));
+  }
+
+  private static Command goTo(Drive drive, Pose2d POSE, int x, int y, Rotation2d r) {
+    return DriveCommands.snapToPosition(drive,
+        POSE.plus(new Transform2d(x, y, r)));
+  }
+
 }
