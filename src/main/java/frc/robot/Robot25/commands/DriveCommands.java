@@ -353,18 +353,17 @@ public class DriveCommands {
 
         new Pose2d(Inches.of(Right_Loading_Station_X + 5.5),
             Inches.of(Right_Loading_Station_Y + 5.5), Rotation2d.fromDegrees(55))
-                .plus(new Transform2d(sourceOffset, Inches.of(0), Rotation2d.kZero)),
+            .plus(new Transform2d(sourceOffset, Inches.of(0), Rotation2d.kZero)),
         new Pose2d(Inches.of(Left_Loading_Station_X - 1.5), Inches.of(Left_Loading_Station_Y + 1.5),
             Rotation2d.fromDegrees(-55))
-                .plus(new Transform2d(sourceOffset, Inches.of(0), Rotation2d.kZero))
-                .plus(new Transform2d(Inches.of(2).plus(sourceOffset), Inches.of(-14),
-                    Rotation2d.kZero)),
+            .plus(new Transform2d(sourceOffset, Inches.of(0), Rotation2d.kZero)).plus(
+                new Transform2d(Inches.of(2).plus(sourceOffset), Inches.of(-14), Rotation2d.kZero)),
         new Pose2d(Inches.of(Right_Loading_Station_X + 5.5 + 623.825 - 8 - 6 - 2),
             Inches.of(Right_Loading_Station_Y + 5.5 + 3 + 6 + 2), Rotation2d.fromDegrees(125))
-                .plus(new Transform2d(sourceOffset, Inches.of(0), Rotation2d.kZero)),
+            .plus(new Transform2d(sourceOffset, Inches.of(0), Rotation2d.kZero)),
         new Pose2d(Inches.of(Left_Loading_Station_X - 1.5 + 623.825 - 10),
             Inches.of(Left_Loading_Station_Y + 1.5 - 4.5), Rotation2d.fromDegrees(-125))
-                .plus(new Transform2d(sourceOffset, Inches.of(0), Rotation2d.kZero))};
+            .plus(new Transform2d(sourceOffset, Inches.of(0), Rotation2d.kZero))};
 
   }
 
