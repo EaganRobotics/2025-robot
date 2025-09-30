@@ -13,6 +13,8 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -48,6 +50,7 @@ import frc.robot.Robot25.subsystems.vision.VisionConstants;
 import frc.robot.Robot25.subsystems.vision.VisionIO;
 import frc.robot.Robot25.subsystems.vision.VisionIOLimelight;
 import frc.robot.Robot25.subsystems.vision.VisionIOPhotonVisionSim;
+import java.util.Set;
 import frc.robot.SimConstants;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -325,7 +328,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
   }
 
   public Command getTestCommand() {
-    return Commands.none();
+    return DriveCommands.testCommand(drive);
+
   }
 
   @Override
