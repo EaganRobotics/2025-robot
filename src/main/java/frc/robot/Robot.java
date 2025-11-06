@@ -45,7 +45,7 @@ public class Robot extends LoggedRobot {
   private Command testCommand;
   private RobotContainer robotContainer;
   private AlgaeDodge algaeDodge;
-  private AlgaeJuker algaeJuker;
+  // private AlgaeJuker algaeJuker;
 
   public Robot() {
     // Record metadata
@@ -162,7 +162,7 @@ public class Robot extends LoggedRobot {
     robotContainer.robotInit();
     WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
     algaeDodge = new AlgaeDodge();
-    algaeJuker = new AlgaeJuker();
+    // algaeJuker = new AlgaeJuker();
   }
 
   /** This function is called periodically during all modes. */

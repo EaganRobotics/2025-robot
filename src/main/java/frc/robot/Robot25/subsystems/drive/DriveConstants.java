@@ -76,7 +76,8 @@ public class DriveConstants {
     private static final MomentOfInertia kDriveInertia = KilogramSquareMeters.of(0.01);
 
     private static final Voltage kSteerFrictionVoltage = Volts.of(0.4); // suggested range 0.3 - 0.5
-    private static final Voltage kDriveFrictionVoltage = Volts.of(0.4); // suggested range 0.6 - 0.8
+    private static final Voltage kDriveFrictionVoltage = Volts.of(0.25); // suggested range 0.6 -
+                                                                         // 0.8
   }
 
   // The closed-loop output type to use for the steer motors;
