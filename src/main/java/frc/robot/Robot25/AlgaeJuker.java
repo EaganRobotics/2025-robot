@@ -4,9 +4,9 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.Random;
+import org.littletonrobotics.junction.Logger;
 
 public class AlgaeJuker {
   private final NetworkTable limelight;
@@ -17,8 +17,6 @@ public class AlgaeJuker {
 
   private double nextMoveTime = 0.0;
   private String currentMove = "forward";
-
-  private static final double BASE_SPEED = 0.5;
 
   public AlgaeJuker() {
     limelight = NetworkTableInstance.getDefault().getTable("limelight");
@@ -33,19 +31,16 @@ public class AlgaeJuker {
     String detectedClass = limelight.getEntry("tclass").getString("none");
     double tx = limelight.getEntry("tx").getDouble(0.0);
 
-    SmartDashboard.putString("Detected", detectedClass);
-    SmartDashboard.putNumber("tx", tx);
+    Logger.recordOutput("Detected", detectedClass);
+    Logger.recordOutput("tx", tx);
 
     if (detectedClass.equals("algae")) {
       jukeMove(tx);
-    } else if (detectedClass.equals("coral")) {
-      pushForward();
     } else {
       searchForTarget();
     }
   }
 
-  /** Tries to "outsmart" the algae by making quick jukes */
   private void jukeMove(double tx) {
     if (timer.get() > nextMoveTime) {
       int moveType = rand.nextInt(3);
@@ -62,12 +57,12 @@ public class AlgaeJuker {
       case "fakeLeft":
         leftMotor.set(0.6);
         rightMotor.set(0.2);
-        SmartDashboard.putString("Action", "Juking left");
+        Logger.recordOutput("Action", "Juking left");
         break;
       case "fakeRight":
         leftMotor.set(0.2);
         rightMotor.set(0.6);
-        SmartDashboard.putString("Action", "Juking right");
+        Logger.recordOutput("Action", "Juking right");
         break;
       case "swerve":
         if (tx > 0) {
@@ -77,22 +72,14 @@ public class AlgaeJuker {
           leftMotor.set(0.3);
           rightMotor.set(0.5);
         }
-        SmartDashboard.putString("Action", "Swerve around algae");
+        Logger.recordOutput("Action", "Swerve around algae");
         break;
     }
   }
 
-  /** Moves toward coral confidently */
-  private void pushForward() {
-    leftMotor.set(BASE_SPEED);
-    rightMotor.set(BASE_SPEED);
-    SmartDashboard.putString("Action", "Advancing toward coral");
-  }
-
-  /** Looks around if nothing is seen */
   private void searchForTarget() {
     leftMotor.set(0.4);
     rightMotor.set(-0.4);
-    SmartDashboard.putString("Action", "Searching...");
+    Logger.recordOutput("Action", "Searching...");
   }
 }

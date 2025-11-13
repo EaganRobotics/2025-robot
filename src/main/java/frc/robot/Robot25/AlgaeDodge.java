@@ -4,7 +4,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.littletonrobotics.junction.Logger;
 
 public class AlgaeDodge {
   private final NetworkTable limelight;
@@ -20,31 +20,25 @@ public class AlgaeDodge {
   }
 
   public void update() {
-    // Limelight posts class IDs or labels depending on your model
     // Example keys: "tclass" (string) or "tclassID" (number)
     String detectedClass = limelight.getEntry("tclass").getString("none");
     double tx = limelight.getEntry("tx").getDouble(0.0); // horizontal offset
     double ta = limelight.getEntry("ta").getDouble(0.0); // target area (optional)
 
-    SmartDashboard.putString("Detected", detectedClass);
-    SmartDashboard.putNumber("tx", tx);
-    SmartDashboard.putNumber("ta", ta);
+    Logger.recordOutput("Detected", detectedClass);
+    Logger.recordOutput("tx", tx);
+    Logger.recordOutput("ta", ta);
 
     if (detectedClass.equals("algae")) {
       // Turn right to dodge
       leftMotor.set(DODGE_SPEED);
       rightMotor.set(-DODGE_SPEED);
-      SmartDashboard.putString("Action", "Dodging algae");
-    } else if (detectedClass.equals("coral")) {
-      // Move forward toward coral
-      leftMotor.set(0.5);
-      rightMotor.set(0.5);
-      SmartDashboard.putString("Action", "Approaching coral");
+      Logger.recordOutput("Action", "Dodging algae");
     } else {
       // Stop if no detection
       leftMotor.stopMotor();
       rightMotor.stopMotor();
-      SmartDashboard.putString("Action", "Idle");
+      Logger.recordOutput("Action", "Idle");
     }
   }
 }
