@@ -20,7 +20,7 @@ public class AlgaeDodge {
   }
 
   public void update() {
-    // Example keys: "tclass" (string) or "tclassID" (number)
+    // examples: "tclass" (string) or "tclassID" (number)
     String detectedClass = limelight.getEntry("tclass").getString("none");
     double tx = limelight.getEntry("tx").getDouble(0.0); // horizontal offset
     double ta = limelight.getEntry("ta").getDouble(0.0); // target area (optional)
@@ -29,13 +29,12 @@ public class AlgaeDodge {
     Logger.recordOutput("tx", tx);
     Logger.recordOutput("ta", ta);
 
-    if (detectedClass.equals("algae")) {
-      // Turn right to dodge
+    if (detectedClass.equals("algae") || detectedClass.equals("algae?")) {
+      // turns right
       leftMotor.set(DODGE_SPEED);
       rightMotor.set(-DODGE_SPEED);
       Logger.recordOutput("Action", "Dodging algae");
     } else {
-      // Stop if no detection
       leftMotor.stopMotor();
       rightMotor.stopMotor();
       Logger.recordOutput("Action", "Idle");

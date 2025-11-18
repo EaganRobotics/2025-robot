@@ -21,8 +21,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.lib.RobotContainer;
 import frc.lib.RobotInstance;
 import frc.lib.replay.WPILogReadMACAddress;
-import frc.robot.Robot25.AlgaeDodge;
-import frc.robot.Robot25.AlgaeJuker;
 import frc.robot.Robot25.commands.DriveCommands;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,8 +42,6 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 public class Robot extends LoggedRobot {
   private Command testCommand;
   private RobotContainer robotContainer;
-  private AlgaeDodge algaeDodge;
-  // private AlgaeJuker algaeJuker;
 
   public Robot() {
     // Record metadata
@@ -161,8 +157,6 @@ public class Robot extends LoggedRobot {
   public void robotInit() {
     robotContainer.robotInit();
     WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
-    algaeDodge = new AlgaeDodge();
-    // algaeJuker = new AlgaeJuker();
   }
 
   /** This function is called periodically during all modes. */
@@ -237,8 +231,6 @@ public class Robot extends LoggedRobot {
   @Override
   public void teleopPeriodic() {
     robotContainer.teleopPeriodic();
-    algaeDodge.update();
-    // algaeJuker.update();
   }
 
   /** This function is called once when test mode is enabled. */
