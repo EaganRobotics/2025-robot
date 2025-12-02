@@ -64,21 +64,21 @@ public class RobotContainer extends frc.lib.RobotContainer {
   private final Algae algae;
 
   // Drive simulation
-  private static final SwerveDriveSimulation driveSimulation = new SwerveDriveSimulation(Drive.MAPLE_SIM_CONFIG,
-      SimConstants.SIM_INITIAL_FIELD_POSE);
+  private static final SwerveDriveSimulation driveSimulation =
+      new SwerveDriveSimulation(Drive.MAPLE_SIM_CONFIG, SimConstants.SIM_INITIAL_FIELD_POSE);
   private final CommandXboxController driverController = new CommandXboxController(0);
   private final CommandXboxController operatorController = new CommandXboxController(1);
 
   private final LoggedDashboardChooser<Command> autoChooser;
 
   @AutoLogOutput
-  public final Pose3d[] mechanismPoses = new Pose3d[] { Pose3d.kZero, Pose3d.kZero, Pose3d.kZero, };
+  public final Pose3d[] mechanismPoses = new Pose3d[] {Pose3d.kZero, Pose3d.kZero, Pose3d.kZero,};
 
   public RobotContainer() {
     super(driveSimulation);
     // Check for valid swerve config
-    var modules = new SwerveModuleConstants[] { DriveConstants.FrontLeft, DriveConstants.FrontRight,
-        DriveConstants.BackLeft, DriveConstants.BackRight, };
+    var modules = new SwerveModuleConstants[] {DriveConstants.FrontLeft, DriveConstants.FrontRight,
+        DriveConstants.BackLeft, DriveConstants.BackRight,};
     for (var constants : modules) {
       if (constants.DriveMotorType != DriveMotorArrangement.TalonFX_Integrated
           || constants.SteerMotorType != SteerMotorArrangement.TalonFX_Integrated) {
@@ -123,24 +123,15 @@ public class RobotContainer extends frc.lib.RobotContainer {
         break;
       default:
         // Replayed robot, disable IO implementations
-        drive = new Drive(new GyroIO() {
-        }, new ModuleIO() {
-        }, new ModuleIO() {
-        }, new ModuleIO() {
-        },
-            new ModuleIO() {
-            }, driveSimulation::setSimulationWorldPose);
+        drive = new Drive(new GyroIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {},
+            new ModuleIO() {}, driveSimulation::setSimulationWorldPose);
 
-        elevator = new Elevator(new ElevatorIO() {
-        });
+        elevator = new Elevator(new ElevatorIO() {});
 
-        outtake = new Outtake(new OuttakeIO() {
-        });
+        outtake = new Outtake(new OuttakeIO() {});
 
-        vision = new Vision(drive, new VisionIO() {
-        });
-        algae = new Algae(new AlgaeIO() {
-        });
+        vision = new Vision(drive, new VisionIO() {});
+        algae = new Algae(new AlgaeIO() {});
         break;
     }
 
@@ -239,7 +230,8 @@ public class RobotContainer extends frc.lib.RobotContainer {
     NamedCommands.registerCommand("SnapReef.L",
         DriveCommands.FlySnappyV2Named(drive, ReefPositions.L));
     // Set up auto routines
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser("AL.0C.1M"));
+    autoChooser =
+        new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser("AL.0C.1M"));
 
     autoChooser.addOption("Static Drive Voltage", Commands.run(() -> drive.driveOpenLoop(10)));
     autoChooser.addOption("Static Turn Voltage", Commands.run(() -> drive.TurnOpenLoop(10)));
@@ -301,9 +293,9 @@ public class RobotContainer extends frc.lib.RobotContainer {
     driverController.povRight().onTrue(DriveCommands.FlySnappyV2Right(drive));
     // driverController.povDown().onTrue(DriveCommands.snapToRotation(drive));
 
-    driverController.povDown().whileTrue(DriveCommands.AlgaeSnapper(drive));
+    driverController.povDown().whileTrue(DriveCommands.algaeDodge(drive));
 
-    // OPERATOR CONTROLs
+    // OPERATOR CONTROLS
     operatorController.leftTrigger().whileTrue(outtake.autoQueueCoralOveride());
     operatorController.rightTrigger().whileTrue(outtake.reverseCoral());
     operatorController.start().onTrue(elevator.zeroElevator());
@@ -339,8 +331,7 @@ public class RobotContainer extends frc.lib.RobotContainer {
   }
 
   @Override
-  public void disabledInit() {
-  }
+  public void disabledInit() {}
 
   @Override
   public void disabledPeriodic() {
@@ -363,6 +354,5 @@ public class RobotContainer extends frc.lib.RobotContainer {
   }
 
   @Override
-  public void simulationPeriodic() {
-  }
+  public void simulationPeriodic() {}
 }

@@ -1347,26 +1347,29 @@ public class DriveCommands {
   }
 
   public static Command algaeDodge(Drive drive) {
-    final NetworkTable limelight = NetworkTableInstance.getDefault().getTable("limelight");;
+    final NetworkTable limelight = NetworkTableInstance.getDefault().getTable("limelight-right");
+
     final double DODGE_ROTATION = 10;
-    
+
     return Commands.run(() -> {
-      
-        // examples: "tclass" (string) or "tclassID" (number)
-        String detectedClass = limelight.getEntry("tclass").getString("none");
-        double tx = limelight.getEntry("tx").getDouble(0.0); // horizontal offset
-        double ta = limelight.getEntry("ta").getDouble(0.0); // target area (optional)
 
-        Logger.recordOutput("Detected", detectedClass);
-        Logger.recordOutput("tx", tx);
-        Logger.recordOutput("ta", ta);
+      // examples: "tclass" (string) or "tclassID" (number)
+      String detectedClass = limelight.getEntry("tdclass").getString("none");
+      double tx = limelight.getEntry("tx").getDouble(0.0); // horizontal offset
+      double ta = limelight.getEntry("ta").getDouble(0.0); // target area (optional)
 
-        if (detectedClass.equals("algae") || detectedClass.equals("algae?")) {
-          // turns right
-          drive.setDesiredRotation(drive.getRotation().plus(Rotation2d.fromDegrees(DODGE_ROTATION)));
-          Logger.recordOutput("Action", "Dodging algae");
-        }
-      
+      Logger.recordOutput("AlgaeDodger/Detected", detectedClass);
+      Logger.recordOutput("AlgaeDodger/tx", tx);
+      Logger.recordOutput("AlgaeDodger/ta", ta);
+
+      if (detectedClass.contains("algae") || detectedClass.equals("algae?") || detectedClass.equals("Algae")) {
+        // turns right
+        drive.setDesiredRotation(drive.getRotation().plus(Rotation2d.fromDegrees(DODGE_ROTATION)));
+        Logger.recordOutput("AlgaeDodger/Action", "Dodging algae");
+      } else {
+        Logger.recordOutput("AlgaeDodger/Action", "Not dodging algae");
+      }
+
     }, drive);
   }
 }
