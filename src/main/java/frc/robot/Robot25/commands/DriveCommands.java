@@ -1378,8 +1378,7 @@ public class DriveCommands {
 
   public static Command algaeDodge(Drive drive) {
     final NetworkTable limelight = NetworkTableInstance.getDefault().getTable("limelight-right");
-    final double DODGE_ROTATION = 10;
-    final Elevator elevator = new Elevator(new ElevatorIOTalonFXNew());
+    final double DODGE_ROTATION = 100;
 
     return Commands.run(() -> {
 
@@ -1395,20 +1394,12 @@ public class DriveCommands {
       if (detectedClass.contains("algae") || detectedClass.equals("algae?")
           || detectedClass.equals("Algae")) {
         // turns right
-        // drive.setDesiredRotation(drive.getRotation().plus(Rotation2d.fromDegrees(DODGE_ROTATION)));
-        elevator.L1();
+        drive.setDesiredRotation(drive.getRotation().plus(Rotation2d.fromDegrees(DODGE_ROTATION)));
         Logger.recordOutput("AlgaeDodger/Action", "Dodging algae");
       } else {
-        elevator.L0();
         Logger.recordOutput("AlgaeDodger/Action", "Not dodging algae");
       }
 
-    }, drive).beforeStarting(() -> {
-      var fieldRelativeSpeeds = drive.getFieldRelativeSpeeds();
-      angleController.reset(drive.getRotation().getRadians(),
-          fieldRelativeSpeeds.omegaRadiansPerSecond);
-      xController.reset(drive.getPose().getX(), fieldRelativeSpeeds.vxMetersPerSecond);
-      yController.reset(drive.getPose().getY(), fieldRelativeSpeeds.vyMetersPerSecond);
-    });
+    }, drive);
   }
 }
