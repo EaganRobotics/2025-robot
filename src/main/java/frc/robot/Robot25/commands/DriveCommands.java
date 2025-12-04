@@ -1378,11 +1378,8 @@ public class DriveCommands {
 
   public static Command algaeDodge(Drive drive) {
     final NetworkTable limelight = NetworkTableInstance.getDefault().getTable("limelight-right");
-
     final double DODGE_ROTATION = 10;
-
-    private final Elevator elevator;
-    elevator = new Elevator(new ElevatorIOTalonFXNew());
+    final Elevator elevator = new Elevator(new ElevatorIOTalonFXNew());
 
     return Commands.run(() -> {
 
@@ -1398,7 +1395,7 @@ public class DriveCommands {
       if (detectedClass.contains("algae") || detectedClass.equals("algae?")
           || detectedClass.equals("Algae")) {
         // turns right
-        drive.setDesiredRotation(drive.getRotation().plus(Rotation2d.fromDegrees(DODGE_ROTATION)));
+        // drive.setDesiredRotation(drive.getRotation().plus(Rotation2d.fromDegrees(DODGE_ROTATION)));
         elevator.L1();
         Logger.recordOutput("AlgaeDodger/Action", "Dodging algae");
       } else {
