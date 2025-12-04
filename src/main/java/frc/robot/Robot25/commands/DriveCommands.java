@@ -1394,7 +1394,7 @@ public class DriveCommands {
       if (detectedClass.contains("algae") || detectedClass.equals("algae?")
           || detectedClass.equals("Algae")) {
         // turns right
-        drive.setDesiredRotation(drive.getRotation().plus(Rotation2d.fromDegrees(DODGE_ROTATION)));
+        drive.setDesiredRotation(Rotation2d.fromDegrees(DODGE_ROTATION));
         Logger.recordOutput("AlgaeDodger/Action", "Dodging algae");
       } else {
         Logger.recordOutput("AlgaeDodger/Action", "Not dodging algae");
