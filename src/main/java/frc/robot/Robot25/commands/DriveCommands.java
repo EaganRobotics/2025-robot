@@ -1391,10 +1391,10 @@ public class DriveCommands {
       Logger.recordOutput("AlgaeDodger/tx", tx);
       Logger.recordOutput("AlgaeDodger/ta", ta);
 
-      if (detectedClass.contains("algae") || detectedClass.equals("algae?")
-          || detectedClass.equals("Algae")) {
+      if (detectedClass.contains("algae")) {
         // turns right
-        drive.setDesiredRotation(Rotation2d.fromDegrees(DODGE_ROTATION));
+        drive.setPose(drive.getPose()
+            .plus(new Transform2d(new Translation2d(), Rotation2d.fromDegrees(DODGE_ROTATION))));
         Logger.recordOutput("AlgaeDodger/Action", "Dodging algae");
       } else {
         Logger.recordOutput("AlgaeDodger/Action", "Not dodging algae");
