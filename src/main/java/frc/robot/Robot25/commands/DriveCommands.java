@@ -1378,11 +1378,10 @@ public class DriveCommands {
 
   public static Command algaeDodge(Drive drive) {
     final NetworkTable limelight = NetworkTableInstance.getDefault().getTable("limelight-right");
-    final double DODGE_ROTATION = 100;
+    final double DODGE_ROTATION = 20;
 
     return Commands.run(() -> {
 
-      // examples: "tclass" (string) or "tclassID" (number)
       String detectedClass = limelight.getEntry("tdclass").getString("none");
       double tx = limelight.getEntry("tx").getDouble(0.0); // horizontal offset
       double ta = limelight.getEntry("ta").getDouble(0.0); // target area (optional)
@@ -1400,6 +1399,35 @@ public class DriveCommands {
         Logger.recordOutput("AlgaeDodger/Action", "Not dodging algae");
       }
 
+    }, drive);
+  }
+
+  public static Command algaeJuke(Drive drive) {
+    NetworkTable limelight = NetworkTableInstance.getDefault().getTable("limelight-right");
+
+    return Commands.run(() -> {
+      String detectedClass = limelight.getEntry("tdclass").getString("none");
+      double tx = limelight.getEntry("tx").getDouble(0.0); // horizontal offset
+      double ta = limelight.getEntry("ta").getDouble(0.0); // target area (optional)
+
+      Logger.recordOutput("AlgaeJuker/Detected", detectedClass);
+      Logger.recordOutput("AlgaeJuker/tx", tx);
+      Logger.recordOutput("AlgaeJuker/ta", ta);
+
+      if (detectedClass.contains("algae")) {
+        double forwardSpeed = 1.0; // m/s
+        double leftSpeed = 0.5; // m/s
+        double rotationSpeed = -tx * 0.05;
+
+        ChassisSpeeds fieldRelativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(forwardSpeed,
+            leftSpeed, rotationSpeed, drive.getPose().getRotation());
+
+        drive.runVelocity(fieldRelativeSpeeds);
+        Logger.recordOutput("AlgaeJuker/Action", "Juking past algae");
+      } else {
+        drive.runVelocity(new ChassisSpeeds(0, 0, 0));
+        Logger.recordOutput("AlgaeJuker/Action", "No algae detected - stopped");
+      }
     }, drive);
   }
 }

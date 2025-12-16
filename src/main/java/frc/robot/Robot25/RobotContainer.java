@@ -289,11 +289,12 @@ public class RobotContainer extends frc.lib.RobotContainer {
             .andThen(outtake.depositCoral()).andThen(elevator.L0()));
 
     driverController.povLeft().onTrue(DriveCommands.FlySnappyV2Left(drive));
-    driverController.povUp().whileTrue(DriveCommands.BargeSnapper(drive));
+    // driverController.povUp().whileTrue(DriveCommands.BargeSnapper(drive));
     driverController.povRight().onTrue(DriveCommands.FlySnappyV2Right(drive));
     // driverController.povDown().onTrue(DriveCommands.snapToRotation(drive));
 
     driverController.povDown().whileTrue(DriveCommands.algaeDodge(drive));
+    driverController.povUp().whileTrue(DriveCommands.algaeJuke(drive));
 
     // OPERATOR CONTROLS
     operatorController.leftTrigger().whileTrue(outtake.autoQueueCoralOveride());
